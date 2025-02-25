@@ -7,20 +7,10 @@ import { useInView } from 'react-intersection-observer';
 import { Menu } from 'lucide-react';
 
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [showMore, setShowMore] = useState(false);
-  const carouselImages = ['canva.png','1.jpg', '2.jpg', 'base.jpg'];
 
+  const [showMore, setShowMore] = useState(false);
   const controls = useAnimation();
   const { ref: secondSectionRef, inView: secondSectionInView } = useInView({ threshold: 0.5 });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     if (secondSectionInView) {
@@ -259,9 +249,7 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
-        </div>
-
-        
+        </div>       
       </div>
     </div>
   );
