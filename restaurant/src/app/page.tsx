@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Menu } from 'lucide-react';
+import Footer from './components/footer';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -260,9 +261,8 @@ export default function Home() {
             </motion.div>
           </div>
         </div>
-
-        
       </div>
+         <Footer />
     </div>
   );
 }
