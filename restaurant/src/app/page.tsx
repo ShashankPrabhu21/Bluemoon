@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Menu } from 'lucide-react';
+import Footer from './components/footer';
 
 export default function Home() {
 
@@ -27,7 +28,7 @@ export default function Home() {
         <div className="flex justify-between items-center px-6 py-6">
           {/* Logo and Text */}
           <div className="flex items-center gap-2">
-            <Image src="/LOGO.jpg" alt="Bluemoon Logo" width={65} height={65} className="rounded-full" />
+            <Image src="/LOGO.jpg" alt="Bluemoon Logo" width={60} height={60} className="rounded-full" />
             <div className="leading-tight">
               <h1 className="text-2xl font-bold tracking-wide">BLUEMOON</h1>
               <p className="text-sm tracking-wider">RESTAURANT</p>
@@ -249,8 +250,9 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
-        </div>       
+        </div>
       </div>
+         <Footer />
     </div>
   );
 }
