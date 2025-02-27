@@ -239,7 +239,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Card 3 */}
+          {/* Card 3 section*/}
           <div className="bg-white text-[#3345A7] border-2 border-[#3345A7] rounded-xl shadow-lg p-8 max-w-sm">
             <FaStar className="text-[#3345A7] text-4xl mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-center">Memorable Dining Experience</h3>
