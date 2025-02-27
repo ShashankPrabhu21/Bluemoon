@@ -1,6 +1,7 @@
 "use client";
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -24,8 +25,8 @@ export default function Home() {
   return (
     <div className="relative h-screen w-full overflow-x-hidden bg-white">
       {/* Navigation Bar */}
-      <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-[#3345A7] to-[#1e2b7a] text-white shadow-lg z-50">
-        <div className="flex justify-between items-center px-6 py-6">
+      <nav className="fixed top-0 left-0 w-full bg-[#1e3799] text-white shadow-lg z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           {/* Logo and Text */}
           <div className="flex items-center gap-2">
             <Image src="/LOGO.jpg" alt="Bluemoon Logo" width={60} height={60} className="rounded-full" />
@@ -36,30 +37,34 @@ export default function Home() {
           </div>
 
           {/* Navbar Links */}
-          <ul className="hidden md:flex space-x-6 text-lg font-medium">
-            <li className="cursor-pointer hover:text-[#3345A7]">Home</li>
-            <li className="cursor-pointer hover:text-[#3345A7]">Menu</li>
-            <li className="cursor-pointer hover:text-[#3345A7]">Delivery</li>
-            <li className="cursor-pointer hover:text-[#3345A7]">Cooking Videos</li>
-            <li className="cursor-pointer hover:text-[#3345A7]">Blog</li>
-            <li className="cursor-pointer hover:text-[#3345A7]">Gallery</li>
-            <li className="cursor-pointer hover:text-[#3345A7]">Table Reservations</li>
-            {showMore && (
-              <>
-                <li className="cursor-pointer hover:text-[#3345A7]">Contact</li>
-                <li className="cursor-pointer hover:text-[#3345A7]">Pick Up</li>
-              </>
-            )}
-            <li className="cursor-pointer" onClick={() => setShowMore(!showMore)}>
-              <Menu className="w-6 h-6" />
-            </li>
-          </ul>
+          <div className="hidden md:flex items-center gap-8">
+            <ul className="flex space-x-6 text-lg font-medium">
+              <li className="cursor-pointer hover:text-gray-200">Home</li>
+              <li className="cursor-pointer hover:text-gray-200">Menu</li>
+              <li className="cursor-pointer hover:text-gray-200">Gallery</li>
+              <li className="cursor-pointer hover:text-gray-200">Contact</li>
+              <li className="cursor-pointer hover:text-gray-200">Events</li>
+            </ul>
+            <div className="flex gap-4">
+              <Link href="#" className="bg-white text-[#1e3799] px-4 py-2 rounded font-semibold hover:bg-gray-100 transition-colors">
+                ORDER ONLINE (10% OFF)
+              </Link>
+              <Link href="#" className="border-2 border-white px-4 py-2 rounded font-semibold hover:bg-white hover:text-[#1e3799] transition-colors">
+                RESERVE A TABLE
+              </Link>
+            </div>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button className="md:hidden" onClick={() => setShowMore(!showMore)}>
+            <Menu className="w-6 h-6" />
+          </button>
         </div>
       </nav>
 
 
       {/* Base Image (Initial) */}
-      <div className="fixed top-1/2 left-1/2 w-[calc(100vw-35px)] h-[65vh] -translate-x-1/2 -translate-y-1/2 overflow-hidden z-10 transition-none">
+      <div className="fixed top-1/2 left-1/2 w-[calc(100vw-35px)] h-[65vh] -translate-x-1/2 -translate-y-1/2 overflow-hidden z-[1] transition-none">
         <Image
           src="/base.jpg"
           alt="Fixed Background"
@@ -77,8 +82,7 @@ export default function Home() {
         animate={controls}
         initial={{ opacity: 0 }}
         transition={{ duration: 0.01 }}
-        className="fixed top-1/2 left-1/2 w-[calc(100vw-35px)] h-[65vh] transform -translate-x-1/2 -translate-y-1/2 overflow-hidden z-20"
-      >
+        className="fixed top-1/2 left-1/2 w-[calc(100vw-35px)] h-[65vh] transform -translate-x-1/2 -translate-y-1/2 overflow-hidden z-[2] transition-none">
         <Image
           src="/base1.jpg"
           alt="Second Base Image"
@@ -90,7 +94,7 @@ export default function Home() {
         />
       </motion.div>
 
-      <div className="relative z-30 mt-8 w-full">
+      <div className="relative z-[40] mt-8 w-full">
        {/*Background image */}
                <div className="w-full bg-white py-16">
                  <div className="flex w-full">
