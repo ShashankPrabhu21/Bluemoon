@@ -80,7 +80,7 @@ export default function Home() {
         className="fixed top-1/2 left-1/2 w-[calc(100vw-35px)] h-[65vh] transform -translate-x-1/2 -translate-y-1/2 overflow-hidden z-20"
       >
         <Image
-          src="/1.jpg"
+          src="/base1.jpg"
           alt="Second Base Image"
           layout="fill"
           objectFit="cover"
@@ -92,28 +92,19 @@ export default function Home() {
 
       <div className="relative z-30 mt-8 w-full">
        {/*Background image */}
-        <div className="w-full bg-white py-16">
-          <div className="flex w-full">
-            
-            <div className="w-[65%] h-[610px]">
-              <Image
-                src="/canva.png"
-                alt="Kerala Cuisine"
-                width={1000}
-                height={650}
-                className="object-cover w-full h-full"
-                priority
-              />
-            </div>
-
-           
-            <div className="w-[35%] bg-white p-10 flex items-center">
-              <p className="text-[#4962f4] text-lg  font-semibold text-center leading-loose">
-                As the pioneers of authentic Kerala cuisine in Sydney, we take pride in preserving traditional flavors with excellence. Renowned for our rich culinary heritage, we offer an exceptional dining experience while also specializing in bulk catering services. Whether for intimate gatherings or large-scale events, our expertly crafted dishes bring the true taste of Kerala to every occasion.
-              </p>
-            </div>
-          </div>
-        </div>
+               <div className="w-full bg-white py-16">
+                 <div className="flex w-full">
+                   
+                   
+       
+                  
+                   <div className="w-[35%] bg-white p-10 flex items-center">
+                     <p className="text-[#4962f4] text-lg  font-semibold text-center leading-loose">
+                       As the pioneers of authentic Kerala cuisine in Sydney, we take pride in preserving traditional flavors with excellence. Renowned for our rich culinary heritage, we offer an exceptional dining experience while also specializing in bulk catering services. Whether for intimate gatherings or large-scale events, our expertly crafted dishes bring the true taste of Kerala to every occasion.
+                     </p>
+                   </div>
+                 </div>
+               </div>
 
 
 
@@ -122,8 +113,8 @@ export default function Home() {
         {/* Welcome Section */}
         <div className="w-full bg-gradient-to-r from-[#FFFFFF] to-[#FFF4FF] ">
           <div className="w-11/12 max-w-7xl mx-auto text-center text-black">
-            <h1 className="text-4xl font-bold mb-4">Welcome</h1>
-            <p className="text-lg">Some text content that scrolls.</p>
+            <h1 className="text-4xl font-bold mb-4 text-[#3345A7]">Filling every occasion </h1>
+            <p className="text-3xl font-bold text-[#3345A7] ">with great Food and Services</p>
           </div>
         </div>
 
