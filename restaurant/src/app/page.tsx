@@ -1,7 +1,6 @@
 "use client";
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -9,12 +8,10 @@ import { UtensilsCrossed, ChefHat } from "lucide-react";
 import Footer from './components/footer';
 import { FaUtensils, FaLeaf, FaStar } from "react-icons/fa";
 import Navbar from './components/navbar';
-import { Description } from '@headlessui/react';
 
 export default function Home() {
 
-  {/*Navbar*/}
-  const [showMore, setShowMore] = useState(false);
+ 
   const controls = useAnimation();
   const { ref: secondSectionRef, inView: secondSectionInView } = useInView({ threshold: 0.5 });
 
@@ -88,7 +85,7 @@ useEffect(() => {
   return (
     <div className="relative h-screen w-full overflow-x-hidden bg-white/95">
       {/* Navigation Bar */}
-      <Navbar />
+      <Navbar/>
 
       {/* Hero Section Image */}
       <section className="relative h-[95vh] flex items-center justify-center text-white z-30  overflow-hidden" id="hero-section" >
