@@ -270,7 +270,7 @@ useEffect(() => {
                 <UtensilsCrossed size={50} className="text-[#3345A7] mx-auto" />
                 <h3 className="text-2xl font-semibold mt-4 text-center text-[#3345A7]">Quality Food</h3>
                 <p className="text-lg mt-2 text-center text-gray-700">
-                  "Deliciously crafted dishes blending fresh, seasonal ingredients with authentic Indian spices and innovation."
+                &quot;Deliciously crafted dishes blending fresh, seasonal ingredients with authentic Indian spices and innovation.&quot;
                 </p>
               </motion.div>
 
@@ -283,7 +283,7 @@ useEffect(() => {
                 <ChefHat size={50} className="text-[#3345A7] mx-auto" />
                 <h3 className="text-2xl font-semibold mt-4 text-center text-[#3345A7]">Perfect Taste</h3>
                 <p className="text-lg mt-2 text-center text-gray-700">
-                  "Exceptional dishes blending fresh, seasonal ingredients with authentic Indian spices and innovative flair."
+                &quot;Exceptional dishes blending fresh, seasonal ingredients with authentic Indian spices and innovative flair.&quot;
                 </p>
               </motion.div>
             </div>
