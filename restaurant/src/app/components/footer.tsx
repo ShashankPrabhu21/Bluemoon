@@ -4,13 +4,13 @@ import { Facebook, Instagram, Twitter, Mail, Phone } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1e3799] text-white py-16 relative z-[50]">
+    <footer className="bg-[#314ec4] text-white py-6 relative z-[50]">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* About Us Section */}
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">About Us</h2>
           <p className="text-sm leading-relaxed">
-            At Bluemoon, we believe in honoring the deep-rooted traditions of Indian cooking while embracing the possibilities of modern culinary techniques. Our chefs bring years of expertise in creating authentic flavors that delight your senses.
+            At Bluemoon, we believe in honoring the deep-rooted traditions of Kerala cooking while embracing the possibilities of modern culinary techniques. Our chefs bring years of expertise in creating authentic flavors that delight your senses.
           </p>
           <div className="flex gap-4">
             <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer">
@@ -49,30 +49,27 @@ export default function Footer() {
           <h2 className="text-2xl font-semibold">Contact Info</h2>
           <div className="space-y-2">
             <p className="flex items-center gap-2">
-              <span>264 Peats Ferry Road</span>
+              <span>Bluemoon Restaurant</span>
             </p>
-            <p>Hornsby NSW 2077</p>
+            <p>4 station street Wentworthville</p>
             <p className="flex items-center gap-2">
               <Phone size={16} />
-              <a href="tel:0294777158" className="hover:text-gray-200">(02) 9477 7158</a>
+              <a href="tel:0294777158" className="hover:text-gray-200">0422  306  777</a>
             </p>
-            <p className="flex items-center gap-2">
-              <Phone size={16} />
-              <a href="tel:0434472796" className="hover:text-gray-200">0434 472 796</a>
-            </p>
+  
             <p className="flex items-center gap-2">
               <Mail size={16} />
-              <a href="mailto:mehmaanhornsby@gmail.com" className="hover:text-gray-200">mehmaanhornsby@gmail.com</a>
+              <a href="mailto:mehmaanhornsby@gmail.com" className="hover:text-gray-200">bluemoonrest@gmail.com</a>
             </p>
           </div>
         </div>
 
         {/* Buttons Moved to Right (4th Column) */}
         <div className="flex flex-col items-end space-y-4">
-          <Link href="/order" className="inline-block bg-white text-[#1e3799] text-center py-2 px-4 rounded font-semibold hover:bg-gray-100 transition-colors">
+          <Link href="/order" className="inline-block bg-white text-[#1e3799] text-center py-2 px-3 rounded font-semibold hover:bg-gray-100 transition-colors">
             ORDER ONLINE (10% OFF)
           </Link>
-          <Link href="/reserve" className="inline-block border-2 border-white text-center py-2 px-4 rounded font-semibold hover:bg-white hover:text-[#1e3799] transition-colors">
+          <Link href="/reserve" className="inline-block border-2 border-white text-center py-2 px-10 rounded font-semibold hover:bg-white hover:text-[#1e3799] transition-colors">
             RESERVE A TABLE
           </Link>
         </div>
