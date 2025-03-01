@@ -18,7 +18,7 @@ export default function Footer() {
         </div>
 
         {/* Quick Links Section */}
-        <div className="space-y-8">
+        <div className="space-y-4">
           <h2 className="text-2xl font-semibold">Quick Links</h2>
           <ul className="space-y-2">
             <li><Link href="/" className="hover:text-gray-200">Home</Link></li>
