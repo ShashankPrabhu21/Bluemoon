@@ -32,7 +32,7 @@ export default function Home() {
       highlight: "Cuisine",
       subtitle: "Fresh, Bold, Indian",
       description:
-        "A new chapter in Indian cuisine, blending tradition with modern culinary innovation.",
+        "A new chapter in Kerala cuisine, blending tradition with modern culinary innovation.",
       position: "bottom-10 left-1/2 transform -translate-x-1/2 text-center",
     },
     {

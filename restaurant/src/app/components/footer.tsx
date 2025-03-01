@@ -9,30 +9,16 @@ export default function Footer() {
         {/* About Us Section */}
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">About Us</h2>
-          <p className="text-sm leading-relaxed">
-            At Bluemoon, we believe in honoring the deep-rooted traditions of Kerala cooking while embracing the possibilities of modern culinary techniques. Our chefs bring years of expertise in creating authentic flavors that delight your senses.
+          <p className="text-sm leading-relaxed text-justify">
+            As the pioneers of authentic Kerala cuisine in Sydney, we take pride in preserving traditional flavors with excellence. 
+            Renowned for our rich culinary heritage, we offer an exceptional dining experience while also specializing in bulk catering services. 
+            Whether for intimate gatherings or large-scale events, our expertly crafted dishes bring the true taste of Kerala to every occasion.
           </p>
-          <div className="flex gap-4">
-            <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-              <span className="cursor-pointer hover:text-gray-200">
-                <Facebook size={24} />
-              </span>
-            </Link>
-            <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-              <span className="cursor-pointer hover:text-gray-200">
-                <Instagram size={24} />
-              </span>
-            </Link>
-            <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-              <span className="cursor-pointer hover:text-gray-200">
-                <Twitter size={24} />
-              </span>
-            </Link>
-          </div>
+
         </div>
 
         {/* Quick Links Section */}
-        <div className="space-y-4">
+        <div className="space-y-8">
           <h2 className="text-2xl font-semibold">Quick Links</h2>
           <ul className="space-y-2">
             <li><Link href="/" className="hover:text-gray-200">Home</Link></li>
@@ -61,6 +47,24 @@ export default function Footer() {
               <Mail size={16} />
               <a href="mailto:mehmaanhornsby@gmail.com" className="hover:text-gray-200">bluemoonrest@gmail.com</a>
             </p>
+          </div>
+          
+          <div className="flex gap-4">
+            <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+              <span className="cursor-pointer hover:text-gray-200">
+                <Facebook size={24} />
+              </span>
+            </Link>
+            <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+              <span className="cursor-pointer hover:text-gray-200">
+                <Instagram size={24} />
+              </span>
+            </Link>
+            <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+              <span className="cursor-pointer hover:text-gray-200">
+                <Twitter size={24} />
+              </span>
+            </Link>
           </div>
         </div>
 

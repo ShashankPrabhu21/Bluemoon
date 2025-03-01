@@ -82,7 +82,7 @@ export default function Navbar() {
         />
         <div className="leading-tight">
           <h1 className="text-2xl font-bold tracking-wide">BLUEMOON</h1>
-          <p className="text-sm tracking-wider">RESTAURANT</p>
+          <p className="text-sm tracking-wider"> RESTAURANT</p>
         </div>
       </div>
 
