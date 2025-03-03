@@ -6,16 +6,6 @@ export default function Footer() {
   return (
     <footer className="bg-[#314ec4] text-white py-6 relative z-[50]">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* About Us Section */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">About Us</h2>
-          <p className="text-sm leading-relaxed text-justify">
-            As the pioneers of authentic Kerala cuisine in Sydney, we take pride in preserving traditional flavors with excellence. 
-            Renowned for our rich culinary heritage, we offer an exceptional dining experience while also specializing in bulk catering services. 
-            Whether for intimate gatherings or large-scale events, our expertly crafted dishes bring the true taste of Kerala to every occasion.
-          </p>
-
-        </div>
 
         {/* Quick Links Section */}
         <div className="space-y-4">

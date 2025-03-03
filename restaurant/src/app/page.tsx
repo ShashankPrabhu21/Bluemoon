@@ -5,9 +5,7 @@ import { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { UtensilsCrossed, ChefHat } from "lucide-react";
-import Footer from './components/footer';
 import { FaUtensils, FaLeaf, FaStar } from "react-icons/fa";
-import Navbar from './components/navbar';
 
 export default function Home() {
 
@@ -84,9 +82,7 @@ useEffect(() => {
 
   return (
     <div className="relative h-screen w-full overflow-x-hidden bg-white/95">
-      {/* Navigation Bar */}
-      <Navbar/>
-
+    
       {/* Hero Section Image */}
       <section className="relative h-[95vh] flex items-center justify-center text-white z-30  overflow-hidden" id="hero-section" >
       <div className="absolute inset-0" >
@@ -352,7 +348,7 @@ useEffect(() => {
           </div>
         </section>
     </div>
-  <Footer />
+  
   </div>
   );
 }
