@@ -45,11 +45,10 @@ const reviews = [
 export default function Reviews() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Auto-play functionality
   useEffect(() => {
     const interval = setInterval(() => {
       nextReview();
-    }, 6000); // Auto-switch every 6 seconds
+    }, 3000); 
 
     return () => clearInterval(interval);
   }, [currentIndex]);

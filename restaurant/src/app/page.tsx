@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { useInView } from "react-intersection-observer";
-import Navbar from "./components/navbar";
-import Reviews from "./components/reviews";
-import { motion } from "framer-motion";
-import Footer from "./components/footer";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { UtensilsCrossed, ChefHat } from "lucide-react"; 
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { motion, useAnimation } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { UtensilsCrossed, ChefHat } from "lucide-react";
 import { FaUtensils, FaLeaf, FaStar } from "react-icons/fa";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Reviews from './components/reviews';
+
 
 export default function Home() {
   {/*Base Images */}
@@ -71,15 +70,10 @@ export default function Home() {
 
 
   return (
-    <div className="relative w-full overflow-x-hidden bg-transparent">
-      <Navbar />
-      {/*Hero Section */}
-      <section
-      className="relative h-[95vh] flex items-center justify-center text-white z-30 overflow-hidden"
-      id="hero-section"
-    >
-      {/* Hero Section Background */}
-      <div className="absolute inset-0">
+    <div className="relative h-screen w-full overflow-x-hidden bg-white/95">
+      {/* Hero Section Image */}
+      <section className="relative h-[95vh] flex items-center justify-center text-white z-30  overflow-hidden" id="hero-section" >
+      <div className="absolute inset-0" >
         {slides.map((slide, index) => (
           <motion.div
             key={index}
@@ -115,6 +109,7 @@ export default function Home() {
       </motion.div>
     </section>
 
+
       {/* Buttons */}
       <div className="relative z-30 w-full mt-10">
         <div className="bg-white py-5 flex justify-center gap-6">
@@ -129,6 +124,7 @@ export default function Home() {
           </button>
         </div>
       </div>
+
 
       {/* Carousel Slider */}
       <div className="relative mx-auto w-[70%] flex justify-center items-center mt-8 mb-8 py-12 bg-gradient-to-r from-[#2C3E50] via-[#4c4caf] to-[#2C3E50] shadow-lg rounded-[30px]">
@@ -198,7 +194,6 @@ export default function Home() {
                     </motion.div>
                   </div>
                 </div>
-        
                 {/* Right Text Section */}
                 <motion.div
                   initial={{ opacity: 0, x: 100 }}
@@ -248,16 +243,17 @@ export default function Home() {
           )}
         </div>
 
+
         {/**Second Section */}
         <div 
-      className="relative w-full bg-white/80 backdrop-blur-xl py-32 px-6 lg:px-0 text-gray-900 shadow-md border border-[#3345A7]/40"
-      style={{
-        backgroundImage: "url('/sec22.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat"
-      }}
-    >
+        className="relative w-full bg-white/80 backdrop-blur-xl py-32 px-6 lg:px-0 text-gray-900 shadow-md border border-[#3345A7]/40"
+        style={{
+          backgroundImage: "url('/sec22.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
+        }}
+      >
       <div className="relative z-10 w-11/12 mx-auto flex justify-end lg:justify-end items-center gap-10">
         {/* Right Cards Section Only */}
         <div className="w-full lg:w-1/2 flex flex-col lg:flex-row gap-6 ml-16 pl-12">
@@ -309,15 +305,15 @@ export default function Home() {
           )}
         </div>
 
+
         {/**Third Section */}
         <div>
-      {/* Main Section */}
-      <section className="bg-white/60 py-16 px-6 text-center" style={{
-        backgroundImage: "url('/sec11.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat"
-      }}>
+        <section className="bg-white/60 py-16 px-6 text-center" style={{
+          backgroundImage: "url('/sec11.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
+        }}>
         {/* Animated Heading */}
         <motion.h2
           className="text-[#ffffff] text-3xl font-bold uppercase tracking-wide"
@@ -328,8 +324,6 @@ export default function Home() {
         >
           WHY PEOPLE LOVE US
         </motion.h2>
-
-        {/* Animated Paragraph */}
         <motion.p
           className="text-white text-lg max-w-2xl mx-auto mt-3"
           initial={{ opacity: 0, y: 20 }}
@@ -341,7 +335,6 @@ export default function Home() {
           experience that combines the best of traditional Indian cuisine with modern
           innovation.
         </motion.p>
-
         {/* Cards Section with Animation */}
         <div className="mt-10 flex flex-col md:flex-row gap-6 justify-center">
           {[
@@ -378,29 +371,8 @@ export default function Home() {
       </section>
     </div>
 
-        {/* Third Gap Section */}
-        <div ref={gapRef3} className="h-[250px] relative">
-          {gapInView3 && (
-            <div className="fixed inset-0 w-full h-screen z-[-1]">
-              <Image
-                src="/sec11.jpg"
-                alt="Fixed Background"
-                layout="fill"
-                objectFit="cover"
-                objectPosition="center"
-                quality={100}
-                priority
-                className="!opacity-100"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/90" />
-            </div>
-          )}
-        </div>
-
-        <Reviews />
-      </div>
-
-      <Footer />
-    </div>
+    <Reviews/>
+  </div>
+  </div>
   );
 }
