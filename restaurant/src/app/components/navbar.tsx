@@ -83,7 +83,7 @@ export default function Navbar() {
           <li className="cursor-pointer hover:text-gray-300">
             <Link href="/about">About Us</Link>
           </li>
-          <li className="cursor-pointer hover:text-gray-300">Delivery</li>
+          <li className="cursor-pointer hover:text-gray-300"><Link href="/delivery">Delivery</Link> </li>
           <li className="cursor-pointer hover:text-gray-300">Cooking Videos</li>
           <li className="cursor-pointer hover:text-gray-300">Blog</li>
           <li className="cursor-pointer hover:text-gray-300">Gallery</li>

@@ -59,7 +59,7 @@ export default function ReservationForm() {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-xl">
+    <div className="bg-gray p-8 rounded-lg shadow-lg w-full max-w-xl">
       <h2 className="text-3xl font-bold text-center mb-6 text-blue-700">RESERVE A TABLE</h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">

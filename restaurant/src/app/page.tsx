@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { UtensilsCrossed, ChefHat } from "lucide-react";
 import { FaUtensils, FaLeaf, FaStar } from "react-icons/fa";
@@ -14,7 +14,6 @@ export default function Home() {
   {/*Base Images */}
   const { ref: gapRef1, inView: gapInView1 } = useInView({ threshold: 0.0 });
   const { ref: gapRef2, inView: gapInView2 } = useInView({ threshold: 0.05 });
-  const { ref: gapRef3, inView: gapInView3 } = useInView({ threshold: 0.05 });
 
   {/*Offer Carousels */}
   const images = ["/off1.png", "/off2.png", "/off3.png"];
