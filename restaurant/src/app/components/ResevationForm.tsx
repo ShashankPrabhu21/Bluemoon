@@ -60,7 +60,7 @@ export default function ReservationForm() {
 
   return (
     <div className="bg-gray p-8 rounded-lg shadow-lg w-full max-w-xl">
-      <h2 className="text-3xl font-bold text-center mb-6 text-blue-700">RESERVE A TABLE</h2>
+      <h2 className="text-3xl font-bold text-center mb-6 text-blue-900">RESERVE A TABLE</h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="flex space-x-4">
@@ -124,7 +124,7 @@ export default function ReservationForm() {
 
         <button
           type="submit"
-          className={`w-full p-3 bg-blue-600 text-white rounded-lg text-lg hover:bg-blue-800 
+          className={`w-full p-3 bg-blue-900 text-white rounded-lg text-lg hover:bg-blue-800 
             ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
           disabled={loading}
         >

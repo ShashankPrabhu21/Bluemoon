@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import { Mail, Phone } from "lucide-react";
-import Footer from "../components/footer";
+import Link from "next/link";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -149,18 +149,25 @@ const ContactUs = () => {
     <p className="text-yellow-600 text-lg font-medium">Monday to Sunday<br />11:00 AM to 2:00 PM</p>
   </div>
 
-  {/* Dinner */}
-  <div className="mt-6 text-center">
-    <h4 className="text-2xl font-bold text-blue-900">Dinner Time</h4>
-    <p className="text-yellow-600 text-lg font-medium">Monday to Sunday<br />6:00 PM to 10:00 PM</p>
-  </div>
-</div>
-
-  </div>
-</div>
-
-
+    {/* Dinner */}
+    <div className="mt-6 text-center">
+      <h4 className="text-2xl font-bold text-blue-900">Dinner Time</h4>
+      <p className="text-yellow-600 text-lg font-medium">Monday to Sunday<br />6:00 PM to 10:00 PM</p>
     </div>
+  </div>
+  </div>
+    
+    {/* Back Button */}
+    <div className="w-full flex justify-center mt-6">
+      <Link
+        href="/"
+        className="px-6 py-3 bg-blue-800 text-white font-semibold text-lg rounded-full shadow-lg hover:bg-[#253b9c] hover:scale-105 transition-all duration-300 z-10"
+      >
+        Back to Home
+      </Link>
+    </div>
+  </div>
+  </div>
     
   );
 };

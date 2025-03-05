@@ -102,7 +102,7 @@ export default function Blog() {
         <div className="flex flex-col md:flex-row justify-between items-center bg-gradient-to-b from-blue-800 to-blue-900 p-4 rounded-lg shadow-lg gap-4">
           <input
             type="text"
-            placeholder="Search blog..."
+            placeholder=" Search blog..."
             className="p-2 rounded-full text-black w-full md:w-1/2 border border-gray-300 outline-none"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
