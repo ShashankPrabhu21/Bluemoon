@@ -4,13 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 
 const ContactUs = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    subject: "",
-    message: "",
-  });
+
 
 
   return (

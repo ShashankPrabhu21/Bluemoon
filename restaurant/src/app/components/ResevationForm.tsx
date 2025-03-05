@@ -28,37 +28,32 @@ export default function ReservationForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true); // Show loading state
-
-    try {
-      const response = await fetch("http://localhost/restaurant/reservation.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+  
+    const response = await fetch("http://localhost/restaurant/reservation.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+  
+    const result = await response.json();
+    alert(result.message); // Show response message
+  
+    if (result.success) {
+      setFormData({
+        name: "",
+        phone: "",
+        email: "",
+        date: "",
+        fromTime: "",
+        toTime: "",
+        guests: "1",
+        offers: false, // Reset toggle
       });
-
-      const result = await response.json();
-      alert(result.message); // Show response message
-
-      if (result.success) {
-        setFormData({
-          name: "",
-          phone: "",
-          email: "",
-          date: "",
-          fromTime: "",
-          toTime: "",
-          guests: "1",
-          offers: false, // Reset toggle
-        });
-      }
-    } catch (_error) { 
-      alert("Something went wrong. Please try again.");
     }
-     finally {
-      setLoading(false); // Hide loading state
-    }
+  
+    setLoading(false); // Hide loading state
   };
-
+  
   return (
     <div className="bg-gray p-8 rounded-lg shadow-lg w-full max-w-xl">
       <h2 className="text-3xl font-bold text-center mb-6 text-blue-900">RESERVE A TABLE</h2>
