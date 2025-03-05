@@ -2,14 +2,15 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, MoreVertical, Facebook, Youtube, Instagram } from "lucide-react";
+import { Menu, X, PlusCircle, Facebook, Youtube, Instagram, User } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [extraLinks, setExtraLinks] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,8 +19,18 @@ export default function Navbar() {
       setLastScrollY(currentScrollY);
     };
 
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1280); // Mobile menu should activate at 1280px
+    };
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Check on first render
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
   }, [lastScrollY]);
 
   return (
@@ -29,16 +40,22 @@ export default function Navbar() {
       } bg-black/75`}
     >
       {/* Top Contact & Social Media Bar */}
-      <div className="hidden md:flex justify-between items-center px-6 py-2 text-base font-medium">
+      <div className="hidden lg:flex justify-between items-center px-6 py-2 text-base font-medium">
         <div className="flex items-center space-x-5">
           <span>📞 0422 306 777</span>
           <span>✉ bluemoon@gmail.com</span>
         </div>
+        {/* Social Media & Admin Icons */}
         <div className="flex space-x-5">
           <Facebook className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
           <Youtube className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
           <Instagram className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
-        </div>
+          <div className="ml-5">
+            <Link href="/admin">
+              <User className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
+            </Link>
+          </div>
+</div>
       </div>
 
       {/* Navbar Section */}
@@ -52,55 +69,78 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Navbar Links */}
-        <ul className="hidden md:flex space-x-6 text-lg font-medium">
-          <li className="cursor-pointer hover:text-gray-300"><Link href="/">Home</Link></li>
-          <li className="cursor-pointer hover:text-gray-300">Menu</li>
-          <li className="cursor-pointer hover:text-gray-300"><Link href="/about">About Us</Link></li>
-          <li className="cursor-pointer hover:text-gray-300"><Link href="/delivery">Delivery</Link></li>
-          <li className="cursor-pointer hover:text-gray-300"><Link href="/cooking">Cooking Videos</Link></li>
-          <li className="cursor-pointer hover:text-gray-300"><Link href="/blog">Blog</Link></li>
-          <li className="cursor-pointer hover:text-gray-300"><Link href="/contact">Contact Us</Link></li>
-          <li className="cursor-pointer hover:text-gray-300"><Link href="/table">Table Reservation</Link></li>
-
-          {/* Three-dot Overflow Menu */}
-          <div className="relative">
-            <button onClick={() => setMoreOpen(!moreOpen)} className="cursor-pointer">
-              <MoreVertical className="w-12 h-6" />
-            </button>
-            {moreOpen && (
-              <div className="absolute right-0 mt-2 bg-black text-white shadow-lg p-2 rounded-md space-y-4 w-24">
-                
-                <li className="cursor-pointer hover:text-gray-300">Gallery</li>
-                <li className="cursor-pointer hover:text-gray-300"><Link href="/">Pick Up</Link></li>
-              </div>
-            )}
-          </div>
-        </ul>
-
-        {/* Mobile Menu Button */}
-        <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </nav>
-
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-black text-white p-4 space-y-2 shadow-lg">
-          <ul className="flex flex-col items-center text-lg font-medium">
+        {/* Desktop Navbar (Only visible if screen width > 1280px) */}
+        {!isMobile && (
+          <ul className="flex space-x-6 text-lg font-medium items-center">
             <li className="cursor-pointer hover:text-gray-300"><Link href="/">Home</Link></li>
-            <li className="cursor-pointer hover:text-gray-300">Menu</li>
+            <li className="cursor-pointer hover:text-gray-300"><Link href="/menu">Menu</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/about">About Us</Link></li>
-            <li className="cursor-pointer hover:text-gray-300">Delivery</li>
+            <li className="cursor-pointer hover:text-gray-300"><Link href="/delivery">Delivery</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/cooking">Cooking Videos</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/blog">Blog</Link></li>
-            <li className="cursor-pointer hover:text-gray-300">Gallery</li>
-            <li className="cursor-pointer hover:text-gray-300"><Link href="/table">Table Reservation</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/contact">Contact Us</Link></li>
-            <li className="cursor-pointer hover:text-gray-300"><Link href="/">Pick Up</Link></li>
+            <li className="cursor-pointer hover:text-gray-300"><Link href="/table">Table Reservation</Link></li>
+
+            {/* Extra Links Toggle */}
+            {extraLinks && (
+              <>
+                <li className="cursor-pointer hover:text-gray-300"><Link href="/gallery">Gallery</Link></li>
+                <li className="cursor-pointer hover:text-gray-300"><Link href="/pickup">Pick Up</Link></li>
+              </>
+            )}
+
+            {/* Plus Toggle Button */}
+            <button onClick={() => setExtraLinks(!extraLinks)} className="cursor-pointer ml-4">
+              <PlusCircle
+                className={`w-6 h-6 text-white transition-transform duration-200 ${
+                  extraLinks ? "rotate-45 text-gray-400" : "hover:scale-110"
+                }`}
+              />
+            </button>
           </ul>
+        )}
+
+        {/* Mobile Menu Button (Appears at width ≤ 1280px) */}
+        {isMobile && (
+          <button onClick={() => setMenuOpen(!menuOpen)} className="xl:hidden">
+            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        )}
+      </nav>
+
+      {/* Mobile Menu (Appears when menuOpen is true) */}
+      {menuOpen && isMobile && (
+  <div className="absolute top-0 left-0 w-full h-screen bg-gradient-to-b from-black/90 to-black/90 backdrop-blur-lg p-6">
+    {/* Logo & Close Button */}
+    <div className="flex justify-between items-center mb-6">
+      <div className="flex items-center gap-2">
+        <Image src="/LOGO.jpg" alt="Bluemoon Logo" width={55} height={55} className="rounded-full" />
+        <div>
+          <h1 className="text-xl font-bold tracking-wide">BLUEMOON</h1>
+          <p className="text-sm tracking-wider">RESTAURANT</p>
         </div>
-      )}
+      </div>
+      <button onClick={() => setMenuOpen(false)} className="text-white">
+        <X className="w-6 h-6" />
+      </button>
+    </div>
+
+    {/* Navigation Links */}
+    <ul className="flex flex-col items-center space-y-4 text-lg font-medium">
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/">Home</Link></li>
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/menu">Menu</Link></li>
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/about">About Us</Link></li>
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/delivery">Delivery</Link></li>
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/cooking">Cooking Videos</Link></li>
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/blog">Blog</Link></li>
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/gallery">Gallery</Link></li>
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/table">Table Reservation</Link></li>
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/contact">Contact Us</Link></li>
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/pickup">Pick Up</Link></li>
+    </ul>
+  </div>
+)}
+
     </header>
   );
 }

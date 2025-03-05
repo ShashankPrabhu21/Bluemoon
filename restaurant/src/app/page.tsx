@@ -111,27 +111,30 @@ export default function Home() {
     </section>
 
 
-      {/* Buttons */}
-      <div className="relative z-30 w-full mt-10">
-        <div className="bg-white py-5 flex justify-center gap-6">
-          <button className="px-8 py-4 border border-[#3345A7] text-[#3345A7] text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
+     {/* Buttons */}
+      <div className="relative z-30 w-full mt-10 px-4">
+        <div className="bg-white py-5 flex flex-col md:flex-row justify-center gap-4 md:gap-6">
+          <button className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 border border-[#3345A7] text-[#3345A7] text-base md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
             RESERVE A TABLE
           </button>
-          <button className="px-8 py-4 border border-[#3345A7] text-[#3345A7] text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
+          <button className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 border border-[#3345A7] text-[#3345A7] text-base md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
             ONLINE PICKUP ORDERS
           </button>
-          <button className="px-8 py-4 border border-[#3345A7] text-[#3345A7] text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
+          <button className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 border border-[#3345A7] text-[#3345A7] text-base md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
             DELIVERY AVAILABLE
           </button>
         </div>
       </div>
 
 
+
       {/* Carousel Slider */}
-      <div className="relative mx-auto w-[70%] flex justify-center items-center mt-8 mb-8 py-12 bg-gradient-to-r from-[#2C3E50] via-[#4c4caf] to-[#2C3E50] shadow-lg rounded-[30px]">
+      <div className="relative mx-auto w-[90%] md:w-[80%] lg:w-[70%] flex justify-center items-center mt-8 mb-8 py-8 md:py-12 bg-gradient-to-r from-[#2C3E50] via-[#4c4caf] to-[#2C3E50] shadow-lg rounded-[20px] md:rounded-[30px]">
         {/* Images Container */}
-        <div className="flex transition-transform duration-700 ease-in-out"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+        <div 
+          className="flex transition-transform duration-700 ease-in-out"
+          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        >
           {images.map((src, index) => (
             <div key={index} className="min-w-full flex justify-center">
               <Image
@@ -139,91 +142,105 @@ export default function Home() {
                 alt={`Slide ${index + 1}`}
                 width={900}
                 height={600}
-                className="w-auto h-[63vh] object-contain rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 shadow-2xl"
+                className="w-full max-w-[90%] md:max-w-[80%] lg:max-w-[900px] h-[45vh] md:h-[55vh] lg:h-[63vh] object-contain rounded-xl md:rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 shadow-2xl"
               />
             </div>
           ))}
         </div>
+
         {/* Left Arrow */}
-        <button onClick={prevSlide} className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/80 p-3 rounded-full shadow-md hover:bg-white hover:scale-110 transition-all">
-          <ChevronLeft className="w-6 h-6 text-gray-800" />
+        <button 
+          onClick={prevSlide} 
+          className="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 bg-white/80 p-2 md:p-3 rounded-full shadow-md hover:bg-white hover:scale-110 transition-all"
+        >
+          <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
         </button>
+
         {/* Right Arrow */}
-        <button onClick={nextSlide} className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/80 p-3 rounded-full shadow-md hover:bg-white hover:scale-110 transition-all">
-          <ChevronRight className="w-6 h-6 text-gray-800" />
+        <button 
+          onClick={nextSlide} 
+          className="absolute right-4 md:right-6 top-1/2 transform -translate-y-1/2 bg-white/80 p-2 md:p-3 rounded-full shadow-md hover:bg-white hover:scale-110 transition-all"
+        >
+          <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
         </button>
-    </div>
+      </div>
+
 
       
 
       <div className="relative z-10 w-full">
-        {/**First Section */}
-        <div className="w-full relative py-16 overflow-hidden bg-cover bg-center bg-[url('/sec11.jpg')]">
-              {/* Overlay for opacity effect */}
-              <div className="absolute inset-0 bg-black/40"></div>
-        
-              <div className="relative flex flex-col lg:flex-row w-11/12 mx-auto gap-6">
-                {/* Left Images Section */}
-                <div className="w-full lg:w-1/2 flex justify-center items-center">
-                  <div className="flex gap-4">
-                    <motion.div
-                      initial={{ opacity: 0, x: -100 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 1 }}
-                    >
-                      <Image
-                        src="/1.jpg"
-                        alt="Image Left 1"
-                        width={300}
-                        height={300}
-                        className="rounded-lg mr-4 shadow-lg"
-                      />
-                    </motion.div>
-        
-                    <motion.div
-                      initial={{ opacity: 0, x: -100 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 1, delay: 0.8 }}
-                    >
-                      <Image
-                        src="/2.jpg"
-                        alt="Image Left 2"
-                        width={300}
-                        height={300}
-                        className="rounded-lg shadow-lg"
-                      />
-                    </motion.div>
-                  </div>
-                </div>
-                {/* Right Text Section */}
+        {/** First Section */}
+        <div className="w-full relative py-12 md:py-16 overflow-hidden bg-cover bg-center bg-[url('/sec11.jpg')]">
+          {/* Overlay for opacity effect */}
+          <div className="absolute inset-0 bg-black/40"></div>
+
+          <div className="relative flex flex-col lg:flex-row w-[95%] md:w-11/12 mx-auto gap-8 md:gap-12">
+            {/* Left Images Section */}
+            <div className="w-full lg:w-1/2 flex justify-center items-center">
+              <div className="flex gap-4 flex-nowrap justify-center">
                 <motion.div
-                  initial={{ opacity: 0, x: 100 }}
+                  initial={{ opacity: 0, x: -100 }}
                   whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 1, delay: 1.6 }}
-                  className="w-full lg:w-1/2 bg-white/90 p-10 text-[#3345A7] flex items-center justify-center rounded-2xl shadow-xl"
+                  transition={{ duration: 1 }}
+                  className="w-1/2"
                 >
-                  <div>
-                    <h3 className="text-4xl font-bold mb-4 text-[#3345A7]">
-                      BLUEMOON RESTAURANT
-                    </h3>
-                    <h3 className="text-4xl font-bold mb-4 text-[#3345A7]">
-                      KERALA CUISINE
-                    </h3>
-                    <p className="text-lg leading-relaxed text-[#3345A7]">
-                      Embark on a culinary journey at Bluemoon Restaurant, where every dish is a celebration of
-                      flavor and artistry. Our chefs meticulously select the finest ingredients, transforming
-                      them into culinary masterpieces that tantalize the senses. From the first bite to the
-                      lingering aftertaste, your dining experience with us will be nothing short of extraordinary.
-                    </p>
-                    <div className="mt-6">
-                      <button className="px-6 py-3 border border-[#3345A7] text-[#3345A7] text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
-                        Discover More
-                      </button>
-                    </div>
-                  </div>
+                  <Image
+                    src="/1.jpg"
+                    alt="Image Left 1"
+                    width={250}
+                    height={250}
+                    className="w-full h-auto rounded-lg shadow-lg"
+                  />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, x: -100 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 1, delay: 0.8 }}
+                  className="w-1/2"
+                >
+                  <Image
+                    src="/2.jpg"
+                    alt="Image Left 2"
+                    width={250}
+                    height={250}
+                    className="w-full h-auto rounded-lg shadow-lg"
+                  />
                 </motion.div>
               </div>
             </div>
+
+            {/* Right Text Section */}
+            <motion.div
+              initial={{ opacity: 0, x: 100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1, delay: 1.6 }}
+              className="w-full lg:w-1/2 bg-white/90 p-6 md:p-10 text-[#3345A7] flex items-center justify-center rounded-2xl shadow-xl"
+            >
+              <div>
+                <h3 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4 text-[#3345A7]">
+                  BLUEMOON RESTAURANT
+                </h3>
+                <h3 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4 text-[#3345A7]">
+                  KERALA CUISINE
+                </h3>
+                <p className="text-base md:text-lg leading-relaxed text-[#3345A7]">
+                  Embark on a culinary journey at Bluemoon Restaurant, where every dish is a celebration of
+                  flavor and artistry. Our chefs meticulously select the finest ingredients, transforming
+                  them into culinary masterpieces that tantalize the senses. From the first bite to the
+                  lingering aftertaste, your dining experience with us will be nothing short of extraordinary.
+                </p>
+                <div className="mt-4 md:mt-6 flex justify-center md:justify-start">
+                  <button className="px-5 py-3 md:px-6 md:py-3 border border-[#3345A7] text-[#3345A7] text-sm md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
+                    Discover More
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+
 
         {/* First Gap Section */}
         <div ref={gapRef1} className="h-[250px] relative">
@@ -245,47 +262,52 @@ export default function Home() {
         </div>
 
 
-        {/**Second Section */}
-        <div 
-        className="relative w-full bg-white/80 backdrop-blur-xl py-32 px-6 lg:px-0 text-gray-900 shadow-md border border-[#3345A7]/40"
-        style={{
-          backgroundImage: "url('/sec22.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat"
-        }}
-      >
-      <div className="relative z-10 w-11/12 mx-auto flex justify-end lg:justify-end items-center gap-10">
-        {/* Right Cards Section Only */}
-        <div className="w-full lg:w-1/2 flex flex-col lg:flex-row gap-6 ml-16 pl-12">
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex-1 bg-white/70 backdrop-blur-lg p-6 rounded-xl shadow-lg border border-[#3345A7]/60"
-          >
-            <UtensilsCrossed size={50} className="text-[#3345A7] mx-auto" />
-            <h3 className="text-2xl font-semibold mt-4 text-center text-[#3345A7]">Quality Food</h3>
-            <p className="text-lg mt-2 text-center text-gray-700">
-            &quot;Deliciously crafted dishes blending fresh, seasonal ingredients with authentic Indian spices and innovation.&quot;
-            </p>
-          </motion.div>
+        {/** Second Section */}
+        <div
+          className="relative w-full bg-white/80 backdrop-blur-xl py-20 md:py-32 px-4 md:px-6 lg:px-0 text-gray-900 shadow-md border border-[#3345A7]/40"
+          style={{
+            backgroundImage: "url('/sec22.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          <div className="relative z-10 w-[90%] md:w-11/12 mx-auto flex justify-center lg:justify-end items-center">
+            {/* Right Cards Section */}
+            <div className="w-full lg:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-6 md:ml-8 lg:ml-16 md:pl-6 lg:pl-12">
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="flex-1 bg-white/70 backdrop-blur-lg p-6 rounded-xl shadow-lg border border-[#3345A7]/60"
+              >
+                <UtensilsCrossed size={50} className="text-[#3345A7] mx-auto" />
+                <h3 className="text-xl md:text-2xl font-semibold mt-4 text-center text-[#3345A7]">
+                  Quality Food
+                </h3>
+                <p className="text-base md:text-lg mt-2 text-center text-gray-700">
+                  &quot;Deliciously crafted dishes blending fresh, seasonal ingredients with authentic Indian spices and innovation.&quot;
+                </p>
+              </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex-1 bg-white/70 backdrop-blur-lg p-6 rounded-xl shadow-lg border border-[#3345A7]/60"
-          >
-            <ChefHat size={50} className="text-[#3345A7] mx-auto" />
-            <h3 className="text-2xl font-semibold mt-4 text-center text-[#3345A7]">Perfect Taste</h3>
-            <p className="text-lg mt-2 text-center text-gray-700">
-            &quot;Exceptional dishes blending fresh, seasonal ingredients with authentic Indian spices and innovative flair.&quot;
-            </p>
-          </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="flex-1 bg-white/70 backdrop-blur-lg p-6 rounded-xl shadow-lg border border-[#3345A7]/60"
+              >
+                <ChefHat size={50} className="text-[#3345A7] mx-auto" />
+                <h3 className="text-xl md:text-2xl font-semibold mt-4 text-center text-[#3345A7]">
+                  Perfect Taste
+                </h3>
+                <p className="text-base md:text-lg mt-2 text-center text-gray-700">
+                  &quot;Exceptional dishes blending fresh, seasonal ingredients with authentic Indian spices and innovative flair.&quot;
+                </p>
+              </motion.div>
+            </div>
+          </div>
         </div>
-      </div>
-  </div>
+
 
         {/* Second Gap Section */}
         <div ref={gapRef2} className="h-[250px] relative">
@@ -309,69 +331,72 @@ export default function Home() {
 
         {/**Third Section */}
         <div>
-        <section className="bg-white/60 py-16 px-6 text-center" style={{
-          backgroundImage: "url('/sec11.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat"
-        }}>
-        {/* Animated Heading */}
-        <motion.h2
-          className="text-[#ffffff] text-3xl font-bold uppercase tracking-wide"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          viewport={{ once: true }}
-        >
-          WHY PEOPLE LOVE US
-        </motion.h2>
-        <motion.p
-          className="text-white text-lg max-w-2xl mx-auto mt-3"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 0.4 }}
-          viewport={{ once: true }}
-        >
-          At Bluemoon, we are passionate about delivering an exceptional dining
-          experience that combines the best of traditional Indian cuisine with modern
-          innovation.
-        </motion.p>
-        {/* Cards Section with Animation */}
-        <div className="mt-10 flex flex-col md:flex-row gap-6 justify-center">
-          {[
-            {
-              icon: <FaUtensils className="text-[#3345A7] text-4xl mx-auto mb-4" />,
-              title: "Authentic Flavors with a Modern Twist",
-              text: "Our menu reimagines classic Indian dishes with contemporary flair, creating a unique culinary experience that honors tradition while embracing innovation."
-            },
-            {
-              icon: <FaLeaf className="text-[#3345A7] text-4xl mx-auto mb-4" />,
-              title: "Fresh, Seasonal Ingredients",
-              text: "We take pride in using only the freshest, seasonal ingredients to craft our dishes. This commitment ensures every meal is vibrant and nourishing."
-            },
-            {
-              icon: <FaStar className="text-[#3345A7] text-4xl mx-auto mb-4" />,
-              title: "Memorable Dining Experience",
-              text: "Guests love Bluemoon for unforgettable dining experiences. Whether casual or special, we make every visit memorable with great food and hospitality."
-            }
-          ].map((card, index) => (
-            <motion.div
-              key={index}
-              className="bg-white text-[#3345A7] border-2 border-[#3345A7] rounded-xl shadow-lg p-8 max-w-sm"
-              initial={{ opacity: 0, y: 30 }}
+          <section
+            className="bg-white/60 py-16 px-4 md:px-6 text-center"
+            style={{
+              backgroundImage: "url('/sec11.jpg')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            {/* Animated Heading */}
+            <motion.h2
+              className="text-[#ffffff] text-2xl md:text-3xl font-bold uppercase tracking-wide"
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.4, delay: 0.6 * index }}
+              transition={{ duration: 1 }}
               viewport={{ once: true }}
             >
-              {card.icon}
-              <h3 className="text-xl font-semibold text-center">{card.title}</h3>
-              <p className="text-[#3345A7] mt-3 text-center">{card.text}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-    </div>
+              WHY PEOPLE LOVE US
+            </motion.h2>
 
+            <motion.p
+              className="text-white text-base md:text-lg max-w-2xl mx-auto mt-3"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              At Bluemoon, we are passionate about delivering an exceptional dining experience that
+              combines the best of traditional Indian cuisine with modern innovation.
+            </motion.p>
+
+            {/* Cards Section with Animation */}
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
+              {[
+                {
+                  icon: <FaUtensils className="text-[#3345A7] text-4xl mx-auto mb-4" />,
+                  title: "Authentic Flavors with a Modern Twist",
+                  text: "Our menu reimagines classic Indian dishes with contemporary flair, creating a unique culinary experience that honors tradition while embracing innovation.",
+                },
+                {
+                  icon: <FaLeaf className="text-[#3345A7] text-4xl mx-auto mb-4" />,
+                  title: "Fresh, Seasonal Ingredients",
+                  text: "We take pride in using only the freshest, seasonal ingredients to craft our dishes. This commitment ensures every meal is vibrant and nourishing.",
+                },
+                {
+                  icon: <FaStar className="text-[#3345A7] text-4xl mx-auto mb-4" />,
+                  title: "Memorable Dining Experience",
+                  text: "Guests love Bluemoon for unforgettable dining experiences. Whether casual or special, we make every visit memorable with great food and hospitality.",
+                },
+              ].map((card, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white text-[#3345A7] border-2 border-[#3345A7] rounded-xl shadow-lg p-6 md:p-8 max-w-sm mx-auto"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1.4, delay: 0.6 * index }}
+                  viewport={{ once: true }}
+                >
+                  {card.icon}
+                  <h3 className="text-lg md:text-xl font-semibold text-center">{card.title}</h3>
+                  <p className="text-[#3345A7] mt-3 text-center">{card.text}</p>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+    </div>
     <Reviews/>
   </div>
   </div>

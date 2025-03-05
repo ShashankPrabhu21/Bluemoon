@@ -132,9 +132,10 @@ export default function Blog() {
             >
               {/* Left: Blog Text Content (70%) */}
               <div className="md:w-[65%] flex flex-col flex-1 h-full">
-                <span className="bg-blue-300 text-blue-900 px-3 py-1 rounded-lg font-bold text-lg w-[26%]">
-                  Category: {blog.category}
-                </span>
+              <span className="bg-blue-300 text-blue-900 px-3 py-1 rounded-lg font-bold text-lg w-[28%] min-w-[120px]">
+                Category: {blog.category}
+              </span>
+
 
                 <h2 className="text-3xl font-bold mt-4">{blog.title}</h2>
                 <h3 className="text-xl font-semibold text-gray-700">
