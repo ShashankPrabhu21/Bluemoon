@@ -97,7 +97,7 @@ export default function Reviews() {
           transition={{ duration: 0.5 }}
           className="mt-6 text-center text-lg italic px-6 leading-relaxed"
         >
-          "{reviews[currentIndex].review}"
+          `&quot;`{reviews[currentIndex].review}`&quot;`
         </motion.div>
 
         {/* Reviewer Name */}
