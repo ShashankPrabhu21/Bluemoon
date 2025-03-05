@@ -5,12 +5,13 @@ import { Search } from "lucide-react";
 
 export default function Page() {
   return (
-    <div className="min-h-screen flex flex-col items-center relative bg-blue-900 overflow-hidden">
-      {/* Subtle Blue Gradient Highlights */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute w-96 h-96 bg-blue-700/30 rounded-full blur-3xl bottom-10 left-10"></div>
-        <div className="absolute w-72 h-72 bg-blue-600/40 rounded-full blur-2xl top-20 right-10"></div>
-      </div>
+    <div 
+      className="min-h-screen flex flex-col items-center relative overflow-hidden bg-cover bg-center "
+      style={{ backgroundImage: "url('/sec1.jpg')" }}
+    >
+      {/* Dark Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/70 to-black/50 "></div>
+
 
       {/* White Top Section */}
       <div className="w-full h-[100px] bg-white"></div>
@@ -28,10 +29,9 @@ export default function Page() {
       </div>
 
       {/* Location Cards */}
-      <div className="bg-white rounded-2xl shadow-2xl p-8 mt-10 max-w-lg w-full z-10">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 mt-10 max-w-2xl w-full z-10">
         <div className="space-y-6 text-[#314ec4]">
-          {/* Location List */}
-          {[
+          {[  
             {
               title: "Wentworthville",
               areas: [
@@ -74,10 +74,12 @@ export default function Page() {
       {/* Back to Home Button */}
       <Link
         href="/"
-        className="mt-8 mb-4 px-6 py-3 bg-blue-800 text-white font-semibold text-lg rounded-full shadow-lg hover:bg-[#253b9c] hover:scale-105 transition-all duration-300 z-10"
+        className="mt-6 mb-6 px-6 py-3 bg-blue-800 text-white font-semibold text-lg rounded-full shadow-lg hover:bg-[#253b9c] hover:scale-105 transition-all duration-300 z-10"
       >
         Back to Home
       </Link>
     </div>
   );
 }
+
+

@@ -3,6 +3,7 @@
 import ReservationForm from "../components/ResevationForm";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function TablePage() {
   const router = useRouter();
@@ -36,12 +37,15 @@ export default function TablePage() {
         </div>
 
         {/* Back Button */}
-        <button
-          onClick={() => router.push("/")}
-          className="mt-4 mb-4 px-6 py-3 bg-blue-800 text-white rounded-lg hover:bg-blue-800 transition"
-        >
-          Back to Home
-        </button>
+       
+        <div className="w-full flex justify-center mt-6">
+          <Link
+            href="/"
+            className="px-6 py-3 bg-blue-800 text-white font-semibold text-lg rounded-full shadow-lg hover:bg-[#253b9c] hover:scale-105 transition-all duration-300 z-10"
+          >
+            Back to Home
+          </Link>
+        </div>
        
       </div>
       

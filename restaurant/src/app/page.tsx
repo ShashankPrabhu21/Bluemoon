@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion} from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { UtensilsCrossed, ChefHat } from "lucide-react";
 import { FaUtensils, FaLeaf, FaStar } from "react-icons/fa";
@@ -14,6 +14,7 @@ export default function Home() {
   {/*Base Images */}
   const { ref: gapRef1, inView: gapInView1 } = useInView({ threshold: 0.0 });
   const { ref: gapRef2, inView: gapInView2 } = useInView({ threshold: 0.05 });
+ 
 
   {/*Offer Carousels */}
   const images = ["/off1.png", "/off2.png", "/off3.png"];
@@ -21,7 +22,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 2000); // Auto-slide every 4s
+    }, 3000); // Auto-slide every 4s
     return () => clearInterval(interval);
   }, []);
   const nextSlide = () => {

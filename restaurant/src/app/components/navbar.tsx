@@ -37,7 +37,7 @@ export default function Navbar() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, [lastScrollY, scrollThresholdReached]);
 
   return (
     <header
@@ -85,7 +85,7 @@ export default function Navbar() {
           </li>
           <li className="cursor-pointer hover:text-gray-300"><Link href="/delivery">Delivery</Link> </li>
           <li className="cursor-pointer hover:text-gray-300">Cooking Videos</li>
-          <li className="cursor-pointer hover:text-gray-300">Blog</li>
+          <li className="cursor-pointer hover:text-gray-300"><Link href="/blog">Blog</Link></li>
           <li className="cursor-pointer hover:text-gray-300">Gallery</li>
           <li className="cursor-pointer hover:text-gray-300"><Link href="/table">Table Reservation</Link></li>
           {showMore && (

@@ -35,7 +35,7 @@ export default function Footer() {
                 <Link href={link.href} className="relative inline-block pb-1 text-white hover:text-gray-200 transition-colors">
                   {link.name}
                 </Link>
-                <div className="w-32 h-[3px] bg-blue-700 mt-1 mx-auto md:mx-0 shadow-[0_2px_4px_#CFCFCF]"></div> 
+                <div className="w-28 h-[3px] bg-blue-700 mt-1 mx-auto md:mx-0 shadow-[0_2px_4px_#CFCFCF]"></div> 
               </li>
             ))}
           </ul>
