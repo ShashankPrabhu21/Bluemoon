@@ -1,232 +1,84 @@
 "use client";
-import React, { useState, useEffect } from "react";
 
+import { useRouter } from "next/navigation";
 
-interface FoodItem {
-  id: number;
-  category: string;
-  foodName: string;
-  price: string;
-  token: string;
-  description: string;
-  image: string;
-}
-
-const AdminPage = () => {
-  const [category, setCategory] = useState("");
-  const [foodName, setFoodName] = useState("");
-  const [price, setPrice] = useState("");
-  const [token, setToken] = useState("");
-  const [description, setDescription] = useState("");
-  const [image, setImage] = useState<string | null>(null);
-  const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
-  const [editingId, setEditingId] = useState<number | null>(null);
-
-useEffect(() => {
-  if (typeof window !== "undefined") {
-    const storedItems = localStorage.getItem("foodItems");
-    if (storedItems) {
-      setFoodItems(JSON.parse(storedItems));
-    }
-  }
-}, []);
-
-useEffect(() => {
-  if (typeof window !== "undefined" && foodItems.length > 0) {
-    localStorage.setItem("foodItems", JSON.stringify(foodItems));
-  }
-}, [foodItems]);
-
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleAddToMenu = () => {
-    localStorage.setItem("menuItems", JSON.stringify(foodItems));
-    alert("Items successfully added to the menu!");
-  };
-
-  const handleFoodSubmit = () => {
-    if (!category || !foodName || !price || !token || !description || !image) {
-      alert("Please fill all fields");
-      return;
-    }
-
-    if (editingId !== null) {
-      const updatedItems = foodItems.map((item) =>
-        item.id === editingId
-          ? { ...item, category, foodName, price, token, description, image }
-          : item
-      );
-      setFoodItems(updatedItems);
-      setEditingId(null);
-    } else {
-      const newItem: FoodItem = {
-        id: Date.now(),
-        category,
-        foodName,
-        price,
-        token,
-        description,
-        image,
-      };
-      setFoodItems([...foodItems, newItem]);
-    }
-
-    setCategory("");
-    setFoodName("");
-    setPrice("");
-    setToken("");
-    setDescription("");
-    setImage(null);
-  };
-
-  const deleteFoodItem = (id: number) => {
-    const updatedItems = foodItems.filter((item) => item.id !== id);
-    setFoodItems(updatedItems);
-    localStorage.setItem("foodItems", JSON.stringify(updatedItems));
-  };
-
-  const editFoodItem = (id: number) => {
-    const item = foodItems.find((item) => item.id === id);
-    if (item) {
-      setCategory(item.category);
-      setFoodName(item.foodName);
-      setPrice(item.price);
-      setToken(item.token);
-      setDescription(item.description);
-      setImage(item.image);
-      setEditingId(item.id);
-    }
-  };
+export default function AdminDashboard() {
+  const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-center mb-6 mt-32">Admin Menu</h1>
-
-      <div className="bg-white shadow-lg rounded-xl p-6 max-w-lg mx-auto mb-8 border border-gray-200">
-        <h2 className="text-xl font-semibold text-center text-gray-900 mb-4">
-          {editingId !== null ? "Update Food" : "Add Food"}
+    <div className="mt-32 h-screen flex bg-gradient-to-br from-gray-100 to-gray-300">
+      {/* Sidebar with Glassmorphism */}
+      <aside className="w-1/4 bg-blue-900 bg-opacity-90 backdrop-blur-lg text-white p-6 flex flex-col gap-6 shadow-2xl rounded-r-3xl border-r-4 border-blue-800">
+        <h2 className="text-3xl font-extrabold text-center tracking-wide drop-shadow-lg">
+          🛠️ ADMIN DASHBOARD
         </h2>
 
-        <select
-          className="w-full mb-3 p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="">Select Category</option>
-          <option value="Breakfast">Breakfast</option>
-          <option value="Main Course">Main Course</option>
-          <option value="Desserts">Desserts</option>
-          <option value="Snacks">Snacks</option>
-          <option value="Drinks">Drinks</option>
-        </select>
+        <nav className="flex flex-col gap-4">
+          <button
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg"
+            onClick={() => router.push("/menuSetup")}
+          >
+            🍽️ SETUP MENU CARD
+          </button>
 
-        <input
-          className="w-full mb-3 p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400"
-          type="text"
-          placeholder="Food Name"
-          value={foodName}
-          onChange={(e) => setFoodName(e.target.value)}
-        />
+          <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg">
+            🔑 CHANGE ADMIN PASSWORD
+          </button>
 
-        <div className="flex gap-3">
-          <input
-            className="w-1/2 p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400"
-            type="text"
-            placeholder="Token Number"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-          />
-          <input
-            className="w-1/2 p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400"
-            type="text"
-            placeholder="Price ($)"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-          />
-        </div>
+          <button
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg"
+            onClick={() => router.push("/offerSetup")}
+          >
+            🎁 SETUP OFFERS
+          </button>
 
-        <textarea
-          className="w-full mt-3 p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400"
-          placeholder="Short Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={2}
-        />
+          <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg">
+            👥 USER MANAGEMENT
+          </button>
+        </nav>
+      </aside>
 
-        <div className="mt-3">
-          <input type="file" className="w-full p-2 border rounded-lg" onChange={handleImageUpload} />
-        </div>
-
-        {image && (
-          <div className="flex justify-center mt-3">
-            <img src={image} alt="Preview" className="w-28 h-28 object-cover rounded-lg shadow-md" />
-          </div>
-        )}
-
-        <button
-          className="w-full mt-4 py-2 text-white font-semibold rounded-lg shadow-md bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-transform transform hover:scale-105"
-          onClick={handleFoodSubmit}
-        >
-          {editingId !== null ? "Update Food" : "Add Food"}
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {foodItems.map((item) => (
-          <div key={item.id} className="bg-white shadow-lg rounded-xl overflow-hidden w-72 mx-auto">
-            <img src={item.image} alt={item.foodName} className="w-full h-48 object-cover rounded-t-xl" />
-            <div className="p-3 text-center text-black">
-                <span className="text-xs font-semibold uppercase bg-gray-400 bg-opacity-40 px-2 py-1 rounded-full">
-                  Category: {item.category}
-                </span>
-                <h2 className="text-2xl font-bold mt-2">{item.foodName}</h2>
-                <p className="text-sm mt-1 truncate">{item.description}</p>
-
-                <div className="flex justify-between items-center bg-blue-400 bg-opacity-20 p-2 rounded-md mt-2">
-                  <span className="text-xl font-semibold">${item.price}</span>
-                  <span className="text-xs font-medium">
-                    Token: <span className="text-lg font-bold">{item.token}</span>
-                  </span>
-                </div>
-            
-
-              {/* Edit & Delete Buttons */}
-              <div className="flex justify-between mt-3">
-                <button
-                  onClick={() => editFoodItem(item.id)}
-                  className="bg-yellow-500 text-white px-8 py-2 rounded-lg text-sm hover:bg-yellow-600"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteFoodItem(item.id)}
-                  className="bg-red-500 text-white px-8 py-2 rounded-lg text-sm hover:bg-red-600"
-                >
-                  Delete
-                </button>
-              </div>
+      {/* Main Content */}
+      <main className="flex-1 p-10">
+        <div className="grid grid-cols-2 gap-8">
+          {/* Setup Offers */}
+          <section 
+            className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
+            onClick={() => router.push("/offerSetup")}
+          >
+            <h3 className="text-2xl font-bold text-blue-900 mb-4">🎁 SETUP OFFERS</h3>
+            <div className="flex flex-col gap-4">
+              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+                🌞 DAILY OFFERS
+              </button>
+              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+                🎉 WEEKEND OFFERS
+              </button>
+              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+                🌿 SEASONAL OFFERS
+              </button>
             </div>
-          </div>
-        ))}
-      </div>
+          </section>
 
-      <div className="flex justify-center mt-10">
-        <button onClick={handleAddToMenu} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold">
-          Add to Menu
-        </button>
-      </div>
+          {/* Change Admin Password */}
+          <section className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200">
+            <h3 className="text-2xl font-bold text-blue-900">🔑 CHANGE ADMIN PASSWORD</h3>
+          </section>
+
+          {/* Setup Menu */}
+          <section 
+            className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
+            onClick={() => router.push("/menuSetup")}
+          >
+            <h3 className="text-2xl font-bold text-blue-900">🍽️ SETUP MENU CARD</h3>
+          </section>
+
+          {/* User Management */}
+          <section className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200">
+            <h3 className="text-2xl font-bold text-blue-900">👥 USER MANAGEMENT</h3>
+          </section>
+        </div>
+      </main>
     </div>
   );
-};
-
-export default AdminPage;
+}
