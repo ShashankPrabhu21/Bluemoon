@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, PlusCircle, Facebook, Youtube, Instagram, User } from "lucide-react";
+import { Menu, X, Facebook, Youtube, Instagram, User } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
@@ -34,11 +34,8 @@ export default function Navbar() {
   }, [lastScrollY]);
 
   return (
-    <header
-      className={`fixed top-0 left-0 w-full text-white z-50 transition-transform duration-500 ease-in-out backdrop-blur-lg ${
-        isVisible ? "translate-y-0" : "-translate-y-full"
-      } bg-black/75`}
-    >
+<header className="fixed top-0 left-0 w-full text-white z-50 backdrop-blur-lg bg-black/75">
+
       {/* Top Contact & Social Media Bar */}
       <div className="hidden lg:flex justify-between items-center px-6 py-2 text-base font-medium">
         <div className="flex items-center space-x-5">
@@ -76,24 +73,25 @@ export default function Navbar() {
             <li className="cursor-pointer hover:text-gray-300"><Link href="/menu">Menu</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/about">About Us</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/delivery">Delivery</Link></li>
+            <li className="cursor-pointer hover:text-gray-300"><Link href="/gallery">Gallery</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/cooking">Cooking Videos</Link></li>
-            <li className="cursor-pointer hover:text-gray-300"><Link href="/blog">Blog</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/contact">Contact Us</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/table">Table Reservation</Link></li>
 
             {/* Extra Links Toggle */}
             {extraLinks && (
               <>
-                <li className="cursor-pointer hover:text-gray-300"><Link href="/gallery">Gallery</Link></li>
+                <li className="cursor-pointer hover:text-gray-300"><Link href="/blog">Blog</Link></li>
                 <li className="cursor-pointer hover:text-gray-300"><Link href="/pickup">Pick Up</Link></li>
               </>
             )}
 
             {/* Plus Toggle Button */}
+            {/* More Options Toggle Button */}
             <button onClick={() => setExtraLinks(!extraLinks)} className="cursor-pointer ml-4">
-              <PlusCircle
+              <Menu
                 className={`w-6 h-6 text-white transition-transform duration-200 ${
-                  extraLinks ? "rotate-45 text-gray-400" : "hover:scale-110"
+                  extraLinks ? "text-gray-400" : "hover:scale-110"
                 }`}
               />
             </button>

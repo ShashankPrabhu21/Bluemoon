@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#314ec4] text-white py-6 relative z-[50] w-full">
       <div className="max-w-7xl mx-auto px-4 flex justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-24 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-48 text-center md:text-left">
 
           {/* Quick Links Section */}
           <div className="space-y-4">

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+
 
 interface FoodItem {
   id: number;
@@ -124,7 +124,7 @@ const AdminPage = () => {
           <option value="Main Course">Main Course</option>
           <option value="Desserts">Desserts</option>
           <option value="Snacks">Snacks</option>
-          <option value="Dinner">Drinks</option>
+          <option value="Drinks">Drinks</option>
         </select>
 
         <input
@@ -183,13 +183,13 @@ const AdminPage = () => {
           <div key={item.id} className="bg-white shadow-lg rounded-xl overflow-hidden w-72 mx-auto">
             <img src={item.image} alt={item.foodName} className="w-full h-48 object-cover rounded-t-xl" />
             <div className="p-3 text-center text-black">
-                <span className="text-xs font-semibold uppercase bg-black bg-opacity-40 px-2 py-1 rounded-full">
-                  {item.category}
+                <span className="text-xs font-semibold uppercase bg-gray-400 bg-opacity-40 px-2 py-1 rounded-full">
+                  Category: {item.category}
                 </span>
                 <h2 className="text-2xl font-bold mt-2">{item.foodName}</h2>
                 <p className="text-sm mt-1 truncate">{item.description}</p>
 
-                <div className="flex justify-between items-center bg-black bg-opacity-20 p-2 rounded-md mt-2">
+                <div className="flex justify-between items-center bg-blue-400 bg-opacity-20 p-2 rounded-md mt-2">
                   <span className="text-xl font-semibold">${item.price}</span>
                   <span className="text-xs font-medium">
                     Token: <span className="text-lg font-bold">{item.token}</span>

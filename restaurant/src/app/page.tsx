@@ -63,7 +63,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-    }, 2100);
+    }, 3000);
     
     return () => clearInterval(interval);
   }, []);
@@ -95,7 +95,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 2 }}
         className={`absolute ${slides[currentIndex].position} px-4 z-10`}
       >
         <h3 className="text-lg font-semibold tracking-wider">
@@ -136,15 +136,20 @@ export default function Home() {
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
           {images.map((src, index) => (
-            <div key={index} className="min-w-full flex justify-center">
-              <Image
-                src={src}
-                alt={`Slide ${index + 1}`}
-                width={900}
-                height={600}
-                className="w-full max-w-[90%] md:max-w-[80%] lg:max-w-[900px] h-[45vh] md:h-[55vh] lg:h-[63vh] object-contain rounded-xl md:rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 shadow-2xl"
-              />
-            </div>
+            <div key={index}  className="min-w-full flex justify-center">
+            <Image
+              src={src}
+              alt={`Slide ${index + 1}`}
+              width={900}
+              height={600}
+             
+              className="w-full max-w-[90%] md:max-w-[80%] lg:max-w-[900px] 
+                         h-[45vh] md:h-[55vh] lg:h-[63vh] 
+                         object-contain rounded-xl md:rounded-2xl 
+                          "
+          />
+          </div>
+          
           ))}
         </div>
 

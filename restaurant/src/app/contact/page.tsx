@@ -1,12 +1,8 @@
 "use client";
 import Image from "next/image";
-
 import Link from "next/link";
 
 const ContactUs = () => {
-
-
-
   return (
     <div className="min-h-screen bg-blue-900 text-white">
       <div className="relative bg-white h-32 flex items-center justify-center -mt-6">       
