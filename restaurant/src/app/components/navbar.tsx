@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, Facebook, Youtube, Instagram, User } from "lucide-react";
+import { Menu, X, Facebook, Youtube, Instagram, User, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 
 export default function Navbar() {
-  const [isVisible, setIsVisible] = useState(true);
+  const [, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [extraLinks, setExtraLinks] = useState(false);
@@ -86,10 +86,10 @@ export default function Navbar() {
               </>
             )}
 
-            {/* Plus Toggle Button */}
+          
             {/* More Options Toggle Button */}
             <button onClick={() => setExtraLinks(!extraLinks)} className="cursor-pointer ml-4">
-              <Menu
+              <MoreHorizontal
                 className={`w-6 h-6 text-white transition-transform duration-200 ${
                   extraLinks ? "text-gray-400" : "hover:scale-110"
                 }`}
