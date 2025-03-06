@@ -51,7 +51,7 @@ export default function ReservationForm() {
           offers: false, // Reset toggle
         });
       }
-    } catch (error) {
+    } catch {
       alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false); // Hide loading state

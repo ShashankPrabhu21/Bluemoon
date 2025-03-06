@@ -1,39 +1,37 @@
-import db from "../../../../lib/db";  
+import connectDB from "@/lib/mongodb"; 
+import ContactMessage from "@/models/ContactMessage";
+import { NextResponse } from "next/server";
 
-
-
+// Handle POST request (Save Contact Message)
 export async function POST(req) {
   try {
+    await connectDB();
     const body = await req.json();
-    console.log("Received data:", body);
 
     const { name, email, phone, subject, message } = body;
 
     if (!name || !email || !message) {
-      console.log("Validation failed: Missing required fields");
-      return new Response("Missing required fields", { status: 400 });
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const query = `
-      INSERT INTO contact_messages (name, email, phone, subject, message)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    const values = [name, email, phone, subject, message];
+    const newMessage = new ContactMessage({ name, email, phone, subject, message });
+    await newMessage.save();
 
-    await new Promise((resolve, reject) => {
-      db.query(query, values, (err, result) => {
-        if (err) {
-          console.error("Database error:", err);
-          return reject(err);
-        }
-        console.log("Data inserted successfully:", result);
-        resolve();
-      });
-    });
-
-    return new Response("Message saved successfully", { status: 200 });
+    return NextResponse.json({ message: "Message saved successfully" }, { status: 200 });
   } catch (error) {
     console.error("Database error:", error);
-    return new Response("Database error", { status: 500 });
+    return NextResponse.json({ error: "Database error" }, { status: 500 });
+  }
+}
+
+// Handle GET request (Fetch all messages)
+export async function GET() {
+  try {
+    await connectDB();
+    const messages = await ContactMessage.find();
+    return NextResponse.json(messages, { status: 200 });
+  } catch (error) {
+    console.error("Database error:", error);
+    return NextResponse.json({ error: "Database error" }, { status: 500 });
   }
 }
