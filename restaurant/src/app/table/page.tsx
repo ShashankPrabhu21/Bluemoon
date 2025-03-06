@@ -2,10 +2,11 @@
 
 import ReservationForm from "../components/ResevationForm";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+
+import Link from "next/link";
 
 export default function TablePage() {
-  const router = useRouter();
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -15,7 +16,7 @@ export default function TablePage() {
     <div
       className="relative min-h-screen flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundImage: "url('/base1.jpg')",
+        backgroundImage: "url('/sec1.jpg')",
       }}
     >
       {/* Dark Gradient Overlay */}
@@ -24,7 +25,7 @@ export default function TablePage() {
       {/* Content Wrapper to Ensure Proper Layering */}
       <div className="relative z-10 flex flex-col items-center mt-32 ">
         <h1 className="text-4xl font-bold text-transparent bg-clip-text 
-          bg-gradient-to-b from-gray-100 to-gray-300 tracking-wide drop-shadow-md 
+          bg-gradient-to-b from-gray-100 to-gray-200 tracking-wide drop-shadow-md 
           animate-fadeIn">
           TABLE RESERVATION
         </h1>
@@ -36,12 +37,14 @@ export default function TablePage() {
         </div>
 
         {/* Back Button */}
-        <button
-          onClick={() => router.push("/")}
-          className="mt-4 mb-4 px-6 py-3 bg-blue-800 text-white rounded-lg hover:bg-blue-800 transition"
-        >
-          Back to Home
-        </button>
+        <div className="w-full flex justify-center mt-6">
+          <Link
+            href="/"
+            className="px-6 py-3 mb-6 bg-blue-900 text-white font-semibold text-lg rounded-full shadow-lg hover:bg-[#253b9c] hover:scale-105 transition-all duration-300 z-10"
+          >
+            Back to Home
+          </Link>
+        </div>
        
       </div>
       
