@@ -29,6 +29,7 @@ const MenuPage = () => {
       setMenuItems(JSON.parse(storedMenu));
     }
   }, []);
+  
 
   const categories = Object.keys(categoryImages);
 

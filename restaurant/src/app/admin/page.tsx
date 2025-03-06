@@ -22,21 +22,21 @@ const AdminPage = () => {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedItems = localStorage.getItem("foodItems");
-      if (storedItems) {
-        setFoodItems(JSON.parse(storedItems));
-      }
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const storedItems = localStorage.getItem("foodItems");
+    if (storedItems) {
+      setFoodItems(JSON.parse(storedItems));
     }
-  }, []);
-  
-  useEffect(() => {
-    if (typeof window !== "undefined" && foodItems.length > 0) {
-      localStorage.setItem("foodItems", JSON.stringify(foodItems));
-    }
-  }, [foodItems]);
-  
+  }
+}, []);
+
+useEffect(() => {
+  if (typeof window !== "undefined" && foodItems.length > 0) {
+    localStorage.setItem("foodItems", JSON.stringify(foodItems));
+  }
+}, [foodItems]);
+
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
