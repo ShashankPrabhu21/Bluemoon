@@ -14,7 +14,7 @@ interface FoodItem {
 const categoryImages: Record<string, string> = {
   Breakfast: "/breakfast.png",
   "Main Course": "/1.jpg",
-  Drinks: "/drinks.png",
+  Drinks: "/tea.png",
   Desserts: "/sec2.jpg",
   Snacks: "/sec11.jpg",
 };

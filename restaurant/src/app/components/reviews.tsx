@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import Image from "next/image";
 
 const reviews = [
@@ -11,6 +11,7 @@ const reviews = [
     image: "/r1.png",
     review:
       "Absolutely loved the authentic Kerala flavors! The seafood dishes were fresh, aromatic, and bursting with taste. Every bite took me straight to Kerala, especially the prawn curry—it was divine!",
+    rating: 5,
   },
   {
     id: 2,
@@ -18,6 +19,7 @@ const reviews = [
     image: "/r2.png",
     review:
       "The best Kerala restaurant in Australia! The spices were perfectly blended, and the appam with stew was heavenly. The service was exceptional, and the ambiance made the experience even better.",
+    rating: 4.5,
   },
   {
     id: 3,
@@ -25,6 +27,7 @@ const reviews = [
     image: "/r3.png",
     review:
       "Bluemoon Restaurant is a hidden gem! The Malabar biryani was outstanding—flavorful, aromatic, and cooked to perfection. The balance of spices was impeccable, and the raita complemented it beautifully.",
+    rating: 4,
   },
   {
     id: 4,
@@ -32,6 +35,7 @@ const reviews = [
     image: "/r4.png",
     review:
       "A true taste of Kerala! The coconut-infused curries reminded me of home. The seafood platter was fresh and bursting with flavors, and the mango lassi was the perfect refreshing drink.",
+    rating: 5,
   },
   {
     id: 5,
@@ -39,6 +43,7 @@ const reviews = [
     image: "/r5.png",
     review:
       "Incredible experience! The flavors transported me straight to Kerala. The parotta was soft and flaky, and the beef fry had just the right amount of spice. Highly recommend their seafood platters!",
+    rating: 4.5,
   },
 ];
 
@@ -48,7 +53,7 @@ export default function Reviews() {
   useEffect(() => {
     const interval = setInterval(() => {
       nextReview();
-    }, 3000); 
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [currentIndex]);
@@ -87,6 +92,21 @@ export default function Reviews() {
             className="object-cover w-full h-full"
           />
         </motion.div>
+
+        {/* Star Rating */}
+        <div className="flex mt-3">
+          {[...Array(5)].map((_, i) => (
+            <span key={i} className="text-yellow-400">
+              {i + 1 <= Math.floor(reviews[currentIndex].rating) ? (
+                <FaStar />
+              ) : i + 0.5 === reviews[currentIndex].rating ? (
+                <FaStarHalfAlt />
+              ) : (
+                <FaStar className="opacity-50" />
+              )}
+            </span>
+          ))}
+        </div>
 
         {/* Review Text */}
         <motion.div
