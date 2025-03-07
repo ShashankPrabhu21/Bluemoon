@@ -8,7 +8,7 @@ import { UtensilsCrossed, ChefHat } from "lucide-react";
 import { FaUtensils, FaLeaf, FaStar } from "react-icons/fa";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Reviews from './components/reviews';
-
+//import AddUserForm from "./components/AddUserForm";
 
 export default function Home() {
   {/*Base Images */}
