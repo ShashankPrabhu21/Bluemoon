@@ -90,7 +90,7 @@ export default function Blog() {
       <div className="relative max-w-6xl w-full">
         {/* Blog Title */}
         <motion.h1
-          className="text-center text-4xl font-bold mt-24 mb-6"
+          className="text-center text-4xl font-bold mt-32 mb-6"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}

@@ -24,7 +24,7 @@ export default function About() {
             <div className="relative flex flex-col items-center justify-center h-80 bg-cover bg-center" 
                 style={{ backgroundImage: "url('/base.jpg')" }}>
                 <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/80"></div> 
-                <h2 className="text-5xl font-bold text-white z-10 drop-shadow-2xl tracking-wide animate-fadeIn mt-5">
+                <h2 className="text-5xl font-bold text-white z-10 drop-shadow-2xl tracking-wide animate-fadeIn mt-10">
                     About Us
                 </h2>     
                 <div className="w-24 h-1 bg-white mt-4 rounded-full z-10 animate-scaleIn"></div>

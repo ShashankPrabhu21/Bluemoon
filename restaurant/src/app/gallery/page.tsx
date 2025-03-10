@@ -61,7 +61,7 @@ const Gallery = () => {
       <div className="relative w-full bg-cover bg-center" 
         style={{ backgroundImage: "linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url('/sec22.jpg')" }}>
         <div className="container mx-auto px-4 py-12 text-center">
-          <h2 className="text-4xl font-bold mb-4 mt-20">Our Gallery</h2>
+          <h2 className="text-4xl font-bold mb-4 mt-24">Our Gallery</h2>
           <div className="w-24 h-1 bg-white mx-auto mb-6"></div>
           <p className="max-w-2xl mx-auto">Experience the elegant ambiance and exquisite cuisine of Bluemoon Restaurant through our gallery.</p>
         </div>

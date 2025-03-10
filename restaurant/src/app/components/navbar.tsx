@@ -35,6 +35,7 @@ export default function Navbar() {
     };
   }, [lastScrollY]);
 
+  
   return (
 <header className="fixed top-0 left-0 w-full text-white z-50 backdrop-blur-lg bg-black/75">
 
@@ -67,12 +68,18 @@ export default function Navbar() {
       {/* Navbar Section */}
       <nav className="py-4 shadow-md px-6 flex justify-between items-center">
         {/* Logo and Text */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <Image src="/LOGO.jpg" alt="Bluemoon Logo" width={65} height={65} className="rounded-full" />
-          <div className="leading-tight">
-            <h1 className="text-2xl font-bold tracking-wide">BLUEMOON</h1>
-            <p className="text-sm tracking-wider">RESTAURANT</p>
+          <div className="leading-tight text-left">
+            <h1 className="text-[1.65rem] font-medium uppercase tracking-wide text-blue-400 drop-shadow-md animate-slide-in">
+              BLUEMOON
+            </h1>
+            <p className="text-[1.6rem] font-medium uppercase tracking-wide text-gray-300 drop-shadow-md animate-slide-in">
+              RESTAURANT
+            </p>
           </div>
+
+
         </div>
 
         {/* Desktop Navbar (Only visible if screen width > 1280px) */}

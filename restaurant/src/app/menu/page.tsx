@@ -35,11 +35,15 @@ const MenuPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      {!selectedCategory && (
-        <h1 className="text-4xl font-bold text-center mb-6 mt-32 text-gray-800">
+    {!selectedCategory && (
+      <div className="text-center mt-32">
+        <h1 className="text-4xl font-bold text-gray-800 mb-2">
           Our Menu
         </h1>
-      )}
+        <div className="w-24 h-1 bg-black mx-auto rounded-full mb-10"></div>
+      </div>
+    )}
+
 
 
       {selectedCategory ? (

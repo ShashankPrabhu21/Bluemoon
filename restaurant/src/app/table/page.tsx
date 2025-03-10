@@ -23,7 +23,7 @@ export default function TablePage() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/60"></div>
 
       {/* Content Wrapper to Ensure Proper Layering */}
-      <div className="relative z-10 flex flex-col items-center mt-32 ">
+      <div className="relative z-10 flex flex-col items-center mt-36 ">
         <h1 className="text-4xl font-bold text-transparent bg-clip-text 
           bg-gradient-to-b from-gray-100 to-gray-200 tracking-wide drop-shadow-md 
           animate-fadeIn">

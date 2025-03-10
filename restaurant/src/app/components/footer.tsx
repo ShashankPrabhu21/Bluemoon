@@ -1,6 +1,7 @@
 // components/Footer.tsx
 import Link from 'next/link';
-import { Facebook, Instagram, Twitter, Mail, Phone } from 'lucide-react';
+import { Facebook, Youtube, Mail, Phone } from 'lucide-react';
+import { FaWhatsapp, FaInstagram } from 'react-icons/fa';
 
 export default function Footer() {
   return (
@@ -47,20 +48,52 @@ export default function Footer() {
             {/* Social Media Links */}
             <div className="flex justify-center md:justify-start gap-4">
               <Link href="https://facebook.com" target="_blank"><Facebook size={24} className="cursor-pointer hover:text-gray-200" /></Link>
-              <Link href="https://instagram.com" target="_blank"><Instagram size={24} className="cursor-pointer hover:text-gray-200" /></Link>
-              <Link href="https://twitter.com" target="_blank"><Twitter size={24} className="cursor-pointer hover:text-gray-200" /></Link>
+              <a href="https://www.instagram.com/bluemoonrestaurant1/" target="_blank" rel="noopener noreferrer">
+                <FaInstagram className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
+            </a>
+              <Link href="https://twitter.com" target="_blank"><Youtube size={24} className="cursor-pointer hover:text-gray-200" /></Link>
+              <a href="/QRCode.jpg" target="_blank" rel="noopener noreferrer"> {/* WhatsApp link to QR code */}
+                <FaWhatsapp className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
+            </a>
             </div>
           </div>
 
           {/* Buttons Centered */}
           <div className="flex flex-col items-center space-y-4">
-            <Link href="/order" className="inline-block bg-white text-[#1e3799] text-center py-2 px-12 rounded font-semibold hover:bg-gray-100 transition-colors">
+            {/* ORDER ONLINE Button */}
+            <Link 
+              href="/order" 
+              className="inline-block bg-white text-[#1e3799] text-center py-3 px-14 rounded-lg font-bold shadow-md hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
+            >
               ORDER ONLINE 
             </Link>
-            <Link href="/reserve" className="inline-block border-2 border-white text-center py-2 px-10 rounded font-semibold hover:bg-white hover:text-[#1e3799] transition-colors">
+
+            {/* RESERVE A TABLE Button */}
+            <Link 
+              href="/reserve" 
+              className="inline-block border-2 border-white text-white text-center py-3 px-12 rounded-lg font-bold shadow-md hover:bg-white hover:text-[#1e3799] hover:shadow-lg hover:scale-105 transition-all duration-300"
+            >
               RESERVE A TABLE
             </Link>
+
+            {/* SUBSCRIBE FOR UPDATES Button */}
+            <Link 
+              href="/subscribe" 
+              className="inline-block border-2 border-white text-white text-center py-3 px-4 rounded-lg font-bold shadow-md hover:bg-white hover:text-[#1e3799] hover:shadow-lg hover:scale-105 transition-all duration-300"
+            >
+              SUBSCRIBE FOR UPDATES
+            </Link>
+
+            {/* WRITE A REVIEW Button */}
+            <Link 
+              href="/review" 
+              className="inline-block border-2 border-white text-white text-center py-3 px-12 rounded-lg font-bold shadow-md hover:bg-white hover:text-[#1e3799] hover:shadow-lg hover:scale-105 transition-all duration-300"
+            >
+              WRITE A REVIEW
+            </Link>
           </div>
+
+
         </div>
       </div>
 
