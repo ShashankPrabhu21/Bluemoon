@@ -71,7 +71,7 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <Image src="/LOGO.jpg" alt="Bluemoon Logo" width={65} height={65} className="rounded-full" />
           <div className="leading-tight text-left">
-            <h1 className="text-[1.65rem] font-medium uppercase tracking-wide text-blue-400 drop-shadow-md animate-slide-in">
+            <h1 className="text-[1.65rem] font-medium uppercase tracking-wide text-blue-600 drop-shadow-md animate-slide-in">
               BLUEMOON
             </h1>
             <p className="text-[1.6rem] font-medium uppercase tracking-wide text-gray-300 drop-shadow-md animate-slide-in">
