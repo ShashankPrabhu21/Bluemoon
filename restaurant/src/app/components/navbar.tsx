@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, Facebook, Youtube, Instagram, User, MoreHorizontal } from "lucide-react";
+import { Menu, X, Facebook, Youtube, MoreHorizontal } from "lucide-react";
+import { FaWhatsapp } from 'react-icons/fa';
+import { FaInstagram, FaUser } from 'react-icons/fa';
 import Link from "next/link";
 
 export default function Navbar() {
@@ -38,22 +40,29 @@ export default function Navbar() {
 
       {/* Top Contact & Social Media Bar */}
       <div className="hidden lg:flex justify-between items-center px-6 py-2 text-base font-medium">
-        <div className="flex items-center space-x-5">
-          <span>📞 0422 306 777</span>
-          <span>✉ bluemoon@gmail.com</span>
-        </div>
-        {/* Social Media & Admin Icons */}
-        <div className="flex space-x-5">
-          <Facebook className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
-          <Youtube className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
-          <Instagram className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
-          <div className="ml-5">
+    <div className="flex items-center space-x-5">
+        <span>📞 0422 306 777</span>
+        <span>✉ bluemoon@gmail.com</span>
+    </div>
+    {/* Social Media & Admin Icons (Right-Aligned) */}
+    <div className="flex items-center flex-row-reverse">
+        <div className="ml-10">
             <Link href="/admin">
-              <User className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
+                <FaUser className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
             </Link>
-          </div>
+        </div>
+        <div className="flex space-x-3">
+            <a href="/QRCode.jpg" target="_blank" rel="noopener noreferrer"> {/* WhatsApp link to QR code */}
+                <FaWhatsapp className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
+            </a>
+            <Facebook className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
+            <Youtube className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
+            <a href="https://www.instagram.com/bluemoonrestaurant1/" target="_blank" rel="noopener noreferrer">
+                <FaInstagram className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
+            </a>
+        </div>
+    </div>
 </div>
-      </div>
 
       {/* Navbar Section */}
       <nav className="py-4 shadow-md px-6 flex justify-between items-center">
