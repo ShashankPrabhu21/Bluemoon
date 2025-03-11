@@ -13,8 +13,10 @@ import OfferItem from './components/offerCard';
 import Reviews from './components/reviews';
 
 //import AddUserForm from "./components/AddUserForm";
-const NextArrow = (props: any) => {
-  const { onClick } = props;
+interface ArrowProps {
+  onClick?: () => void;
+}
+const NextArrow: React.FC<ArrowProps> = ({ onClick }) => {
   return (
     <div
       className="absolute top-1/2 right-[-20px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer"
@@ -25,8 +27,7 @@ const NextArrow = (props: any) => {
   );
 };
 
-const PrevArrow = (props: any) => {
-  const { onClick } = props;
+const PrevArrow: React.FC<ArrowProps> = ({ onClick }) => {
   return (
     <div
       className="absolute top-1/2 left-[-20px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer z-10"
