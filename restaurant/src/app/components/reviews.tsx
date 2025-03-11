@@ -1,71 +1,37 @@
 "use client";
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { FaArrowLeft, FaArrowRight, FaStar, FaStarHalfAlt } from "react-icons/fa";
-import Image from "next/image";
+import { useEffect, useState } from "react";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { motion, AnimatePresence } from "framer-motion";
 
-const reviews = [
-  {
-    id: 1,
-    name: "John Doe",
-    image: "/r1.png",
-    review:
-      "Absolutely loved the authentic Kerala flavors! The seafood dishes were fresh, aromatic, and bursting with taste. Every bite took me straight to Kerala, especially the prawn curry—it was divine!",
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    image: "/r2.png",
-    review:
-      "The best Kerala restaurant in Australia! The spices were perfectly blended, and the appam with stew was heavenly. The service was exceptional, and the ambiance made the experience even better.",
-    rating: 4.5,
-  },
-  {
-    id: 3,
-    name: "Emily Johnson",
-    image: "/r3.png",
-    review:
-      "Bluemoon Restaurant is a hidden gem! The Malabar biryani was outstanding—flavorful, aromatic, and cooked to perfection. The balance of spices was impeccable, and the raita complemented it beautifully.",
-    rating: 4,
-  },
-  {
-    id: 4,
-    name: "Michael Brown",
-    image: "/r4.png",
-    review:
-      "A true taste of Kerala! The coconut-infused curries reminded me of home. The seafood platter was fresh and bursting with flavors, and the mango lassi was the perfect refreshing drink.",
-    rating: 5,
-  },
-  {
-    id: 5,
-    name: "Juliet Wilson",
-    image: "/r5.png",
-    review:
-      "Incredible experience! The flavors transported me straight to Kerala. The parotta was soft and flaky, and the beef fry had just the right amount of spice. Highly recommend their seafood platters!",
-    rating: 4.5,
-  },
-];
+interface Review {
+  id: number;
+  name: string;
+  rating: number;
+  comment: string;
+  date: string;
+  gender?: string;
+}
 
 export default function Reviews() {
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 for next, -1 for previous
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextReview();
-    }, 3000);
+    const storedReviews = localStorage.getItem("reviews");
+    if (storedReviews) {
+      setReviews(JSON.parse(storedReviews));
+    }
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [currentIndex]);
-
-  const nextReview = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % reviews.length);
+  const nextSlide = () => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % reviews.length);
   };
 
-  const prevReview = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? reviews.length - 1 : prevIndex - 1
-    );
+  const prevSlide = () => {
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
   };
 
   return (
@@ -74,91 +40,79 @@ export default function Reviews() {
         ⭐ CUSTOMER REVIEWS ⭐
       </h2>
 
-      <div className="relative flex flex-col items-center w-full max-w-3xl bg-gradient-to-br from-[#5e88b3] to-[#3345A7] rounded-3xl shadow-lg p-8 text-white">
-        {/* Reviewer Image */}
-        <motion.div
-          key={reviews[currentIndex].id}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.5 }}
-          className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-md"
-        >
-          <Image
-            src={reviews[currentIndex].image}
-            alt={reviews[currentIndex].name}
-            width={112}
-            height={112}
-            className="object-cover w-full h-full"
-          />
-        </motion.div>
+      {reviews.length > 0 ? (
+        <div className="relative w-full max-w-3xl mx-auto overflow-hidden">
+          <AnimatePresence custom={direction} mode="popLayout">
+            <motion.div
+              key={currentIndex}
+              className="p-8 rounded-xl shadow-xl 
+              bg-gradient-to-b from-[#E0ECFF] to-[#F9FBFF] 
+              transition-all duration-300 w-full flex-shrink-0 flex flex-col items-center text-center"
+              initial={{ x: direction > 0 ? "100%" : "-100%", opacity: 0 }}
+              animate={{ x: "0%", opacity: 1 }}
+              exit={{ x: direction > 0 ? "-100%" : "100%", opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {/* Gender Image */}
+              <motion.img
+                src={
+                  reviews[currentIndex].gender?.toLowerCase() === "male"
+                    ? "/male.png"
+                    : "/female.png"
+                }
+                alt="Gender Icon"
+                className="w-20 h-20 object-contain mb-4 rounded-full shadow-md"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.4 }}
+              />
 
-        {/* Star Rating */}
-        <div className="flex mt-3">
-          {[...Array(5)].map((_, i) => (
-            <span key={i} className="text-yellow-400">
-              {i + 1 <= Math.floor(reviews[currentIndex].rating) ? (
-                <FaStar />
-              ) : i + 0.5 === reviews[currentIndex].rating ? (
-                <FaStarHalfAlt />
-              ) : (
-                <FaStar className="opacity-50" />
-              )}
-            </span>
-          ))}
+              {/* Review Details */}
+              <h3 className="text-xl font-semibold text-gray-800">{reviews[currentIndex].name}</h3>
+
+              {/* Star Ratings with Bounce Effect */}
+              <div className="flex gap-1 mt-2">
+                {Array.from({ length: reviews[currentIndex].rating }).map((_, index) => (
+                  <motion.span
+                    key={index}
+                    className="text-yellow-400 text-3xl"
+                    whileHover={{ scale: 1.2, y: -5 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    ⭐
+                  </motion.span>
+                ))}
+              </div>
+
+              <p className="italic text-gray-700 mt-3 text-lg">{reviews[currentIndex].comment}</p>
+              <p className="text-sm text-gray-500 mt-1">{reviews[currentIndex].date}</p>
+              {/* Navigation Buttons - Positioned at the Bottom */}
+          <div className="flex justify-center gap-6 mt-6">
+            <motion.button
+              className="text-2xl p-3 bg-[#2A4D80] text-white rounded-full shadow-lg hover:bg-[#1E3A60] 
+              transition-all duration-300"
+              onClick={prevSlide}
+              whileTap={{ scale: 0.9 }}
+            >
+              <IoIosArrowBack />
+            </motion.button>
+            <motion.button
+              className="text-2xl p-3 bg-[#2A4D80] text-white rounded-full shadow-lg hover:bg-[#1E3A60] 
+              transition-all duration-300"
+              onClick={nextSlide}
+              whileTap={{ scale: 0.9 }}
+            >
+              <IoIosArrowForward />
+            </motion.button>
+          </div>
+            </motion.div>
+          </AnimatePresence>
+
+          
         </div>
-
-        {/* Review Text */}
-        <motion.div
-          key={reviews[currentIndex].review}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.5 }}
-          className="mt-6 text-center text-lg italic px-6 leading-relaxed"
-        >
-          `&quot;`{reviews[currentIndex].review}`&quot;`
-        </motion.div>
-
-        {/* Reviewer Name */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-4 font-semibold text-lg"
-        >
-          - {reviews[currentIndex].name}
-        </motion.p>
-
-        {/* Navigation Arrows */}
-        <div className="flex items-center mt-6 space-x-4">
-          <button
-            onClick={prevReview}
-            className="p-3 bg-white bg-opacity-25 text-white rounded-full shadow-md hover:bg-opacity-40 transition"
-          >
-            <FaArrowLeft size={20} />
-          </button>
-          <button
-            onClick={nextReview}
-            className="p-3 bg-white bg-opacity-25 text-white rounded-full shadow-md hover:bg-opacity-40 transition"
-          >
-            <FaArrowRight size={20} />
-          </button>
-        </div>
-
-        {/* Indicator Dots */}
-        <div className="flex mt-6 space-x-2">
-          {reviews.map((_, index) => (
-            <span
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full cursor-pointer ${
-                index === currentIndex ? "bg-white" : "bg-white bg-opacity-50"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
+      ) : (
+        <p className="text-center text-gray-500 text-lg">No reviews yet. Be the first to leave one!</p>
+      )}
     </div>
   );
 }

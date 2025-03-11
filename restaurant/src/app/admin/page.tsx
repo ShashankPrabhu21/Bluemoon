@@ -1,84 +1,75 @@
 "use client";
-
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { FaUser, FaLock } from "react-icons/fa";
 
-export default function AdminDashboard() {
+export default function LoginPage() {
   const router = useRouter();
+  const [credentials, setCredentials] = useState({ username: "", password: "" });
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Simple authentication (Replace this with real authentication logic)
+    if (credentials.username === "admin" && credentials.password === "admin123") {
+      router.push("/adminDashboard"); // Redirect to Admin Dashboard
+    } else {
+      alert("Invalid Credentials");
+    }
+  };
 
   return (
-    <div className="mt-32 h-screen flex bg-gradient-to-br from-gray-100 to-gray-300">
-      {/* Sidebar with Glassmorphism */}
-      <aside className="w-1/4 bg-blue-900 bg-opacity-90 backdrop-blur-lg text-white p-6 flex flex-col gap-6 shadow-2xl rounded-r-3xl border-r-4 border-blue-800">
-        <h2 className="text-3xl font-extrabold text-center tracking-wide drop-shadow-lg">
-          🛠️ ADMIN DASHBOARD
-        </h2>
+    <div className="flex h-screen items-center justify-center bg-gray-100">
+      {/* White Card Login Box */}
+      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl border border-gray-200">
+        <h2 className="text-3xl font-bold text-center text-blue-800">Admin Login</h2>
 
-        <nav className="flex flex-col gap-4">
+        {/* Login Form */}
+        <form onSubmit={handleLogin} className="mt-6">
+          <div className="relative">
+            <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-gray-50 placeholder-gray-400 text-gray-700 outline-none transition-all duration-300"
+              placeholder="Username"
+              onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+            />
+          </div>
+
+          <div className="relative mt-4">
+            <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="password"
+              className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-gray-50 placeholder-gray-400 text-gray-700 outline-none transition-all duration-300"
+              placeholder="Password"
+              onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+            />
+          </div>
+
+          {/* Forgot Password & Login Button */}
+          <div className="flex justify-between items-center mt-3">
+            <button
+              type="button"
+              className="text-blue-800 hover:text-blue-800 hover:underline text-sm transition-all duration-300"
+              onClick={() => alert("Forgot password functionality here")}
+            >
+              Forgot Password?
+            </button>
+          </div>
+
           <button
-            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg"
-            onClick={() => router.push("/menuSetup")}
+            type="submit"
+            className="w-full mt-5 bg-blue-800 text-white py-3 rounded-lg hover:bg-blue-900 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105"
           >
-            🍽️ SETUP MENU CARD
+            Login
           </button>
+        </form>
 
-          <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg">
-            🔑 CHANGE ADMIN PASSWORD
-          </button>
-
-          <button
-            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg"
-            onClick={() => router.push("/offerSetup")}
-          >
-            🎁 SETUP OFFERS
-          </button>
-
-          <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg">
-            👥 USER MANAGEMENT
-          </button>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-10">
-        <div className="grid grid-cols-2 gap-8">
-          {/* Setup Offers */}
-          <section 
-            className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
-            onClick={() => router.push("/offerSetup")}
-          >
-            <h3 className="text-2xl font-bold text-blue-900 mb-4">🎁 SETUP OFFERS</h3>
-            <div className="flex flex-col gap-4">
-              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🌞 DAILY OFFERS
-              </button>
-              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🎉 WEEKEND OFFERS
-              </button>
-              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🌿 SEASONAL OFFERS
-              </button>
-            </div>
-          </section>
-
-          {/* Change Admin Password */}
-          <section className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200">
-            <h3 className="text-2xl font-bold text-blue-900">🔑 CHANGE ADMIN PASSWORD</h3>
-          </section>
-
-          {/* Setup Menu */}
-          <section 
-            className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
-            onClick={() => router.push("/menuSetup")}
-          >
-            <h3 className="text-2xl font-bold text-blue-900">🍽️ SETUP MENU CARD</h3>
-          </section>
-
-          {/* User Management */}
-          <section className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200">
-            <h3 className="text-2xl font-bold text-blue-900">👥 USER MANAGEMENT</h3>
-          </section>
-        </div>
-      </main>
+        {/* Footer */}
+        <p className="text-center text-gray-400 text-sm mt-5">
+          © {new Date().getFullYear()} Admin Panel. All rights reserved.
+        </p>
+      </div>
     </div>
   );
 }

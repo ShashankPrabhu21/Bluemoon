@@ -1,36 +1,48 @@
 "use client";
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from "react";
 import { motion} from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { UtensilsCrossed, ChefHat } from "lucide-react";
 import { FaUtensils, FaLeaf, FaStar } from "react-icons/fa";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import OfferItem from './components/offerCard';
 import Reviews from './components/reviews';
+
 //import AddUserForm from "./components/AddUserForm";
+const NextArrow = (props: any) => {
+  const { onClick } = props;
+  return (
+    <div
+      className="absolute top-1/2 right-[-20px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer"
+      onClick={onClick}
+    >
+      ➡
+    </div>
+  );
+};
+
+const PrevArrow = (props: any) => {
+  const { onClick } = props;
+  return (
+    <div
+      className="absolute top-1/2 left-[-20px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer z-10"
+      onClick={onClick}
+    >
+      ⬅
+    </div>
+  );
+};
 
 export default function Home() {
   {/*Base Images */}
   const { ref: gapRef1, inView: gapInView1 } = useInView({ threshold: 0.0 });
   const { ref: gapRef2, inView: gapInView2 } = useInView({ threshold: 0.05 });
- 
-
-  {/*Offer Carousels */}
-  const images = ["/off1.png", "/off2.png", "/off3.png"];
   const [currentIndex, setCurrentIndex] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 3000); // Auto-slide every 4s
-    return () => clearInterval(interval);
-  }, []);
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-  };
+
 
   // Hero Section Transition
   const slides = [
@@ -68,7 +80,48 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  //Offer Section
+  interface FoodItem {
+    id: number;
+    category: string;
+    foodName: string;
+    price: string;
+    token: string;
+    description: string;
+    image: string;
+  }
+  interface Offer {
+    id: number;
+    category: string;
+    selectedItems: FoodItem[];
+    totalPrice: number;
+    discountedPrice: number;
+    offerType: string;
+    startDate?: string;
+    endDate?: string;
+  }
+  
+  const [offers, setOffers] = useState<Offer[]>([]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedOffers = localStorage.getItem("offers");
+      if (storedOffers) setOffers(JSON.parse(storedOffers));
+    }
+  }, []);
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1, // Show 2 offers at a time
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
+  };
+  
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-white/95">
 
@@ -110,7 +163,6 @@ export default function Home() {
       </motion.div>
     </section>
 
-
      {/* Buttons */}
       <div className="relative z-30 w-full mt-10 px-4">
         <div className="bg-white py-5 flex flex-col md:flex-row justify-center gap-4 md:gap-6">
@@ -126,52 +178,58 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Display Offers in Carousel */}
+      <div className="mt-10 mb-10 rounded-5xl">
+        <div className="max-w-4xl mx-auto ">
+          <Slider {...settings}>
+            {offers.map((offer) => (
+              <div
+                key={offer.id}
+                className="w-80 bg-gradient-to-b from-[#202A44] to-[#2A3457] text-white rounded-xl shadow-xl p-5 h-[540px] flex flex-col items-center transition-all duration-300 hover:scale-[1.02]"
+              >
+                {/* Offer Header (Full Width, No Border) */}
+                <h3 className="w-full -mt-2 text-3xl font-extrabold text-center text-white py-3 rounded-xl shadow-md tracking-wider uppercase 
+                  bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-600 animate-pulse">
+                  {offer.offerType}
+                </h3>
 
+                {/* Display Offer Items in a Row */}
+                <div className="flex gap-4 justify-center items-center mt-4">
+                  {offer.selectedItems.map((item) => (
+                    <OfferItem
+                      key={item.id}
+                      image={item.image}
+                      name={item.foodName}
+                      price={item.price}
+                      token={item.token}
+                    />
+                  ))}
+                </div>
 
-      {/* Carousel Slider */}
-      <div className="relative mx-auto w-[90%] md:w-[80%] lg:w-[70%] flex justify-center items-center mt-8 mb-8 py-8 md:py-12 bg-gradient-to-r from-[#2C3E50] via-[#4c4caf] to-[#2C3E50] shadow-lg rounded-[20px] md:rounded-[30px]">
-        {/* Images Container */}
-        <div 
-          className="flex transition-transform duration-700 ease-in-out"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-        >
-          {images.map((src, index) => (
-            <div key={index}  className="min-w-full flex justify-center">
-            <Image
-              src={src}
-              alt={`Slide ${index + 1}`}
-              width={900}
-              height={600}
-             
-              className="w-full max-w-[90%] md:max-w-[80%] lg:max-w-[900px] 
-                         h-[45vh] md:h-[55vh] lg:h-[63vh] 
-                         object-contain rounded-xl md:rounded-2xl 
-                          "
-          />
-          </div>
-          
-          ))}
+                {/* Pricing Details */}
+                <div className="mt-1 text-center w-full">
+                  {/* Total Price with Strikethrough Effect */}
+                  <p className="text-lg text-gray-200 tracking-wide font-medium line-through decoration-red-600">
+                    Total Price: <span className="font-bold text-gray-100 opacity-90 text-xl">${offer.totalPrice}</span>
+                  </p>
+
+                  {/* Discounted Price - Bold & Eye-Catching */}
+                  <div className="mt-0">
+                    <p className="text-base font-semibold text-yellow-300 uppercase tracking-widest">
+                      Limited Time Offer
+                    </p>
+                    <p className="text-4xl font-extrabold text-yellow-400 drop-shadow-md animate-pulse">
+                      ${offer.discountedPrice}
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            ))}
+          </Slider>
         </div>
-
-        {/* Left Arrow */}
-        <button 
-          onClick={prevSlide} 
-          className="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 bg-white/80 p-2 md:p-3 rounded-full shadow-md hover:bg-white hover:scale-110 transition-all"
-        >
-          <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
-        </button>
-
-        {/* Right Arrow */}
-        <button 
-          onClick={nextSlide} 
-          className="absolute right-4 md:right-6 top-1/2 transform -translate-y-1/2 bg-white/80 p-2 md:p-3 rounded-full shadow-md hover:bg-white hover:scale-110 transition-all"
-        >
-          <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
-        </button>
       </div>
 
-
-      
 
       <div className="relative z-10 w-full">
         {/** First Section */}
@@ -402,8 +460,12 @@ export default function Home() {
             </div>
           </section>
     </div>
-    <Reviews/>
+   
+  <Reviews/>
+
   </div>
   </div>
   );
 }
+
+

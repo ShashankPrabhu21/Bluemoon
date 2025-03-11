@@ -70,7 +70,7 @@ export default function Footer() {
 
             {/* RESERVE A TABLE Button */}
             <Link 
-              href="/reserve" 
+              href="/table" 
               className="inline-block border-2 border-white text-white text-center py-3 px-12 rounded-lg font-bold shadow-md hover:bg-white hover:text-[#1e3799] hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
               RESERVE A TABLE
