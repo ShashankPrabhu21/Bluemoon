@@ -113,7 +113,7 @@ export default function Home() {
 
   const settings = {
     dots: true,
-    infinite: true,
+    infinite: offers.length > 1,
     speed: 500,
     slidesToShow: 1, // Show 2 offers at a time
     slidesToScroll: 1,
