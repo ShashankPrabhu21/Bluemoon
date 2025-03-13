@@ -5,13 +5,8 @@ import AdminUserSidebar from "@/app/components/AdminUserSidebar";
 export default function RolesPermissions() {
   const LOCAL_STORAGE_KEY = "user_roles";
 
-  // Load roles from local storage
-  const loadRoles = () => {
-    const storedRoles = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return storedRoles ? JSON.parse(storedRoles) : [];
-  };
-
-  const [roles, setRoles] = useState<{ name: string; description: string; permissions: string[] }[]>(loadRoles());
+  // State for roles
+  const [roles, setRoles] = useState<{ name: string; description: string; permissions: string[] }[]>([]);
   
   const [newRole, setNewRole] = useState<{ name: string; description: string; permissions: string[] }>({
     name: "",
@@ -23,9 +18,19 @@ export default function RolesPermissions() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
 
-  // Save roles to local storage whenever roles change
+  // Load roles from local storage on the client side
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(roles));
+    if (typeof window !== "undefined") {
+      const storedRoles = localStorage.getItem(LOCAL_STORAGE_KEY);
+      setRoles(storedRoles ? JSON.parse(storedRoles) : []);
+    }
+  }, []);
+
+  // Save roles to local storage when roles change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(roles));
+    }
   }, [roles]);
 
   // Open Create Role Modal
