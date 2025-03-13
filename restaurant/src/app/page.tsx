@@ -115,10 +115,10 @@ export default function Home() {
     dots: true,
     infinite: offers.length > 1,
     speed: 500,
-    slidesToShow: 1, // Show 2 offers at a time
+    slidesToShow: 1, 
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 1500,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
   };
@@ -181,55 +181,51 @@ export default function Home() {
 
       {/* Display Offers in Carousel */}
       <div className="mt-10 mb-10 rounded-5xl">
-        <div className="max-w-4xl mx-auto ">
-          <Slider {...settings}>
-            {offers.map((offer) => (
-              <div
-                key={offer.id}
-                className="w-80 bg-gradient-to-b from-[#202A44] to-[#2A3457] text-white rounded-xl shadow-xl p-5 h-[540px] flex flex-col items-center transition-all duration-300 hover:scale-[1.02]"
-              >
-                {/* Offer Header (Full Width, No Border) */}
-                <h3 className="w-full -mt-2 text-3xl font-extrabold text-center text-white py-3 rounded-xl shadow-md tracking-wider uppercase 
-                  bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-600 animate-pulse">
-                  {offer.offerType}
-                </h3>
+      <div className="max-w-4xl mx-auto">
+        <Slider {...settings}>
+          {offers.map((offer) => (
+            <div
+            key={offer.id}
+            className="w-80 bg-gradient-to-b from-[#F7E7CE] to-[#FAE6C0] rounded-xl shadow-xl p-5 h-[540px] flex flex-col items-center transition-all duration-300"
+          >
+              <h3 className="w-full -mt-2 text-3xl font-extrabold text-center text-white py-3 rounded-xl shadow-md tracking-wider uppercase bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-600 animate-pulse">
+                {offer.offerType}
+              </h3>
 
-                {/* Display Offer Items in a Row */}
-                <div className="flex gap-4 justify-center items-center mt-4">
-                  {offer.selectedItems.map((item) => (
-                    <OfferItem
-                      key={item.id}
-                      image={item.image}
-                      name={item.foodName}
-                      price={item.price}
-                      token={item.token}
-                    />
-                  ))}
-                </div>
-
-                {/* Pricing Details */}
-                <div className="mt-1 text-center w-full">
-                  {/* Total Price with Strikethrough Effect */}
-                  <p className="text-lg text-gray-200 tracking-wide font-medium line-through decoration-red-600">
-                    Total Price: <span className="font-bold text-gray-100 opacity-90 text-xl">${offer.totalPrice}</span>
-                  </p>
-
-                  {/* Discounted Price - Bold & Eye-Catching */}
-                  <div className="mt-0">
-                    <p className="text-base font-semibold text-yellow-300 uppercase tracking-widest">
-                      Limited Time Offer
-                    </p>
-                    <p className="text-4xl font-extrabold text-yellow-400 drop-shadow-md animate-pulse">
-                      ${offer.discountedPrice}
-                    </p>
-                  </div>
-                </div>
-
+              <div className="flex gap-4 justify-center items-center mt-4">
+                {offer.selectedItems.map((item) => (
+                  <OfferItem
+                    key={item.id}
+                    image={item.image}
+                    name={item.foodName}
+                    price={item.price}
+                    token={item.token}
+                  />
+                ))}
               </div>
-            ))}
-          </Slider>
-        </div>
+
+              <div className="mt-1 text-center w-full">
+                <p className="text-xl text-gray-700 tracking-wide font-medium line-through decoration-red-600">
+                  Total Price:{" "}
+                  <span className="font-bold text-gray-700 opacity-90 text-xl">
+                    ${offer.totalPrice}
+                  </span>
+                </p>
+
+                <div className="mt-0">
+                  <p className="text-base font-semibold text-yellow-800 uppercase tracking-widest">
+                    Limited Time Offer
+                  </p>
+                  <p className="text-4xl font-extrabold text-yellow-700 drop-shadow-md animate-pulse">
+                    ${offer.discountedPrice}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </Slider>
       </div>
+    </div>
 
 
       <div className="relative z-10 w-full">

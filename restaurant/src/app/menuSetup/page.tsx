@@ -110,7 +110,17 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-center mb-6 mt-32">Admin Menu</h1>
+      <h1 className="text-3xl font-bold text-center mb-2 mt-32">Admin Menu SetUp</h1>
+      <div className="flex justify-center mb-6">
+        <button
+          onClick={() => window.location.href = "/adminDashboard"}
+          className="bg-blue-800 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition-all duration-300"
+        >
+          ⬅️ Back to Dashboard
+        </button>
+      </div>
+
+
 
       <div className="bg-white shadow-lg rounded-xl p-6 max-w-lg mx-auto mb-8 border border-gray-200">
         <h2 className="text-xl font-semibold text-center text-gray-900 mb-4">
@@ -174,12 +184,13 @@ useEffect(() => {
         )}
 
         <button
-          className="w-full mt-4 py-2 text-white font-semibold rounded-lg shadow-md bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-transform transform hover:scale-105"
+          className="w-full mt-4 py-2 text-white font-semibold rounded-lg shadow-md bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-600 hover:to-blue-700 transition-transform transform hover:scale-105"
           onClick={handleFoodSubmit}
         >
           {editingId !== null ? "Update Food" : "Add Food"}
         </button>
       </div>
+      
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {foodItems.map((item) => (

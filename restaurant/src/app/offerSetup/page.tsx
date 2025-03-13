@@ -95,7 +95,15 @@ const OfferSection = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-center mb-6 mt-32">SetUp Offers</h1>
+      <h1 className="text-3xl font-bold text-center mb-6 mt-32">Admin SetUp Offers</h1>
+      <div className="flex justify-center mb-6">
+        <button
+          onClick={() => window.location.href = "/adminDashboard"}
+          className="bg-blue-800 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition-all duration-300"
+        >
+          ⬅️ Back to Dashboard
+        </button>
+      </div>
       {!selectedCategory ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {[...new Set(foodItems.map((item) => item.category))].map((category) => (

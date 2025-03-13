@@ -2,13 +2,16 @@
 
 import { useRouter } from "next/navigation";
 
+
 export default function AdminDashboard() {
   const router = useRouter();
 
+
+    
   return (
-    <div className="mt-32 h-screen flex bg-gradient-to-br from-gray-100 to-gray-300">
+    <div className="mt-32  h-screen flex bg-gradient-to-br from-gray-100 to-gray-300">
       {/* Sidebar with Glassmorphism */}
-      <aside className="w-1/4 bg-blue-900 bg-opacity-90 backdrop-blur-lg text-white p-6 flex flex-col gap-6 shadow-2xl rounded-r-3xl border-r-4 border-blue-800">
+      <aside className="w-1/4  bg-blue-900 bg-opacity-90 backdrop-blur-lg text-white p-6 flex flex-col gap-6 shadow-2xl rounded-r-3xl border-r-4 border-blue-800">
         <h2 className="text-3xl font-extrabold text-center tracking-wide drop-shadow-lg">
           🛠️ ADMIN DASHBOARD
         </h2>
@@ -32,18 +35,23 @@ export default function AdminDashboard() {
             🎁 SETUP OFFERS
           </button>
 
-          <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg">
+          <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg" onClick={() => router.push("/admin/user-management/roles-permissions")}>
             👥 USER MANAGEMENT
+          </button>
+
+
+          <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg">
+          👤 CUSTOMER MANAGEMENT
           </button>
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-10">
+      <main className="flex-1 p-10 ">
         <div className="grid grid-cols-2 gap-8">
           {/* Setup Offers */}
           <section 
-            className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
+            className="bg-white p-6  rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
             onClick={() => router.push("/offerSetup")}
           >
             <h3 className="text-2xl font-bold text-blue-900 mb-4">🎁 SETUP OFFERS</h3>
@@ -67,15 +75,44 @@ export default function AdminDashboard() {
 
           {/* Setup Menu */}
           <section 
-            className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
+            className="bg-white p-6  rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
             onClick={() => router.push("/menuSetup")}
           >
-            <h3 className="text-2xl font-bold text-blue-900">🍽️ SETUP MENU CARD</h3>
+            <h3 className="text-2xl font-bold text-blue-900 mb-4">🍽️ SETUP MENU CARD</h3>
+            <div className="flex flex-col gap-4">
+            <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+              🍳 BREAKFAST
+            </button>
+            <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+              🍛 MAIN COURSE
+            </button>
+            <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+              🍹 DRINKS
+            </button>
+            
+            <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+              🍰 DESSERTS
+            </button>
+          </div>
           </section>
 
           {/* User Management */}
           <section className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200">
-            <h3 className="text-2xl font-bold text-blue-900">👥 USER MANAGEMENT</h3>
+            <h3 className="text-2xl font-bold text-blue-900 mb-4"> USER MANAGEMENT </h3>
+            <div className="flex flex-col gap-4">
+              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/roles-permissions")}>
+                🔐 User Roles & Permissions
+              </button>
+              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/registration-login")}>
+                🏷️ User Registration & Login
+              </button>
+              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/listing-search")}>
+                🔍 User Listing & Search
+              </button>
+              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/user-editing")}>
+                ✏️ User Creation & Editing
+              </button>
+            </div>
           </section>
         </div>
       </main>

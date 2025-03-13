@@ -23,6 +23,16 @@ export default function Reviews() {
       setReviews(JSON.parse(storedReviews));
     }
   }, []);
+    // Auto-slide every 1.5 seconds
+    useEffect(() => {
+      if (reviews.length > 1) {
+        const interval = setInterval(() => {
+          nextSlide();
+        }, 1500);
+  
+        return () => clearInterval(interval); // Cleanup on unmount
+      }
+    }, [reviews, currentIndex]);
 
   const nextSlide = () => {
     setDirection(1);
