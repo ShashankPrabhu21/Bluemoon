@@ -3,9 +3,16 @@
 import { useState } from "react";
 import AdminUserSidebar from "@/app/components/AdminUserSidebar";
 
+// Define User Type
+type User = {
+  name: string;
+  email: string;
+  password: string;
+};
+
 export default function UserAuth() {
   const [isLogin, setIsLogin] = useState(true);
-  const [userData, setUserData] = useState({ name: "", email: "", password: "" });
+  const [userData, setUserData] = useState<User>({ name: "", email: "", password: "" });
 
   // Handle Input Change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,17 +24,17 @@ export default function UserAuth() {
     e.preventDefault();
     
     // Get existing users from localStorage
-    const storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
+    const storedUsers: User[] = JSON.parse(localStorage.getItem("users") || "[]");
 
     // Check if the user already exists
-    if (storedUsers.some((user: any) => user.email === userData.email)) {
+    if (storedUsers.some((user) => user.email === userData.email)) {
       alert("User already registered. Please login.");
       setIsLogin(true);
       return;
     }
 
     // Store new user
-    const updatedUsers = [...storedUsers, { name: userData.name, email: userData.email, password: userData.password }];
+    const updatedUsers: User[] = [...storedUsers, userData];
     localStorage.setItem("users", JSON.stringify(updatedUsers));
 
     alert("Registration successful! You can now log in.");
@@ -40,10 +47,10 @@ export default function UserAuth() {
     e.preventDefault();
 
     // Get users from localStorage
-    const storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
+    const storedUsers: User[] = JSON.parse(localStorage.getItem("users") || "[]");
 
     // Find user
-    const user = storedUsers.find((user: any) => user.email === userData.email && user.password === userData.password);
+    const user = storedUsers.find((user) => user.email === userData.email && user.password === userData.password);
 
     if (user) {
       alert(`Welcome, ${user.name}!`);
@@ -57,7 +64,7 @@ export default function UserAuth() {
   return (
     <div className="flex min-h-screen">
       <AdminUserSidebar />
-      <div className=" flex-1 flex items-center justify-center text-center">
+      <div className="flex-1 flex items-center justify-center text-center">
         <div className="bg-white p-8 rounded-lg shadow-lg w-96">
           <h1 className="text-2xl font-bold text-blue-900">
             {isLogin ? "🔑 Login" : "🏷️ Register"}
