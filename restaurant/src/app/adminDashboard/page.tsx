@@ -48,21 +48,22 @@ export default function AdminDashboard() {
 
       {/* Main Content */}
       <main className="flex-1 p-10 ">
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-8 ">
           {/* Setup Offers */}
           <section 
-            className="bg-white p-6  rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
+            className="bg-white p-6  rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer "
             onClick={() => router.push("/offerSetup")}
           >
             <h3 className="text-2xl font-bold text-blue-900 mb-4">🎁 SETUP OFFERS</h3>
-            <div className="flex flex-col gap-4">
-              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🌞 DAILY OFFERS
-              </button>
-              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+            <div className="flex flex-col gap-4 items-center ">
+            <button className="py-3 px-4 w-[350px] bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+              🌞 DAILY OFFERS
+            </button>
+
+              <button className="py-3 px-4 w-[350px] bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
                 🎉 WEEKEND OFFERS
               </button>
-              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+              <button className="py-3 px-4 w-[350px] bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
                 🌿 SEASONAL OFFERS
               </button>
             </div>
@@ -79,18 +80,18 @@ export default function AdminDashboard() {
             onClick={() => router.push("/menuSetup")}
           >
             <h3 className="text-2xl font-bold text-blue-900 mb-4">🍽️ SETUP MENU CARD</h3>
-            <div className="flex flex-col gap-4">
-            <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+            <div className="flex flex-col gap-4 items-center">
+            <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
               🍳 BREAKFAST
             </button>
-            <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+            <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
               🍛 MAIN COURSE
             </button>
-            <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+            <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
               🍹 DRINKS
             </button>
             
-            <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+            <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
               🍰 DESSERTS
             </button>
           </div>
@@ -99,17 +100,17 @@ export default function AdminDashboard() {
           {/* User Management */}
           <section className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200">
             <h3 className="text-2xl font-bold text-blue-900 mb-4"> USER MANAGEMENT </h3>
-            <div className="flex flex-col gap-4">
-              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/roles-permissions")}>
+            <div className="flex flex-col gap-4 items-center">
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/roles-permissions")}>
                 🔐 User Roles & Permissions
               </button>
-              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/registration-login")}>
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/registration-login")}>
                 🏷️ User Registration & Login
               </button>
-              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/listing-search")}>
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/listing-search")}>
                 🔍 User Listing & Search
               </button>
-              <button className="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/user-editing")}>
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/user-editing")}>
                 ✏️ User Creation & Editing
               </button>
             </div>
