@@ -29,7 +29,7 @@ export default function Reviews() {
       if (reviews.length > 1) {
         const interval = setInterval(() => {
           nextSlide();
-        }, 1500);
+        }, 1900);
   
         return () => clearInterval(interval); // Cleanup on unmount
       }
