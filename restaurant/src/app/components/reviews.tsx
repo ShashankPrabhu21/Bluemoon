@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
 
+
+
+
 interface Review {
   id: number;
   name: string;
@@ -44,6 +47,18 @@ export default function Reviews() {
     setCurrentIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
   };
 
+    // Slick slider settings
+    const settings = {
+      dots: true,
+      infinite: true,
+      speed: 500,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      autoplay: true,
+      autoplaySpeed: 1500,
+      arrows: false, // Hide default arrows, we will use custom ones
+    };
+
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 bg-white bg-opacity-90">
       <h2 className="text-4xl font-bold mb-8 text-[#2A4D80] text-center">
@@ -56,7 +71,7 @@ export default function Reviews() {
             <motion.div
               key={currentIndex}
               className="p-8 rounded-xl shadow-xl 
-              bg-gradient-to-b from-[#E0ECFF] to-[#F9FBFF] 
+              bg-gradient-to-b from-[#7d84bb] to-[#F9FBFF] 
               transition-all duration-300 w-full flex-shrink-0 flex flex-col items-center text-center"
               initial={{ x: direction > 0 ? "100%" : "-100%", opacity: 0 }}
               animate={{ x: "0%", opacity: 1 }}

@@ -15,6 +15,21 @@ html{
 }
 
 
+@keyframes slideRightToLeft {
+  0% {
+    transform: translateX(100vw); /* Start from extreme right */
+  }
+  100% {
+    transform: translateX(-100vw); /* Slide to extreme left */
+  }
+}
+
+.animate-slideRightToLeft {
+  animation: slideRightToLeft 8s linear infinite; /* Adjust speed as needed */
+}
+.slick-slide {
+  margin: 0 50px; /* Adjust this value for desired spacing */
+}
 
 
 @layer base {

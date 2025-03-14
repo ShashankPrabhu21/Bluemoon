@@ -13,30 +13,6 @@ import OfferItem from './components/offerCard';
 import Reviews from './components/reviews';
 
 //import AddUserForm from "./components/AddUserForm";
-interface ArrowProps {
-  onClick?: () => void;
-}
-const NextArrow: React.FC<ArrowProps> = ({ onClick }) => {
-  return (
-    <div
-      className="absolute top-1/2 right-[-20px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer"
-      onClick={onClick}
-    >
-      ➡
-    </div>
-  );
-};
-
-const PrevArrow: React.FC<ArrowProps> = ({ onClick }) => {
-  return (
-    <div
-      className="absolute top-1/2 left-[-20px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer z-10"
-      onClick={onClick}
-    >
-      ⬅
-    </div>
-  );
-};
 
 export default function Home() {
   {/*Base Images */}
@@ -112,16 +88,19 @@ export default function Home() {
   }, []);
 
   const settings = {
-    dots: true,
-    infinite: offers.length > 1,
-    speed: 500,
-    slidesToShow: 1, 
+    dots: false,
+    infinite: true,
+    speed: 5000, // Smooth continuous movement
+    slidesToShow: 1, // One slide at a time
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 1500,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,
+    autoplaySpeed: 0,
+    cssEase: "linear",
+    swipe: false,
+    arrows: false,
+    variableWidth: true, // Allow slides to take natural width
   };
+  
   
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-white/95">
@@ -180,53 +159,52 @@ export default function Home() {
       </div>
 
       {/* Display Offers in Carousel */}
-      <div className="mt-10 mb-10 rounded-5xl">
-      <div className="max-w-4xl mx-auto">
-        <Slider {...settings}>
-          {offers.map((offer) => (
-            <div
-            key={offer.id}
-            className="w-80 bg-gradient-to-b from-[#F7E7CE] to-[#FAE6C0] rounded-xl shadow-xl p-5 h-[540px] flex flex-col items-center transition-all duration-300"
-          >
-              <h3 className="w-full -mt-2 text-3xl font-extrabold text-center text-white py-3 rounded-xl shadow-md tracking-wider uppercase bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-600 animate-pulse">
-                {offer.offerType}
-              </h3>
+      <div className="mt-10 mb-10 overflow-hidden relative w-full">
+      <div className="flex gap-x-4">
+  <Slider {...settings}>
+    {offers.map((offer) => (
+      <div
+        key={offer.id}
+        className="px-8 w-[800px] bg-gradient-to-b from-[#faedcd] to-[#faedcd] rounded-xl shadow-xl p-5 h-[540px] flex flex-col items-center"
+      >
+            <h3 className="w-full -mt-2 text-3xl font-extrabold text-center text-white py-3 rounded-xl shadow-md tracking-wider uppercase bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-600 animate-pulse">
+              {offer.offerType}
+            </h3>
 
-              <div className="flex gap-4 justify-center items-center mt-4">
-                {offer.selectedItems.map((item) => (
-                  <OfferItem
-                    key={item.id}
-                    image={item.image}
-                    name={item.foodName}
-                    price={item.price}
-                    token={item.token}
-                  />
-                ))}
-              </div>
+            <div className="flex gap-4 justify-center items-center mt-4">
+              {offer.selectedItems.map((item) => (
+                <OfferItem
+                  key={item.id}
+                  image={item.image}
+                  name={item.foodName}
+                  price={item.price}
+                  token={item.token}
+                />
+              ))}
+            </div>
 
-              <div className="mt-1 text-center w-full">
-                <p className="text-xl text-gray-700 tracking-wide font-medium line-through decoration-red-600">
-                  Total Price:{" "}
-                  <span className="font-bold text-gray-700 opacity-90 text-xl">
-                    ${offer.totalPrice}
-                  </span>
+            <div className="mt-1 text-center w-full">
+              <p className="text-xl text-gray-700 tracking-wide font-medium line-through decoration-red-600">
+                Total Price:{" "}
+                <span className="font-bold text-gray-700 opacity-90 text-xl">
+                  ${offer.totalPrice}
+                </span>
+              </p>
+
+              <div className="mt-0">
+                <p className="text-base font-semibold text-blue-800 uppercase tracking-widest">
+                  Limited Time Offer
                 </p>
-
-                <div className="mt-0">
-                  <p className="text-base font-semibold text-yellow-800 uppercase tracking-widest">
-                    Limited Time Offer
-                  </p>
-                  <p className="text-4xl font-extrabold text-yellow-700 drop-shadow-md animate-pulse">
-                    ${offer.discountedPrice}
-                  </p>
-                </div>
+                <p className="text-4xl font-extrabold text-blue-700 drop-shadow-md animate-pulse">
+                  ${offer.discountedPrice}
+                </p>
               </div>
             </div>
-          ))}
-        </Slider>
-      </div>
+          </div>
+        ))}
+      </Slider>
     </div>
-
+  </div>
 
       <div className="relative z-10 w-full">
         {/** First Section */}

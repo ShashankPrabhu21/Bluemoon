@@ -9,7 +9,7 @@ interface OfferItemProps {
 
 const OfferItem: React.FC<OfferItemProps> = ({ image, name, price, token }) => {
   return (
-<div className="w-56 bg-gradient-to-b from-[#3b4e7c] to-[#9cb7ff]
+<div className="w-56 bg-gradient-to-b from-[#8d99ae] to-[#8d99ae]
  text-white rounded-xl overflow-hidden shadow-xl p-3 transition-all duration-300 hover:shadow-2xl">
   
   {/* Title */}
@@ -25,7 +25,7 @@ const OfferItem: React.FC<OfferItemProps> = ({ image, name, price, token }) => {
   </div>
 
   {/* Pricing Details */}
-  <div className="w-full bg-gradient-to-b from-[#3f56a9] to-[#000000] text-white p-3 mt-3 rounded-xl shadow-lg flex flex-col items-center transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+  <div className="w-full bg-gradient-to-b from-[#003049] to-[#003049] text-white p-3 mt-3 rounded-xl shadow-lg flex flex-col items-center transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
     <p className="text-xs font-semibold tracking-wider text-gray-200">ACTUAL PRICE</p>
     <p className="text-3xl font-extrabold text-yellow-300 mt-0 drop-shadow-lg">${price}</p>
     <div className="text-sm font-bold w-7 h-7 flex items-center justify-center bg-black text-white rounded-full mt-2 shadow-md border-2 border-white">
