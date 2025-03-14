@@ -3,9 +3,6 @@ import { useEffect, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
 
-
-
-
 interface Review {
   id: number;
   name: string;
@@ -26,6 +23,7 @@ export default function Reviews() {
       setReviews(JSON.parse(storedReviews));
     }
   }, []);
+
     // Auto-slide every 1.5 seconds
     useEffect(() => {
       if (reviews.length > 1) {
@@ -50,24 +48,25 @@ export default function Reviews() {
 
 
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-6 bg-white bg-opacity-90">
+    <div className="flex flex-col items-center justify-center py-16 px-6 bg-white bg-opacity-90 w-full">
       <h2 className="text-4xl font-bold mb-8 text-[#2A4D80] text-center">
         ⭐ CUSTOMER REVIEWS ⭐
       </h2>
 
       {reviews.length > 0 ? (
-        <div className="relative w-full max-w-3xl mx-auto overflow-hidden">
-          <AnimatePresence custom={direction} mode="popLayout">
-            <motion.div
-              key={currentIndex}
-              className="p-8 rounded-xl shadow-xl 
-              bg-gradient-to-b from-[#7d84bb] to-[#F9FBFF] 
-              transition-all duration-300 w-full flex-shrink-0 flex flex-col items-center text-center"
-              initial={{ x: direction > 0 ? "100%" : "-100%", opacity: 0 }}
-              animate={{ x: "0%", opacity: 1 }}
-              exit={{ x: direction > 0 ? "-100%" : "100%", opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
+        <div className="relative w-screen overflow-hidden"> {/* Ensure relative positioning */}
+        <AnimatePresence custom={direction}> {/* Removed mode="popLayout" */}
+    <motion.div
+        key={currentIndex}
+        className="left-0 right-0 mx-auto max-w-3xl p-8 rounded-xl shadow-xl 
+            bg-gradient-to-b from-[#7d84bb] to-[#F9FBFF] transition-all duration-300 w-full 
+            flex-shrink-0 flex flex-col items-center text-center"
+        initial={{ x: "100vw", opacity: 0 }}
+        animate={{ x: "0vw", opacity: 1 }}
+        exit={{ x: "-100vw", opacity: 0 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }} // Increased duration
+    >
+      
               {/* Gender Image */}
               <motion.img
                 src={
