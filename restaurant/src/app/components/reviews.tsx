@@ -47,17 +47,7 @@ export default function Reviews() {
     setCurrentIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
   };
 
-    // Slick slider settings
-    const settings = {
-      dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      autoplay: true,
-      autoplaySpeed: 1500,
-      arrows: false, // Hide default arrows, we will use custom ones
-    };
+
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 bg-white bg-opacity-90">
