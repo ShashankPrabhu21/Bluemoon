@@ -23,10 +23,18 @@ html{
     transform: translateX(-100vw); /* Slide to extreme left */
   }
 }
-
-.animate-slideRightToLeft {
-  animation: slideRightToLeft 8s linear infinite; /* Adjust speed as needed */
+.slick-track {
+  display: flex !important;
+  justify-content: center !important; /* Ensures slides center properly */
 }
+
+.slick-slide {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+
 .slick-slide {
   margin: 0 50px; /* Adjust this value for desired spacing */
 }

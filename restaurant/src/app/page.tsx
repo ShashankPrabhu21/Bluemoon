@@ -90,17 +90,20 @@ export default function Home() {
   const settings = {
     dots: false,
     infinite: true,
-    speed: 5000, // Smooth continuous movement
-    slidesToShow: 1, // One slide at a time
+    speed: 1000, // Smooth slide-in effect (1 second)
+    slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 0,
-    cssEase: "linear",
+    autoplaySpeed: 2000, // Pause in center for 2 seconds
+    cssEase: "ease-in-out",
     swipe: false,
     arrows: false,
-    variableWidth: true, // Allow slides to take natural width
+    variableWidth: false, // Ensures full-width movement
+    adaptiveHeight: true,
+    pauseOnHover: false, // Keep sliding even when hovered
+    centerMode: true, // Forces centering
+    centerPadding: "0px", // Removes any extra padding
   };
-  
   
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-white/95">
@@ -159,52 +162,56 @@ export default function Home() {
       </div>
 
       {/* Display Offers in Carousel */}
-      <div className="mt-10 mb-10 overflow-hidden relative w-full">
-      <div className="flex gap-x-4">
-  <Slider {...settings}>
-    {offers.map((offer) => (
-      <div
-        key={offer.id}
-        className="px-8 w-[800px] bg-gradient-to-b from-[#faedcd] to-[#faedcd] rounded-xl shadow-xl p-5 h-[540px] flex flex-col items-center"
-      >
-            <h3 className="w-full -mt-2 text-3xl font-extrabold text-center text-white py-3 rounded-xl shadow-md tracking-wider uppercase bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-600 animate-pulse">
-              {offer.offerType}
-            </h3>
+      <div className="mt-10 mb-10 overflow-hidden relative w-screen"> {/* Full screen width */}
+    <Slider {...settings}>
+      {offers.length > 0 ? (
+        offers.map((offer) => (
+          <div
+            key={offer.id}
+            className="flex justify-center w-screen" // Ensure full screen sliding
+          >
+            <div className="w-[800px] bg-gradient-to-b from-[#faedcd] to-[#faedcd] rounded-xl shadow-xl p-5 h-[540px] flex flex-col items-center">
+              <h3 className="w-full text-3xl font-extrabold text-center text-white py-3 rounded-xl shadow-md tracking-wider uppercase bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-600 animate-pulse">
+                {offer.offerType}
+              </h3>
 
-            <div className="flex gap-4 justify-center items-center mt-4">
-              {offer.selectedItems.map((item) => (
-                <OfferItem
-                  key={item.id}
-                  image={item.image}
-                  name={item.foodName}
-                  price={item.price}
-                  token={item.token}
-                />
-              ))}
-            </div>
+              <div className="flex gap-4 justify-center items-center mt-4">
+                {offer.selectedItems.map((item) => (
+                  <OfferItem
+                    key={item.id}
+                    image={item.image}
+                    name={item.foodName}
+                    price={item.price}
+                    token={item.token}
+                  />
+                ))}
+              </div>
 
-            <div className="mt-1 text-center w-full">
-              <p className="text-xl text-gray-700 tracking-wide font-medium line-through decoration-red-600">
-                Total Price:{" "}
-                <span className="font-bold text-gray-700 opacity-90 text-xl">
-                  ${offer.totalPrice}
-                </span>
-              </p>
-
-              <div className="mt-0">
-                <p className="text-base font-semibold text-blue-800 uppercase tracking-widest">
-                  Limited Time Offer
+              <div className="mt-1 text-center w-full">
+                <p className="text-xl text-gray-700 tracking-wide font-medium line-through decoration-red-600">
+                  Total Price: <span className="font-bold text-gray-700 opacity-90 text-xl">
+                    ${offer.totalPrice}
+                  </span>
                 </p>
-                <p className="text-4xl font-extrabold text-blue-700 drop-shadow-md animate-pulse">
-                  ${offer.discountedPrice}
-                </p>
+
+                <div className="mt-0">
+                  <p className="text-base font-semibold text-blue-800 uppercase tracking-widest">
+                    Limited Time Offer
+                  </p>
+                  <p className="text-4xl font-extrabold text-blue-700 drop-shadow-md animate-pulse">
+                    ${offer.discountedPrice}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        ))}
-      </Slider>
-    </div>
+        ))
+      ) : (
+        <p className="text-center text-gray-500">No offers available.</p>
+      )}
+    </Slider>
   </div>
+
 
       <div className="relative z-10 w-full">
         {/** First Section */}
