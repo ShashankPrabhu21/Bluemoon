@@ -98,9 +98,21 @@ export default function Footer() {
       </div>
 
       {/* Bottom Section - Copyright */}
-      <div className="text-center mt-8">
-        <p>© {new Date().getFullYear()} Bluemoon Restaurant. All rights reserved.</p>
-      </div>
+      <div className="text-center mt-8 relative">
+  {/* Policy Link */}
+  <div className="mb-2">
+    <Link href="/policy" className="text-white underline hover:text-gray-200">
+      Privacy Policy
+    </Link>
+  </div>
+
+  <div className="relative w-full">
+    <p className="text-center">© {new Date().getFullYear()} Bluemoon Restaurant. All rights reserved.</p>
+    <span className="absolute right-80 top-0">Designed by Qodes Systems</span>
+  </div>
+</div>
+
+
     </footer>
   );
 }

@@ -170,8 +170,8 @@ export default function Home() {
             key={offer.id}
             className="flex justify-center w-screen" // Ensure full screen sliding
           >
-            <div className="w-[800px] bg-gradient-to-b from-[#faedcd] to-[#faedcd] rounded-xl shadow-xl p-5 h-[540px] flex flex-col items-center">
-              <h3 className="w-full text-3xl font-extrabold text-center text-white py-3 rounded-xl shadow-md tracking-wider uppercase bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-600 animate-pulse">
+            <div className="w-[800px] bg-gradient-to-b from-[#e0ccc3] to-[#e0ccc3] rounded-xl shadow-xl p-5 h-[540px] flex flex-col items-center">
+              <h3 className="w-full text-3xl font-extrabold text-center text-white py-3 rounded-xl shadow-md tracking-wider uppercase bg-gradient-to-r from-[#6e4750] via-[#6e4750] to-[#6e4750] animate-pulse">
                 {offer.offerType}
               </h3>
 
@@ -441,6 +441,7 @@ export default function Home() {
               ))}
             </div>
           </section>
+          
     </div>
    
   <Reviews/>
