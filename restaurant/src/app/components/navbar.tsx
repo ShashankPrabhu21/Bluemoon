@@ -98,7 +98,7 @@ export default function Navbar() {
             {extraLinks && (
               <>
                 <li className="cursor-pointer hover:text-gray-300"><Link href="/blog">Blog</Link></li>
-                <li className="cursor-pointer hover:text-gray-300"><Link href="/pickup">Pick Up</Link></li>
+                <li className="cursor-pointer hover:text-gray-300"><Link href="/order">Online Order</Link></li>
               </>
             )}
 
@@ -150,7 +150,7 @@ export default function Navbar() {
       <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/gallery">Gallery</Link></li>
       <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/table">Table Reservation</Link></li>
       <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/contact">Contact Us</Link></li>
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/pickup">Pick Up</Link></li>
+      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/order">Online Order</Link></li>
     </ul>
   </div>
 )}
