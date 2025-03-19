@@ -11,6 +11,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import OfferItem from './components/offerCard';
 import Reviews from './components/reviews';
+import Link from 'next/link';
 
 //import AddUserForm from "./components/AddUserForm";
 
@@ -149,15 +150,21 @@ export default function Home() {
      {/* Buttons */}
       <div className="relative z-30 w-full mt-10 px-4">
         <div className="bg-white py-5 flex flex-col md:flex-row justify-center gap-4 md:gap-6">
+          <Link href={"/table"}>
           <button className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 border border-[#3345A7] text-[#3345A7] text-base md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
             RESERVE A TABLE
           </button>
+          </Link>
+          <Link href={"/order"}>
           <button className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 border border-[#3345A7] text-[#3345A7] text-base md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
             ONLINE PICKUP ORDERS
           </button>
+          </Link>
+          <Link href={"/delivery"}>
           <button className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 border border-[#3345A7] text-[#3345A7] text-base md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
             DELIVERY AVAILABLE
           </button>
+          </Link>
         </div>
       </div>
 
