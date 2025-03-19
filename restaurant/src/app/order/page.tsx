@@ -9,7 +9,7 @@ const OrderSelectionPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <div className="bg-white shadow-xl rounded-2xl p-10 max-w-lg w-full text-center transition-all duration-300 hover:shadow-2xl">
         <h1 className="text-4xl font-bold text-gray-900 mb-3">Order Now</h1>
-        <p className="text-gray-600 mb-6 text-lg">Choose how you'd like to place your order.</p>
+        <p className="text-gray-600 mb-6 text-lg">Choose how you&apos;d like to place your order.</p>
         
         <div className="space-y-5">
           <Link href="/viewMenu">

@@ -17,6 +17,11 @@ const CheckoutPage = () => {
     postCode: "",
   });
 
+  interface CartItem {
+    price: number;
+    quantity?: number;
+  }
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedOrderType = localStorage.getItem("orderType");
@@ -26,7 +31,7 @@ const CheckoutPage = () => {
 
       if (storedCart) {
         const cartItems = JSON.parse(storedCart);
-        const total = cartItems.reduce((acc: number, item: any) => acc + item.price * (item.quantity || 1), 0);
+        const total = cartItems.reduce((acc: number, item: CartItem) => acc + item.price * (item.quantity || 1), 0);
         setTotalAmount(total);
       }
     }
