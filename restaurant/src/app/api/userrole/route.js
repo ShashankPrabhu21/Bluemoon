@@ -9,10 +9,10 @@ export async function GET() {
     );
     return NextResponse.json(result.rows, { status: 200 });
   } catch (error) {
+    console.error("GET Error:", error); // ✅ Log the error
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
 }
-
 
 // POST - Add a new role
 export async function POST(req) {
@@ -28,6 +28,7 @@ export async function POST(req) {
     );
     return NextResponse.json(result.rows[0], { status: 201 });
   } catch (error) {
+    console.error("POST Error:", error); // ✅ Log the error
     return NextResponse.json({ error: 'Failed to insert role' }, { status: 500 });
   }
 }
@@ -39,6 +40,7 @@ export async function DELETE(req) {
     await pool.query('DELETE FROM roles WHERE id = $1', [id]);
     return NextResponse.json({ message: 'Role deleted successfully' }, { status: 200 });
   } catch (error) {
+    console.error("DELETE Error:", error); // ✅ Log the error
     return NextResponse.json({ error: 'Failed to delete role' }, { status: 500 });
   }
 }
@@ -53,6 +55,7 @@ export async function PUT(req) {
     );
     return NextResponse.json(result.rows[0], { status: 200 });
   } catch (error) {
+    console.error("PUT Error:", error); // ✅ Log the error
     return NextResponse.json({ error: 'Failed to update role' }, { status: 500 });
   }
 }
