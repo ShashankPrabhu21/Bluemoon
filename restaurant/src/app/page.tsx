@@ -67,16 +67,7 @@ export default function Home() {
     description: string;
     image: string;
   }
-  interface Offer {
-    id: number;
-    category: string;
-    selectedItems: FoodItem[];
-    totalPrice: number;
-    discountedPrice: number;
-    offerType: string;
-    startDate?: string;
-    endDate?: string;
-  }
+
   
 
   
