@@ -17,12 +17,14 @@ const OrderSelectionPage = () => {
               <FaUtensils className="text-2xl" /> View Menu
             </button>
           </Link>
+          <Link href="/schedule" className="w-full flex items-center justify-center gap-3 bg-gray-700 text-white font-semibold text-lg rounded-xl"
+         >
           <button
-            onClick={() => alert("Schedule for Later feature coming soon!")}
             className="w-full flex items-center justify-center gap-3 py-4 bg-gray-700 text-white font-semibold text-lg rounded-xl shadow-lg hover:bg-gray-600 transition-all duration-300 transform hover:scale-105"
           >
             <FaClock className="text-2xl" /> Schedule for Later
           </button>
+          </Link>
         </div>
       </div>
     </div>

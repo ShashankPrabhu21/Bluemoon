@@ -14,6 +14,117 @@ html{
   animation: slide-in 0.8s ease-out;
 }
 
+/* Calendar specific styles */
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: var(--royal-blue-600);
+  --rdp-background-color: var(--royal-blue-50);
+  margin: 0;
+}
+
+.rdp-months {
+  justify-content: center;
+}
+
+.rdp-month {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.rdp-caption {
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.rdp-cell {
+  width: var(--rdp-cell-size);
+  height: var(--rdp-cell-size);
+  font-size: 0.875rem;
+}
+
+.rdp-head_cell {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--royal-blue-600);
+  height: 2rem;
+}
+
+.rdp-day {
+  width: var(--rdp-cell-size);
+  height: var(--rdp-cell-size);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+  font-weight: 400;
+}
+
+.rdp-day_selected {
+  background-color: var(--rdp-accent-color);
+  color: white;
+}
+
+.rdp-day_today {
+  background-color: var(--rdp-background-color);
+  font-weight: 600;
+}
+
+.rdp-day_outside {
+  color: #9CA3AF;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.time-slot {
+  @apply px-6 py-3 rounded-full transition-all duration-300 border-2 border-blue-100 hover:border-blue-300 font-medium relative overflow-hidden;
+}
+
+.time-slot:not(.selected):hover {
+  @apply bg-blue-50 transform scale-105;
+}
+
+.time-slot.selected {
+  @apply bg-blue-600 text-white border-blue-600 transform scale-105;
+}
+
+.time-slot::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 transition-opacity duration-300;
+}
+
+.time-slot:hover::before {
+  @apply opacity-20;
+}
+
+.guest-button {
+  @apply w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 border-2 border-blue-100 hover:border-blue-300 font-medium relative overflow-hidden;
+}
+
+.guest-button:not(.selected):hover {
+  @apply bg-blue-50 transform scale-105;
+}
+
+.guest-button.selected {
+  @apply bg-blue-600 text-white border-blue-600 transform scale-105;
+}
+
+.guest-button::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 transition-opacity duration-300;
+}
+
+.guest-button:hover::before {
+  @apply opacity-20;
+}
+
+
 
 @keyframes slideRightToLeft {
   0% {
