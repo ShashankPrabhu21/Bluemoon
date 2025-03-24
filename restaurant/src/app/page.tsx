@@ -57,16 +57,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  //Offer Section
-  interface FoodItem {
-    id: number;
-    category: string;
-    foodName: string;
-    price: string;
-    token: string;
-    description: string;
-    image: string;
-  }
+
 
   
 
