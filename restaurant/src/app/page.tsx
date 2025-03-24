@@ -6,7 +6,7 @@ import { motion} from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { UtensilsCrossed, ChefHat } from "lucide-react";
 import { FaUtensils, FaLeaf, FaStar } from "react-icons/fa";
-import Slider from "react-slick";
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import OfferItem from './components/offerCard';
@@ -78,32 +78,7 @@ export default function Home() {
     endDate?: string;
   }
   
-  const [offers, setOffers] = useState<Offer[]>([]);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedOffers = localStorage.getItem("offers");
-      if (storedOffers) setOffers(JSON.parse(storedOffers));
-    }
-  }, []);
-
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 1000, // Smooth slide-in effect (1 second)
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 2000, // Pause in center for 2 seconds
-    cssEase: "ease-in-out",
-    swipe: false,
-    arrows: false,
-    variableWidth: false, // Ensures full-width movement
-    adaptiveHeight: true,
-    pauseOnHover: false, // Keep sliding even when hovered
-    centerMode: true, // Forces centering
-    centerPadding: "0px", // Removes any extra padding
-  };
   
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-white/95">

@@ -1,11 +1,11 @@
-require("dotenv").config();
-const { Pool } = require("pg");
+import dotenv from "dotenv";
+import { Pool } from "pg";
+
+dotenv.config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: { rejectUnauthorized: false },
 });
 
 async function testConnection() {
@@ -20,4 +20,4 @@ async function testConnection() {
 
 testConnection();
 
-module.exports = pool;
+export default pool;
