@@ -4,8 +4,12 @@ import React, { useEffect, useState } from "react";
 import { IoChevronBack } from "react-icons/io5";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+
 
 const CheckoutPage = () => {
+  const router = useRouter();
   const [orderType, setOrderType] = useState<"pickup" | "delivery">("delivery");
   const [totalAmount, setTotalAmount] = useState(0);
   const [deliveryInfo, setDeliveryInfo] = useState({
@@ -53,7 +57,7 @@ const CheckoutPage = () => {
         <button className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition">
           LOGIN WITH EMAIL
         </button>
-        <button className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition">
+        <button className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition" onClick={() => router.push("/pickup")}>
           PROCEED AS GUEST
         </button>
       </div>

@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 import { useEffect, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,8 +7,8 @@ interface Review {
   id: number;
   name: string;
   rating: number;
-  comment: string;
-  date: string;
+  experience: string;  // Updated from 'comment' to match API
+  created_at: string;
   gender?: string;
 }
 
@@ -18,18 +18,28 @@ export default function Reviews() {
   const [direction, setDirection] = useState(1); // 1 for next, -1 for previous
 
   useEffect(() => {
-    const storedReviews = localStorage.getItem("reviews");
-    if (storedReviews) {
-      setReviews(JSON.parse(storedReviews));
-    }
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch("/api/reviews");
+        if (response.ok) {
+          const data = await response.json();
+          setReviews(data);
+        } else {
+          console.error("Failed to fetch reviews");
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+
+    fetchReviews();
   }, []);
 
   useEffect(() => {
     if (reviews.length > 1) {
       const interval = setInterval(() => {
         nextSlide();
-      }, 1900);
-
+      }, 1500);
       return () => clearInterval(interval);
     }
   }, [reviews, currentIndex]);
@@ -45,21 +55,23 @@ export default function Reviews() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-6 bg-white bg-opacity-90 w-full ">
+    <div className="flex flex-col items-center justify-center py-16 px-6 bg-white bg-opacity-90">
       <h2 className="text-4xl font-bold mb-8 text-[#2A4D80] text-center">
         ⭐ CUSTOMER REVIEWS ⭐
       </h2>
 
       {reviews.length > 0 ? (
-        <div className="relative w-screen overflow-hidden min-h-[450px] flex justify-center items-center rounded-3xl">
-          <AnimatePresence custom={direction}>
+        <div className="relative w-full max-w-3xl mx-auto overflow-hidden">
+          <AnimatePresence custom={direction} mode="popLayout">
             <motion.div
               key={currentIndex}
-              className="absolute left-0 right-0 mx-auto max-w-3xl p-8 rounded-3xl shadow-xl bg-gradient-to-b from-[#7d84bb] to-[#F9FBFF] w-full flex-shrink-0 flex flex-col items-center text-center min-h-[320px]"
-              initial={{ x: "100vw", opacity: 0 }}
-              animate={{ x: "0vw", opacity: 1 }}
-              exit={{ x: "-100vw", opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="p-8 rounded-xl shadow-xl 
+              bg-gradient-to-b from-[#E0ECFF] to-[#F9FBFF] 
+              transition-all duration-300 w-full flex-shrink-0 flex flex-col items-center text-center"
+              initial={{ x: direction > 0 ? "100%" : "-100%", opacity: 0 }}
+              animate={{ x: "0%", opacity: 1 }}
+              exit={{ x: direction > 0 ? "-100%" : "100%", opacity: 0 }}
+              transition={{ duration: 0.2 }}
             >
               {/* Gender Image */}
               <motion.img
@@ -92,8 +104,14 @@ export default function Reviews() {
                 ))}
               </div>
 
-              <p className="italic text-gray-700 mt-3 text-lg font-semibold">{reviews[currentIndex].comment}</p>
-              <p className="text-sm text-gray-500 mt-1">{reviews[currentIndex].date}</p>
+              <p className="italic text-gray-700 mt-3 text-lg">{reviews[currentIndex].experience}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {new Date(reviews[currentIndex].created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
 
               {/* Navigation Buttons */}
               <div className="flex justify-center gap-6 mt-6">

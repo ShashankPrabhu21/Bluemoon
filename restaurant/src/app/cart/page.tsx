@@ -55,7 +55,7 @@ const CartPage = () => {
         <div className="text-center text-gray-600">
           <p className="text-lg">Your cart is empty.</p>
           <Link
-            href="/viewMenu"
+            href="/onlineOrder"
             className="text-blue-600 mt-4 inline-block text-lg font-semibold hover:underline"
           >
             Continue Shopping

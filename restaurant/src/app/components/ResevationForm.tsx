@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { useState } from "react";
 
@@ -28,34 +28,30 @@ export default function ReservationForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true); // Show loading state
-
-    try {
-      const response = await fetch("http://localhost/restaurant/reservation.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+  
+    const response = await fetch("/api/reservation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+  
+    const result = await response.json();
+    alert(result.message); // Show response message
+  
+    if (result.success) {
+      setFormData({
+        name: "",
+        phone: "",
+        email: "",
+        date: "",
+        fromTime: "",
+        toTime: "",
+        guests: "1",
+        offers: false, // Reset toggle
       });
-
-      const result = await response.json();
-      alert(result.message); // Show response message
-
-      if (result.success) {
-        setFormData({
-          name: "",
-          phone: "",
-          email: "",
-          date: "",
-          fromTime: "",
-          toTime: "",
-          guests: "1",
-          offers: false, // Reset toggle
-        });
-      }
-    } catch {
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false); // Hide loading state
     }
+  
+    setLoading(false); // Hide loading state
   };
   
   return (

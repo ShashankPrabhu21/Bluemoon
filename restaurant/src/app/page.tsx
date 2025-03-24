@@ -11,7 +11,6 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import OfferItem from './components/offerCard';
 import Reviews from './components/reviews';
-import Link from 'next/link';
 
 //import AddUserForm from "./components/AddUserForm";
 
@@ -150,74 +149,19 @@ export default function Home() {
      {/* Buttons */}
       <div className="relative z-30 w-full mt-10 px-4">
         <div className="bg-white py-5 flex flex-col md:flex-row justify-center gap-4 md:gap-6">
-          <Link href={"/table"}>
           <button className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 border border-[#3345A7] text-[#3345A7] text-base md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
             RESERVE A TABLE
           </button>
-          </Link>
-          <Link href={"/order"}>
           <button className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 border border-[#3345A7] text-[#3345A7] text-base md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
             ONLINE PICKUP ORDERS
           </button>
-          </Link>
-          <Link href={"/delivery"}>
           <button className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 border border-[#3345A7] text-[#3345A7] text-base md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
             DELIVERY AVAILABLE
           </button>
-          </Link>
         </div>
       </div>
 
-      {/* Display Offers in Carousel */}
-      <div className="mt-10 mb-10 overflow-hidden relative w-screen"> {/* Full screen width */}
-    <Slider {...settings}>
-      {offers.length > 0 ? (
-        offers.map((offer) => (
-          <div
-            key={offer.id}
-            className="flex justify-center w-screen" // Ensure full screen sliding
-          >
-            <div className="w-[800px] bg-gradient-to-b from-[#d8bdb0] to-[#e0ccc3] rounded-xl shadow-xl p-5 h-[540px] flex flex-col items-center">
-              <h3 className="w-full text-3xl font-extrabold text-center text-white py-3 rounded-xl shadow-md tracking-wider uppercase bg-gradient-to-r from-[#6e4750] via-[#6e4750] to-[#6e4750] animate-pulse">
-                {offer.offerType}
-              </h3>
-
-              <div className="flex gap-4 justify-center items-center mt-4">
-                {offer.selectedItems.map((item) => (
-                  <OfferItem
-                    key={item.id}
-                    image={item.image}
-                    name={item.foodName}
-                    price={item.price}
-                    token={item.token}
-                  />
-                ))}
-              </div>
-
-              <div className="mt-1 text-center w-full">
-                <p className="text-xl text-gray-700 tracking-wide font-medium line-through decoration-red-600">
-                  Total Price: <span className="font-bold text-gray-700 opacity-90 text-xl">
-                    ${offer.totalPrice}
-                  </span>
-                </p>
-
-                <div className="mt-0">
-                  <p className="text-base font-semibold text-blue-800 uppercase tracking-widest">
-                    Limited Time Offer
-                  </p>
-                  <p className="text-4xl font-extrabold text-blue-700 drop-shadow-md animate-pulse">
-                    ${offer.discountedPrice}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))
-      ) : (
-        <p className="text-center text-gray-500">No offers available.</p>
-      )}
-    </Slider>
-  </div>
+     
 
 
       <div className="relative z-10 w-full">
@@ -450,6 +394,7 @@ export default function Home() {
           </section>
           
     </div>
+    <OfferItem/>
    
   <Reviews/>
 
@@ -457,5 +402,4 @@ export default function Home() {
   </div>
   );
 }
-
 

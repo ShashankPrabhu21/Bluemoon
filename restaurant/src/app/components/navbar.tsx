@@ -99,6 +99,7 @@ export default function Navbar() {
               <>
                 <li className="cursor-pointer hover:text-gray-300"><Link href="/blog">Blog</Link></li>
                 <li className="cursor-pointer hover:text-gray-300"><Link href="/order">Online Order</Link></li>
+                
               </>
             )}
 
