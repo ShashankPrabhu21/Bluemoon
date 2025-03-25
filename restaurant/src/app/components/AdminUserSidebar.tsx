@@ -7,7 +7,7 @@ export default function AdminUserSidebar() {
   return (
     <aside className="w-1/4 bg-blue-900 bg-opacity-90 backdrop-blur-lg text-white p-6 flex flex-col gap-6 shadow-2xl rounded-r-3xl border-r-4 border-blue-800 h-screen left-0 top-0 mt-32 z-10">
       <h2 className="text-3xl font-extrabold text-center tracking-wide drop-shadow-lg">
-        🛠️ ADMIN DASHBOARD
+        🛠️ User Management
       </h2>
 
       <nav className="flex flex-col gap-4">
