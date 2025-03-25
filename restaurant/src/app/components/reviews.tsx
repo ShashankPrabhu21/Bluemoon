@@ -48,10 +48,6 @@ export default function Reviews() {
     setCurrentIndex((prev) => (prev + 1) % reviews.length);
   };
 
-  const prevSlide = () => {
-    setDirection(-1);
-    setCurrentIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
-  };
 
   const prevIndex = (currentIndex - 1 + reviews.length) % reviews.length;
   const nextIndex = (currentIndex + 1) % reviews.length;
