@@ -22,7 +22,7 @@ export default function UserAuth() {
   // Handle Registration
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Get existing users from localStorage
     const storedUsers: User[] = JSON.parse(localStorage.getItem("users") || "[]");
 
@@ -62,10 +62,10 @@ export default function UserAuth() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col md:flex-row min-h-screen">
       <AdminUserSidebar />
-      <div className="flex-1 flex items-center justify-center text-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+      <div className="flex-1 flex items-center justify-center text-center p-4">
+        <div className="bg-white p-6 md:p-8 rounded-lg shadow-lg w-full md:w-96">
           <h1 className="text-2xl font-bold text-blue-900">
             {isLogin ? "🔑 Login" : "🏷️ Register"}
           </h1>

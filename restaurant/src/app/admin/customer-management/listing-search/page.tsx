@@ -9,11 +9,10 @@ export default function CustomerList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch customers from the backend API
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch("/api/customer"); // Fetch customers from API
+        const response = await fetch("/api/customer");
         if (!response.ok) {
           throw new Error("Failed to fetch customers");
         }
@@ -30,7 +29,6 @@ export default function CustomerList() {
     fetchCustomers();
   }, []);
 
-  // Filter customers based on search query
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -39,25 +37,27 @@ export default function CustomerList() {
   );
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col sm:flex-row min-h-screen">
       <CustomerUserSidebar />
-      <div className="mt-40 flex-1 flex flex-col items-center">
-        <h1 className="text-4xl font-bold text-blue-900">🔍 Customer Listing & Search</h1>
+      <div className="flex-1 p-4 sm:p-8">
+        <h1 className="text-2xl sm:text-4xl font-bold text-blue-900 text-center mb-4 mt-28">
+          🔍 Customer Listing & Search
+        </h1>
         <input
           type="text"
           placeholder="Search by name, email, or phone..."
-          className="mt-4 p-2 border rounded w-1/2"
+          className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2 border rounded mb-4"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <div className="mt-6 w-3/4 bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="bg-white shadow-lg rounded-lg overflow-x-auto">
           {loading ? (
             <p className="text-center text-gray-500 p-4">Loading customers...</p>
           ) : error ? (
             <p className="text-center text-red-500 p-4">{error}</p>
           ) : (
-            <table className="w-full text-left border-collapse">
+            <table className="min-w-full text-left border-collapse">
               <thead className="bg-blue-800 text-white">
                 <tr>
                   <th className="p-4">Customer Name</th>

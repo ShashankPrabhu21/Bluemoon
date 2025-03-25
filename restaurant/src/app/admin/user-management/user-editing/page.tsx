@@ -95,19 +95,19 @@ export default function UserList() {
   );
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col md:flex-row min-h-screen">
       <AdminUserSidebar />
-      <div className="mt-40 flex-1 flex flex-col items-center">
-        <h1 className="text-4xl font-bold text-blue-900">👥 User Management</h1>
+      <div className="mt-16 md:mt-20 flex-1 flex flex-col items-center p-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mt-10">👥 User Management</h1>
         <input
           type="text"
           placeholder="Search by name or email..."
-          className="mt-4 p-2 border rounded w-1/2"
+          className="mt-4 p-2 border rounded w-full md:w-1/2"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <div className="mt-6 w-3/4 bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="mt-6 w-full md:w-3/4 bg-white shadow-lg rounded-lg overflow-hidden">
           {loading ? (
             <p className="text-center text-gray-500 p-4">Loading users...</p>
           ) : error ? (
@@ -116,22 +116,22 @@ export default function UserList() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-blue-800 text-white">
                 <tr>
-                  <th className="p-4">Name</th>
-                  <th className="p-4">Email</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4">Actions</th>
+                  <th className="p-3 md:p-4">Name</th>
+                  <th className="p-3 md:p-4">Email</th>
+                  <th className="p-3 md:p-4">Status</th>
+                  <th className="p-3 md:p-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
                     <tr key={user.id} className="border-b">
-                      <td className="p-4">{user.name}</td>
-                      <td className="p-4">{user.email}</td>
-                      <td className="p-4">
+                      <td className="p-3 md:p-4">{user.name}</td>
+                      <td className="p-3 md:p-4">{user.email}</td>
+                      <td className="p-3 md:p-4">
                         {user.is_active ? "Active" : "Inactive"}
                       </td>
-                      <td className="p-4 flex space-x-2">
+                      <td className="p-3 md:p-4 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full">
                         <button
                           className={`px-4 py-2 text-white rounded ${
                             user.is_active ? "bg-red-500" : "bg-green-500"
@@ -141,7 +141,7 @@ export default function UserList() {
                           {user.is_active ? "Deactivate" : "Activate"}
                         </button>
                         <button
-                          className="px-4 py-2 text-white bg-yellow-500 rounded"
+                          className="px-4 py-2 text-white bg-yellow-500 rounded w-full md:w-auto"
                           onClick={() => handleEditClick(user)}
                         >
                           Edit
@@ -163,7 +163,7 @@ export default function UserList() {
 
         {/* ✅ Edit User Form */}
         {editingUser && (
-          <div className="mt-6 w-3/4 bg-gray-100 p-4 rounded-lg shadow">
+          <div className="mt-6 w-full md:w-3/4 bg-gray-100 p-4 rounded-lg shadow">
             <h2 className="text-2xl font-bold text-blue-800">Edit User</h2>
             <div className="mt-4">
               <label className="block text-gray-700">Name:</label>
@@ -187,7 +187,7 @@ export default function UserList() {
                 }
               />
             </div>
-            <div className="mt-4 flex space-x-2">
+            <div className="mt-4 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
               <button className="px-4 py-2 bg-green-500 text-white rounded" onClick={handleSaveEdit}>
                 Save
               </button>

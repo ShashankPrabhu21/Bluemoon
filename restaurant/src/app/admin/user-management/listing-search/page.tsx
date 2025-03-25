@@ -21,32 +21,34 @@ export default function UserList() {
   );
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col md:flex-row min-h-screen">
       <AdminUserSidebar />
-      <div className="mt-40 flex-1 flex flex-col items-center">
-        <h1 className="text-4xl font-bold text-blue-900">🔍 User Listing & Search</h1>
+      <div className="mt-16 md:mt-20 flex-1 flex flex-col items-center p-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mt-12">
+          🔍 User Listing & Search
+        </h1>
         <input
           type="text"
           placeholder="Search by name or email..."
-          className="mt-4 p-2 border rounded w-1/2"
+          className="mt-4 p-2 border rounded w-full md:w-1/2"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <div className="mt-6 w-3/4 bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="mt-6 w-full md:w-3/4 bg-white shadow-lg rounded-lg overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead className="bg-blue-800 text-white">
               <tr>
-                <th className="p-4">User Name</th>
-                <th className="p-4">Email</th>
+                <th className="p-3 md:p-4">User Name</th>
+                <th className="p-3 md:p-4">Email</th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user, index) => (
                   <tr key={index} className="border-b">
-                    <td className="p-4">{user.name}</td>
-                    <td className="p-4">{user.email}</td>
+                    <td className="p-3 md:p-4">{user.name}</td>
+                    <td className="p-3 md:p-4">{user.email}</td>
                   </tr>
                 ))
               ) : (
