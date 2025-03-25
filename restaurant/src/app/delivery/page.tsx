@@ -75,7 +75,7 @@ export default function Page() {
             href="/"
             className="px-6 py-3 mt-8 mb-8 bg-blue-800 text-white font-semibold text-lg rounded-full shadow-lg hover:bg-[#253b9c] hover:scale-105 transition-all duration-300 z-10"
           >
-            Back to Home
+            ⬅️ Back to Home
       </Link>
     </div>
   );

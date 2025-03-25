@@ -24,11 +24,7 @@ export default function TablePage() {
 
       {/* Content Wrapper to Ensure Proper Layering */}
       <div className="relative z-10 flex flex-col items-center mt-36 ">
-        <h1 className="text-4xl font-bold text-transparent bg-clip-text 
-          bg-gradient-to-b from-gray-100 to-gray-200 tracking-wide drop-shadow-md 
-          animate-fadeIn">
-          TABLE RESERVATION
-        </h1>
+       
 
 
         <div className="bg-gradient-to-b from-gray-200 to-blue-100 bg-opacity-90 
@@ -42,7 +38,7 @@ export default function TablePage() {
             href="/"
             className="px-6 py-3 mb-6 bg-blue-900 text-white font-semibold text-lg rounded-full shadow-lg hover:bg-[#253b9c] hover:scale-105 transition-all duration-300 z-10"
           >
-            Back to Home
+            ⬅️ Back to Home
           </Link>
         </div>
        
