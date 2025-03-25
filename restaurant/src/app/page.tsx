@@ -11,6 +11,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import OfferItem from './components/offerCard';
 import Reviews from './components/reviews';
+import { BadgeDollarSign } from "lucide-react";
 
 //import AddUserForm from "./components/AddUserForm";
 
@@ -123,6 +124,25 @@ export default function Home() {
           </Link>
         </div>
       </div>
+
+      <div className="flex items-center justify-center gap-4 py-6">
+      {/* Glowing Icon Badge */}
+      <div className="bg-gradient-to-br from-yellow-400 to-yellow-600 p-4 rounded-full shadow-xl animate-pulse">
+        <BadgeDollarSign className="w-6 h-6 text-white" />
+      </div>
+
+      {/* Enhanced Heading with Glow & Layered Effect */}
+      <div className="relative">
+        {/* White Background with Shadow */}
+        <span className="absolute inset-0 -z-10 bg-white rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.2)] px-6 py-2"></span>
+
+        {/* Main Heading */}
+        <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500 uppercase drop-shadow-md">
+          Feast-Worthy Deal!
+        </h2>
+
+      </div>
+    </div>
 
       <OfferItem/>
 

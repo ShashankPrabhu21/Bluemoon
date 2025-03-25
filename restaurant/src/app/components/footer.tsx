@@ -1,9 +1,13 @@
-// components/Footer.tsx
+"use client"
+import { useState } from "react";
 import Link from 'next/link';
 import { Facebook, Youtube, Mail, Phone } from 'lucide-react';
 import { FaWhatsapp, FaInstagram } from 'react-icons/fa';
+import SubscribeModal from "./SubscribeModal";
 
 export default function Footer() {
+  const [isModalOpen, setModalOpen] = useState(false);
+
   return (
     <footer className="bg-[#314ec4] text-white py-6 relative z-[50] w-full">
       <div className="max-w-7xl mx-auto px-4 flex justify-center">
@@ -50,11 +54,11 @@ export default function Footer() {
               <Link href="https://facebook.com" target="_blank"><Facebook size={24} className="cursor-pointer hover:text-gray-200" /></Link>
               <a href="https://www.instagram.com/bluemoonrestaurant1/" target="_blank" rel="noopener noreferrer">
                 <FaInstagram className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
-            </a>
+              </a>
               <Link href="https://twitter.com" target="_blank"><Youtube size={24} className="cursor-pointer hover:text-gray-200" /></Link>
-              <a href="/QRCode.jpg" target="_blank" rel="noopener noreferrer"> {/* WhatsApp link to QR code */}
+              <a href="/QRCode.jpg" target="_blank" rel="noopener noreferrer">
                 <FaWhatsapp className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
-            </a>
+              </a>
             </div>
           </div>
 
@@ -77,12 +81,12 @@ export default function Footer() {
             </Link>
 
             {/* SUBSCRIBE FOR UPDATES Button */}
-            <Link 
-              href="/subscribe" 
+            <button
+              onClick={() => setModalOpen(true)}
               className="inline-block border-2 border-white text-white text-center py-3 px-4 rounded-lg font-bold shadow-md hover:bg-white hover:text-[#1e3799] hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
               SUBSCRIBE FOR UPDATES
-            </Link>
+            </button>
 
             {/* WRITE A REVIEW Button */}
             <Link 
@@ -93,26 +97,22 @@ export default function Footer() {
             </Link>
           </div>
 
-
         </div>
       </div>
 
-      {/* Bottom Section - Copyright */}
-      <div className="text-center mt-8 relative">
-  {/* Policy Link */}
-  <div className="mb-2">
-    <Link href="/policy" className="text-white underline hover:text-gray-200">
-      Privacy Policy
-    </Link>
-  </div>
+      <div className="w-full text-center p-4">
+        <p className="text-sm sm:text-base flex flex-col sm:flex-row sm:justify-between items-center">
+          <span className="sm:absolute sm:left-1/2 sm:transform sm:-translate-x-1/2">
+            © {new Date().getFullYear()} Bluemoon Restaurant. All rights reserved.
+          </span>
+          <span className="block sm:inline mt-2 sm:mt-0 sm:text-right sm:ml-auto">
+            Designed by Qodes Systems
+          </span>
+        </p>
+        </div>
 
-  <div className="relative w-full">
-    <p className="text-center">© {new Date().getFullYear()} Bluemoon Restaurant. All rights reserved.</p>
-    <span className="absolute right-80 top-0">Designed by Qodes Systems</span>
-  </div>
-</div>
-
-
+      {/* Popup Modal */}
+      <SubscribeModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
     </footer>
   );
 }
