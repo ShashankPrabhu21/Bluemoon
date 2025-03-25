@@ -93,7 +93,7 @@ const MenuPage = () => {
               <img
                 src={item.image_url || "/placeholder.jpg"}
                 alt={item.name}
-                className="w-full h-48 object-cover rounded-t-xl"
+                className="w-full h-52 object-cover rounded-t-xl"
               />
 
               <div className="p-3 text-center bg-white rounded-b-xl space-y-1.5">
@@ -103,7 +103,7 @@ const MenuPage = () => {
                 </h4>
 
                 {/* 🔹 Food Name */}
-                <h3 className="text-xl font-bold text-gray-900 tracking-wide leading-tight">
+                <h3 className="text-2xl font-bold text-gray-900 tracking-wide leading-tight">
                   {item.name}
                 </h3>
 
@@ -115,7 +115,7 @@ const MenuPage = () => {
                 {/* 🔹 Price & Item Number */}
                 <div className="flex justify-between items-center mt-1 px-3">
                   <span className="text-2xl font-extrabold text-red-600 flex items-center gap-1">
-                    💰 <span className="drop-shadow-md">${item.price}</span>
+                     <span className="drop-shadow-md">${item.price}</span>
                   </span>
                   <span className="text-xl font-bold text-white bg-blue-800 px-3 py-1 rounded-md shadow-md">
                     🏷️ : {item.quantity}
