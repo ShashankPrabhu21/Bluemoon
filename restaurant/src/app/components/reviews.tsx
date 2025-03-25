@@ -119,7 +119,7 @@ export default function Reviews() {
                   ))}
                 </div>
                 <p className="italic text-gray-700 mt-4 text-center text-lg leading-relaxed max-w-[500px]">
-                  "{reviews[currentIndex].experience}"
+                `&quot;`{reviews[currentIndex].experience}`&quot;`
                 </p>
                 <p className="text-sm text-gray-500 mt-6">
                   {new Date(reviews[currentIndex].created_at).toLocaleDateString("en-US", {
