@@ -118,7 +118,7 @@ export default function Home() {
         </div>
       </div>
 
-     
+      <OfferItem/>
 
 
       <div className="relative z-10 w-full">
@@ -351,7 +351,7 @@ export default function Home() {
           </section>
           
     </div>
-    <OfferItem/>
+    
    
   <Reviews/>
 

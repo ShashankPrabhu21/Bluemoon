@@ -9,6 +9,7 @@ interface FoodItem {
   price: number;
   availability: boolean;
   image_url: string;
+  quantity:number;
 }
 
 interface Offer {
@@ -174,30 +175,45 @@ export default function OfferSetup() {
     <div className="container mx-auto p-4 mt-20">
       <h1 className="text-2xl font-bold mb-4">Offer Setup</h1>
 
-      <div className="grid grid-cols-3 gap-4">
-        {foodItems.length > 0 ? (
-          foodItems.map((item) => (
-            <div
-              key={item.item_id}
-              className={`border p-4 rounded cursor-pointer ${
-                selectedItems.includes(item.item_id) ? "bg-blue-200" : "bg-white"
-              }`}
-              onClick={() => handleItemSelection(item.item_id)}
-            >
-              <img
-                src={item.image_url}
-                alt={item.name}
-                className="w-full h-32 object-cover mb-2"
-              />
-              <h2 className="text-lg font-semibold">{item.name}</h2>
-              <p className="text-gray-600">Price: ${item.price.toFixed(2)}</p>
-            </div>
-          ))
-        ) : (
-          <p>Loading food items...</p>
-        )}
-      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  {foodItems.length > 0 ? (
+    foodItems.map((item) => (
+      <div
+      key={item.item_id}
+      className={`border p-4 rounded-xl shadow-md transition duration-300 transform hover:scale-105 cursor-pointer ${
+        selectedItems.includes(item.item_id) ? "bg-blue-100 border-blue-500" : "bg-white"
+      }`}
+        onClick={() => handleItemSelection(item.item_id)}
+      >
+        {/* 🔹 Food Image */}
+        <img
+          src={item.image_url}
+          alt={item.name}
+          className="w-full h-44 object-cover rounded-lg shadow-md mb-3"
+        />
 
+        {/* 🔹 Item Name */}
+        <h2 className="text-xl font-extrabold tracking-wide ">
+          {item.name}
+        </h2>
+
+        {/* 🔹 Item Number (Looks distinct now) */}
+        <span className="absolute top-2 right-2 bg-gray-800 text-white text-md px-3 py-1 rounded-full shadow-md">
+          🏷️ Item No: {item.quantity}
+        </span>
+
+        {/* 🔹 Price */}
+        <p className="text-lg font-bold mt-2 text-red-700">
+          💰 <span className="drop-shadow-lg">${item.price.toFixed(2)}</span>
+        </p>
+      </div>
+    ))
+  ) : (
+    <p className="text-center text-gray-500 text-sm col-span-4">Loading food items...</p>
+  )}
+</div>
+
+{/* 🔹 Form for offers */}
       <div className="mt-6 flex flex-col items-center">
         <div className="w-full max-w-md">
           <h2 className="text-xl font-bold bg-yellow-400 text-center py-2 rounded-md w-full">
@@ -250,82 +266,88 @@ export default function OfferSetup() {
             {editingOfferId ? "Update Offer" : "Submit Offer"}
           </button>
           {editingOfferId && (
-    <button
-      onClick={handleCancelEdit}
-      className="bg-gray-500 text-white p-2 rounded w-full mt-2"
-    >
-      Cancel Edit
-    </button>
-  )}
-        </div>
-      </div>
-
-      <h2 className="text-xl font-bold bg-yellow-400 text-center py-2 mt-8">
-        Available Offers
-      </h2>
-
-      <div className="mt-6 grid grid-cols-3 gap-4">
-        {offers.length > 0 ? (
-          offers.map((offer) => (
-            <div
-              key={offer.id}
-              className="p-2 border rounded-lg bg-gray-100 shadow-md text-sm"
-            >
-              <div className="bg-yellow-500 text-white text-center font-bold py-1 rounded-t-lg text-xs">
-                {offer.offer_type} Offer
-              </div>
-
-              <div className="text-center my-2">
-                <p className="text-red-500 line-through text-sm">
-                  Total Price: ${Number(offer.total_price).toFixed(2)}
-                </p>
-                <p className="text-green-600 font-semibold">
-                  Discounted Price: ${Number(offer.discounted_price).toFixed(2)}
-                </p>
-              </div>
-
-              <div className="flex justify-center gap-2">
-                {(typeof offer.selected_items === "string"
-                  ? JSON.parse(offer.selected_items)
-                  : offer.selected_items
-                ).map((itemId: number) => {
-                  const item = foodItems.find(
-                    (food) => food.item_id === itemId
-                  );
-                  return item ? (
-                    <div key={item.item_id} className="text-center">
-                      <img
-                        src={item.image_url}
-                        alt={item.name}
-                        className="w-16 h-16 object-cover rounded-md shadow-sm"
-                      />
-                      <p className="text-xs">{item.name}</p>
-                    </div>
-                  ) : null;
-                })}
-              </div>
-
-              <div className="flex justify-between mt-2">
-                <button
-                  className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
-                  onClick={() => handleEdit(offer)}
-                >
-                  Edit
-                </button>
-                <button
-  className="bg-red-500 text-white px-2 py-1 rounded text-xs"
-  onClick={() => handleDelete(offer.id)}
->
-  Delete
-</button>
-
+          <button
+            onClick={handleCancelEdit}
+            className="bg-gray-500 text-white p-2 rounded w-full mt-2"
+          >
+            Cancel Edit
+          </button>
+        )}
               </div>
             </div>
-          ))
-        ) : (
-          <p className="text-sm">No offers available.</p>
-        )}
-      </div>
-    </div>
-  );
-}
+
+            <h2 className="text-2xl font-extrabold bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-center py-3 rounded-lg shadow-md mt-8">
+        🎉 Available Offers
+          </h2>
+
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {offers.length > 0 ? (
+            offers.map((offer) => (
+              <div
+                key={offer.id}
+                className="p-5 border border-gray-300 rounded-xl bg-white shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02]"
+              >
+                {/* 🔹 Offer Type Badge */}
+                <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-center font-semibold py-1.5 rounded-t-xl text-sm tracking-wide shadow-md">
+                  ⭐ {offer.offer_type} Offer
+                </div>
+
+                {/* 🔹 Price Section */}
+                <div className="text-center my-3">
+                  <p className="text-red-500 line-through text-sm font-medium">
+                    💲 Total Price: <span className="font-semibold">${Number(offer.total_price).toFixed(2)}</span>
+                  </p>
+                  <p className="text-green-600 font-bold text-lg">
+                    ✅ Discounted Price: <span className="text-xl">${Number(offer.discounted_price).toFixed(2)}</span>
+                  </p>
+                </div>
+
+                {/* 🔹 Selected Items Grid */}
+                <div className="flex flex-wrap justify-center gap-3">
+                  {(typeof offer.selected_items === "string"
+                    ? JSON.parse(offer.selected_items)
+                    : offer.selected_items
+                  ).map((itemId: number) => {
+                    const item = foodItems.find((food) => food.item_id === itemId);
+                    return item ? (
+                      <div key={item.item_id} className="text-center w-20">
+                        <img
+                          src={item.image_url}
+                          alt={item.name}
+                          className="w-16 h-16 object-cover rounded-lg shadow-md"
+                        />
+                        <p className="text-xs font-medium mt-1">{item.name}</p>
+                        <p className="text-[10px] font-semibold text-gray-700 bg-gray-200 px-2 py-1 rounded-md mt-1">
+                          Item No. {item.quantity}
+                        </p>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+
+                {/* 🔹 Edit & Delete Buttons */}
+                <div className="flex justify-between mt-5">
+                  <button
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg transition"
+                    onClick={() => handleEdit(offer)}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg transition"
+                    onClick={() => handleDelete(offer.id)}
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-600 text-sm">No offers available.</p>
+          )}
+        </div>
+
+
+            </div>
+          );
+        }

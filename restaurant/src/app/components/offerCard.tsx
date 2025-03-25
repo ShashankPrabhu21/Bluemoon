@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface FoodItem {
   item_id: number;
@@ -13,20 +13,21 @@ interface Offer {
   total_price: number | string | null;
   discounted_price: number | string | null;
   selected_items: string;
+  offer_type: string;
 }
 
 const OffersCarousel = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const totalSlides = offers.length;
 
   useEffect(() => {
     const fetchOffersAndItems = async () => {
       try {
         const res = await fetch("/api/offers");
         const data = await res.json();
-
-        console.log("Fetched Offers:", JSON.stringify(data, null, 2));
 
         if (!data || !Array.isArray(data.foodItems)) {
           console.error("Invalid data format:", data);
@@ -46,76 +47,130 @@ const OffersCarousel = () => {
     fetchOffersAndItems();
   }, []);
 
+  useEffect(() => {
+    if (offers.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % offers.length);
+      }, 3000);
+
+      return () => clearInterval(interval);
+    }
+  }, [offers]);
+
   if (loading) return <p>Loading offers...</p>;
   if (offers.length === 0) return <p>No offers available.</p>;
 
+  const prevIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+  const nextIndex = (currentIndex + 1) % totalSlides;
+
+  const getSelectedItems = (offer: Offer) => {
+    try {
+      const itemIds = JSON.parse(offer.selected_items);
+      return itemIds
+        .map((id: number) => foodItems.find((item) => item.item_id === id))
+        .filter(Boolean) as FoodItem[];
+    } catch (error) {
+      console.error("Error parsing selected_items:", error);
+      return [];
+    }
+  };
+
   return (
-    <div className="w-full p-4 bg-gray-100 flex justify-center">
-      <div className="max-w-[800px] w-full overflow-hidden mx-auto">
-        <h2 className="text-center text-xl font-bold bg-yellow-500 text-white p-2">
-          Daily Offers
-        </h2>
-
-        <div className="flex space-x-6 mt-4 overflow-hidden">
-          {offers.map((offer, index) => {
-            let selectedItems: FoodItem[] = [];
-
-            try {
-              const itemIds = JSON.parse(offer.selected_items);
-              selectedItems = itemIds
-                .map((id: number) =>
-                  foodItems.find((item) => item.item_id === id)
-                )
-                .filter(Boolean) as FoodItem[];
-            } catch (error) {
-              console.error("Error parsing selected_items:", error);
-            }
-
-            const totalPrice = Number(offer.total_price) || 0;
-            const discountedPrice = Number(offer.discounted_price) || 0;
-
-            return (
-              <motion.div
-                key={offer.id}
-                className="w-60 bg-white shadow-md p-4 rounded-lg"
-                initial={{ x: "100%" }}
-                animate={{ x: 0 }}
-                transition={{
-                  delay: index * 2, // Moves one after another (2s delay per item)
-                  duration: 1,
-                  ease: "easeInOut",
-                }}
-              >
-                <p className="text-red-600 line-through text-lg">
-                  Total Price: ${totalPrice.toFixed(2)}
-                </p>
-                <p className="text-green-600 text-lg font-bold">
-                  Discounted Price: ${discountedPrice.toFixed(2)}
-                </p>
-
-                <div className="flex space-x-4 mt-3">
-                  {selectedItems.length > 0 ? (
-                    selectedItems.map((item) => (
-                      <div key={item.item_id} className="text-center">
-                        <img
-                          src={item.image_url}
-                          alt={item.name}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                        <p className="mt-1 text-sm">{item.name}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p>No items available</p>
-                  )}
+    <div className="relative w-full h-[500px] flex items-center justify-center bg-gradient-to-br from-white to-white overflow-hidden">
+      <AnimatePresence>
+        {/* Previous Slide */}
+        <motion.div
+          key={prevIndex}
+          className="absolute left-[15%] w-[400px] h-[400px] flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-white shadow-2xl rounded-xl p-6 opacity-70 border border-gray-700"
+          initial={{ x: "-100vw" }}
+          animate={{ x: "-25vw" }}
+          exit={{ x: "-100vw" }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
+          <h2 className="text-xl bg-yellow-500 px-3 py-1 rounded-md mb-4 mt-[-60] w-[250] text-center">{offers[prevIndex].offer_type}</h2>
+          <div className="flex justify-center gap-6 mt-2">
+            {getSelectedItems(offers[prevIndex]).map((item) => (
+              <div key={item.item_id} className="text-center">
+                <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-yellow-500">
+                  <img
+                    src={item.image_url}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-20"></div>
                 </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-};
+                <p className="mt-2 text-lg font-semibold">{item.name}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 text-center text-xl font-semibold">
+            <p className="text-gray-400 line-through">Actual Price: ${offers[prevIndex].total_price}</p>
+            <p className="text-yellow-300 font-bold text-2xl">Discounted Price: ${offers[prevIndex].discounted_price}</p>
+          </div>
+        </motion.div>
 
-export default OffersCarousel;
+        {/* Center Slide - Enlarged */}
+        <motion.div
+          key={currentIndex}
+          className="absolute w-[650px] h-[450px] flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-white shadow-2xl rounded-2xl p-8 scale-110 border border-gray-700"
+          initial={{ x: "100vw" }}
+          animate={{ x: "0vw" }}
+          exit={{ x: "-25vw" }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
+          <h2 className="text-2xl bg-yellow-500 px-4 py-2 rounded-xl mb-6 mt-[-40] w-full text-center">{offers[currentIndex].offer_type} </h2>
+          <div className="flex justify-center gap-8 mt-2">
+            {getSelectedItems(offers[currentIndex]).map((item) => (
+              <div key={item.item_id} className="text-center">
+                <div className="relative w-40 h-40 rounded-full overflow-hidden border-4 border-yellow-500">
+                  <img
+                    src={item.image_url}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                </div>
+                <p className="mt-2 text-lg font-semibold">{item.name}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 text-center text-2xl font-semibold">
+            <p className="text-gray-400 line-through">Actual Price: ${offers[currentIndex].total_price}</p>
+            <p className="text-yellow-300 font-bold text-3xl">Discounted Price: ${offers[currentIndex].discounted_price}</p>
+          </div>
+        </motion.div>
+
+        {/* Next Slide */}
+        <motion.div
+          key={nextIndex}
+          className="absolute right-[15%] w-[400px] h-[400px] flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-white shadow-2xl rounded-xl p-6 opacity-70 border border-gray-700"
+          initial={{ x: "100vw" }}
+          animate={{ x: "25vw" }}
+          exit={{ x: "100vw" }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
+          <h2 className="text-xl bg-yellow-500 px-3 py-1 rounded-md mb-4 mt-[-60] w-[250] text-center">{offers[nextIndex].offer_type}</h2>
+          <div className="flex justify-center gap-6 mt-2">
+            {getSelectedItems(offers[nextIndex]).map((item) => (
+              <div key={item.item_id} className="text-center">
+                <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-yellow-500">
+                  <img
+                    src={item.image_url}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                </div>
+                <p className="mt-2 text-lg font-semibold">{item.name}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 text-center text-xl font-semibold">
+            <p className="text-gray-400 line-through">Actual Price: ${offers[nextIndex].total_price}</p>
+            <p className="text-yellow-300 font-bold text-2xl">Discounted Price: ${offers[nextIndex].discounted_price}</p>
+            </div>
+</motion.div>
+</AnimatePresence>
+</div>
+);
+};export default OffersCarousel;

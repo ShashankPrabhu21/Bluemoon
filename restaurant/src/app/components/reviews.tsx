@@ -1,13 +1,12 @@
- "use client";
+"use client";
 import { useEffect, useState } from "react";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Review {
   id: number;
   name: string;
   rating: number;
-  experience: string;  // Updated from 'comment' to match API
+  experience: string;
   created_at: string;
   gender?: string;
 }
@@ -39,7 +38,7 @@ export default function Reviews() {
     if (reviews.length > 1) {
       const interval = setInterval(() => {
         nextSlide();
-      }, 1500);
+      }, 3000);
       return () => clearInterval(interval);
     }
   }, [reviews, currentIndex]);
@@ -54,56 +53,76 @@ export default function Reviews() {
     setCurrentIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
   };
 
+  const prevIndex = (currentIndex - 1 + reviews.length) % reviews.length;
+  const nextIndex = (currentIndex + 1) % reviews.length;
+
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-6 bg-white bg-opacity-90">
+    <div className="flex flex-col items-center justify-center py-16 px-6">
       <h2 className="text-4xl font-bold mb-8 text-[#2A4D80] text-center">
         ⭐ CUSTOMER REVIEWS ⭐
       </h2>
 
       {reviews.length > 0 ? (
-        <div className="relative w-full max-w-3xl mx-auto overflow-hidden">
+        <div className="relative w-full mx-auto overflow-hidden h-[500px] flex items-center justify-center">
           <AnimatePresence custom={direction} mode="popLayout">
+            {/* Previous Review */}
+            <motion.div
+              key={prevIndex}
+              className="absolute left-[15%] w-[400px] h-[400px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-200 text-gray-800 shadow-lg rounded-xl p-6 opacity-70 border border-gray-200"
+              initial={{ x: "-100vw" }}
+              animate={{ x: "-25vw" }}
+              exit={{ x: "-100vw" }}
+              transition={{ duration: 1, ease: "easeOut" }}
+            >
+              <img
+                src={
+                  reviews[prevIndex].gender?.toLowerCase() === "male"
+                    ? "/male.png"
+                    : "/female.png"
+                }
+                alt="Gender Icon"
+                className="w-20 h-20 object-contain mb-4 rounded-full shadow-md"
+              />
+              <h3 className="text-xl font-semibold text-gray-800">{reviews[prevIndex].name}</h3>
+              <div className="flex gap-1 mt-2">
+                {Array.from({ length: reviews[prevIndex].rating }).map((_, index) => (
+                  <span key={index} className="text-yellow-400 text-3xl">⭐</span>
+                ))}
+              </div>
+              <p className="italic text-gray-700 mt-3 text-lg">{reviews[prevIndex].experience}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {new Date(reviews[prevIndex].created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            </motion.div>
+
+            {/* Current Review - Enlarged */}
             <motion.div
               key={currentIndex}
-              className="p-8 rounded-xl shadow-xl 
-              bg-gradient-to-b from-[#E0ECFF] to-[#F9FBFF] 
-              transition-all duration-300 w-full flex-shrink-0 flex flex-col items-center text-center"
-              initial={{ x: direction > 0 ? "100%" : "-100%", opacity: 0 }}
-              animate={{ x: "0%", opacity: 1 }}
-              exit={{ x: direction > 0 ? "-100%" : "100%", opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              className="absolute w-[650px] h-[450px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 text-gray-800 shadow-xl rounded-2xl p-8 scale-110 border border-gray-300"
+              initial={{ x: "100vw" }}
+              animate={{ x: "0vw" }}
+              exit={{ x: direction > 0 ? "-25vw" : "25vw" }}
+              transition={{ duration: 1, ease: "easeOut" }}
             >
-              {/* Gender Image */}
-              <motion.img
+              <img
                 src={
                   reviews[currentIndex].gender?.toLowerCase() === "male"
                     ? "/male.png"
                     : "/female.png"
                 }
                 alt="Gender Icon"
-                className="w-20 h-20 object-contain mb-4 rounded-full shadow-md"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.4 }}
+                className="w-24 h-24 object-contain mb-6 rounded-full shadow-md"
               />
-
-              {/* Review Details */}
-              <h3 className="text-xl font-semibold text-gray-800">{reviews[currentIndex].name}</h3>
-
-              {/* Star Ratings */}
+              <h3 className="text-2xl font-semibold text-gray-800">{reviews[currentIndex].name}</h3>
               <div className="flex gap-1 mt-2">
                 {Array.from({ length: reviews[currentIndex].rating }).map((_, index) => (
-                  <motion.span
-                    key={index}
-                    className="text-yellow-400 text-3xl"
-                    whileHover={{ scale: 1.2, y: -5 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    ⭐
-                  </motion.span>
+                  <span key={index} className="text-yellow-400 text-3xl">⭐</span>
                 ))}
               </div>
-
               <p className="italic text-gray-700 mt-3 text-lg">{reviews[currentIndex].experience}</p>
               <p className="text-sm text-gray-500 mt-1">
                 {new Date(reviews[currentIndex].created_at).toLocaleDateString("en-US", {
@@ -112,26 +131,40 @@ export default function Reviews() {
                   day: "numeric",
                 })}
               </p>
+            </motion.div>
 
-              {/* Navigation Buttons */}
-              <div className="flex justify-center gap-6 mt-6">
-                <motion.button
-                  className="text-2xl p-3 bg-[#2A4D80] text-white rounded-full shadow-lg hover:bg-[#1E3A60] 
-                  transition-all duration-300"
-                  onClick={prevSlide}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <IoIosArrowBack />
-                </motion.button>
-                <motion.button
-                  className="text-2xl p-3 bg-[#2A4D80] text-white rounded-full shadow-lg hover:bg-[#1E3A60] 
-                  transition-all duration-300"
-                  onClick={nextSlide}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <IoIosArrowForward />
-                </motion.button>
+            {/* Next Review */}
+            <motion.div
+              key={nextIndex}
+              className="absolute right-[15%] w-[400px] h-[400px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-200 text-gray-800 shadow-lg rounded-xl p-6 opacity-70 border border-gray-200"
+              initial={{ x: "100vw" }}
+              animate={{ x: "25vw" }}
+              exit={{ x: "100vw" }}
+              transition={{ duration: 1, ease: "easeOut" }}
+            >
+              <img
+                src={
+                  reviews[nextIndex].gender?.toLowerCase() === "male"
+                    ? "/male.png"
+                    : "/female.png"
+                }
+                alt="Gender Icon"
+                className="w-20 h-20 object-contain mb-4 rounded-full shadow-md"
+              />
+              <h3 className="text-xl font-semibold text-gray-800">{reviews[nextIndex].name}</h3>
+              <div className="flex gap-1 mt-2">
+                {Array.from({ length: reviews[nextIndex].rating }).map((_, index) => (
+                  <span key={index} className="text-yellow-400 text-3xl">⭐</span>
+                ))}
               </div>
+              <p className="italic text-gray-700 mt-3 text-lg">{reviews[nextIndex].experience}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {new Date(reviews[nextIndex].created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
             </motion.div>
           </AnimatePresence>
         </div>

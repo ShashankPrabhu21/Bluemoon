@@ -197,7 +197,7 @@ const AdminPage = () => {
         <input className="w-full mb-3 p-2 border rounded-lg" type="number" placeholder="Price ($)" value={price} onChange={(e) => setPrice(e.target.value)} />
         <textarea className="w-full mb-3 p-2 border rounded-lg" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
         <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Spicy Level" value={spicyLevel} onChange={(e) => setSpicyLevel(e.target.value)} />
-        <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+        <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Item Number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
         <input type="file" className="w-full p-2 border rounded-lg" onChange={handleImageUpload} />
         {image && <img src={image} alt="Preview" className="w-28 h-28 object-cover rounded-lg shadow-md mt-3" />}
 
@@ -206,22 +206,48 @@ const AdminPage = () => {
         </button>
       </div>
 
-      {/* 🔹 Food List */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {foodItems.map((item, index) => (
-  <div key={item.id ? `food-${item.id}` : `food-index-${index}`} className="bg-white shadow-lg rounded-xl overflow-hidden w-72 mx-auto">
-    <img src={item.image_url || "/placeholder.jpg"} alt={item.name} className="w-full h-48 object-cover rounded-t-xl" />
-    <div className="p-3 text-center">
-      <h2 className="text-2xl font-bold">{item.name}</h2>
-      <p className="text-sm">{item.description}</p>
-      <p className="text-lg font-semibold">${item.price}</p>
-      <button onClick={() => editFoodItem(item)} className="bg-yellow-500 text-white px-8 py-2 rounded-lg">Edit</button>
-      <button onClick={() => deleteFoodItem(item.item_id)} className="bg-red-500 text-white px-8 py-2 rounded-lg">Delete</button>
-    </div>
-  </div>
-))}
+     {/* 🔹 Food List */}
+<div className="w-full max-w-screen-xl mx-auto p-6">
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    {foodItems.map((item, index) => (
+      <div
+        key={item.id ? `food-${item.id}` : `food-index-${index}`}
+        className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105"
+      >
+        <img
+          src={item.image_url || "/placeholder.jpg"}
+          alt={item.name}
+          className="w-full h-52 object-cover rounded-t-2xl"
+        />
+        <div className="p-4 text-center space-y-2">
+          <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
+          <p className="text-gray-500 text-sm">{item.description}</p>
+          <p className="text-xl font-semibold text-blue-800">${item.price}</p>
+          <p className="text-md font-medium text-green-700">
+            Item Number: {item.quantity}
+          </p>
 
+          <div className="flex justify-center gap-4 mt-4">
+            <button
+              onClick={() => editFoodItem(item)}
+              className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-yellow-600 transition-all"
+            >
+              ✏️ Edit
+            </button>
+            <button
+              onClick={() => deleteFoodItem(item.item_id)}
+              className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-red-600 transition-all"
+            >
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
       </div>
+    ))}
+  </div>
+</div>
+
+
     </div>
   );
 };
