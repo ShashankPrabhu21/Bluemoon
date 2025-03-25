@@ -100,8 +100,8 @@ export default function CustomerList() {
   return (
     <div className="flex min-h-screen">
       <CustomerUserSidebar />
-      <div className="mt-40 flex-1 flex flex-col items-center">
-        <h1 className="text-4xl font-bold text-blue-900">🔍 Customer Listing & Search</h1>
+      <div className="mt-6 flex-1 flex flex-col items-center">
+        <h1 className="mt-28 text-4xl font-bold text-blue-900">🔍 Customer Creation and Editing</h1>
         <input
           type="text"
           placeholder="Search by name, email, or phone..."
