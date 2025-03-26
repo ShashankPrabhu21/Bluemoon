@@ -5,10 +5,10 @@ import { IoClose } from "react-icons/io5";
 import Link from "next/link";
 
 interface FoodItem {
-  id: number;
-  foodName: string;
+  item_id: number;
+  name: string;
   price: number;
-  image: string;
+  image_url: string;
   quantity?: number;
   specialNote?: string;
 }
@@ -69,9 +69,9 @@ const CartPage = () => {
                 key={index}
                 className="flex items-center space-x-4 p-4 border-b bg-gray-50 rounded-lg shadow-sm"
               >
-                <img src={item.image} alt={item.foodName} className="w-20 h-20 rounded-md object-cover" />
+                <img src={item.image_url} alt={item.name} className="w-20 h-20 rounded-md object-cover" />
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-gray-800">{item.foodName}</h3>
+                  <h3 className="text-lg font-bold text-gray-800">{item.name}</h3>
                   <p className="text-sm text-gray-600">Qty: {item.quantity || 1}</p>
                   {item.specialNote && (
                     <p className="text-sm italic text-gray-500">Note: {item.specialNote}</p>

@@ -91,7 +91,7 @@ export default function RolesPermissions() {
   return (
     <div className="flex flex-col sm:flex-row min-h-screen">
       <CustomerUserSidebar />
-      <div className="flex-1 p-4 sm:p-8">
+      <div className="flex-1 p-4 sm:p-8 mt-5">
         <h1 className="text-2xl sm:text-4xl font-bold text-blue-900 text-center mb-6 mt-24">
           🔐 Customer Roles & Permissions
         </h1>

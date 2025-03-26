@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import CustomerUserSidebar from "@/app/components/customersidebar";
 
-// ✅ Define Customer Type
 type Customer = {
   id: number;
   name: string;
@@ -17,9 +16,8 @@ export default function CustomerList() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null); // ✅ Track editing customer
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
-  // Fetch customers from API
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -38,7 +36,6 @@ export default function CustomerList() {
     fetchCustomers();
   }, []);
 
-  // Toggle Customer Active/Inactive
   const toggleStatus = async (id: number, isActive: boolean) => {
     try {
       const response = await fetch("/api/customeredit", {
@@ -59,12 +56,10 @@ export default function CustomerList() {
     }
   };
 
-  // Handle Edit Button Click
   const handleEditClick = (customer: Customer) => {
     setEditingCustomer(customer);
   };
 
-  // Handle Save Edited Customer
   const handleSaveEdit = async () => {
     if (!editingCustomer) return;
 
@@ -83,13 +78,12 @@ export default function CustomerList() {
         )
       );
 
-      setEditingCustomer(null); // Close edit modal
+      setEditingCustomer(null);
     } catch (err) {
       console.error("Error updating customer:", err);
     }
   };
 
-  // Filter customers based on search query
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -98,19 +92,23 @@ export default function CustomerList() {
   );
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col md:flex-row min-h-screen"> {/* Adjusted flex direction here */}
       <CustomerUserSidebar />
-      <div className="mt-6 flex-1 flex flex-col items-center">
-        <h1 className="mt-28 text-4xl font-bold text-blue-900">🔍 Customer Creation and Editing</h1>
-        <input
-          type="text"
-          placeholder="Search by name, email, or phone..."
-          className="mt-4 p-2 border rounded w-1/2"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div className="flex-1 p-4">
+        <div className="flex flex-col items-center mt-5">
+          <h1 className="mt-12 md:mt-28 text-2xl md:text-4xl font-bold text-blue-900">
+            🔍 Customer Creation and Editing
+          </h1>
+          <input
+            type="text"
+            placeholder="Search by name, email, or phone..."
+            className="mt-4 p-2 border rounded w-full md:w-1/2"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
-        <div className="mt-6 w-3/4 bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="mt-6 w-full overflow-x-auto">
           {loading ? (
             <p className="text-center text-gray-500 p-4">Loading customers...</p>
           ) : error ? (
@@ -119,24 +117,26 @@ export default function CustomerList() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-blue-800 text-white">
                 <tr>
-                  <th className="p-4">Customer Name</th>
-                  <th className="p-4">Email</th>
-                  <th className="p-4">Phone</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4">Actions</th>
+                  <th className="p-2 md:p-4">Customer Name</th>
+                  <th className="p-2 md:p-4">Email</th>
+                  <th className="p-2 md:p-4">Phone</th>
+                  <th className="p-2 md:p-4">Status</th>
+                  <th className="p-2 md:p-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredCustomers.length > 0 ? (
                   filteredCustomers.map((customer) => (
                     <tr key={customer.id} className="border-b">
-                      <td className="p-4">{customer.name}</td>
-                      <td className="p-4">{customer.email}</td>
-                      <td className="p-4">{customer.phone}</td>
-                      <td className="p-4">{customer.is_active ? "Active" : "Inactive"}</td>
-                      <td className="p-4 flex space-x-2">
+                      <td className="p-2 md:p-4">{customer.name}</td>
+                      <td className="p-2 md:p-4">{customer.email}</td>
+                      <td className="p-2 md:p-4">{customer.phone}</td>
+                      <td className="p-2 md:p-4">
+                        {customer.is_active ? "Active" : "Inactive"}
+                      </td>
+                      <td className="p-2 md:p-4 flex flex-wrap gap-2">
                         <button
-                          className={`px-4 py-2 text-white rounded ${
+                          className={`px-3 py-1 md:px-4 md:py-2 text-white rounded ${
                             customer.is_active ? "bg-red-500" : "bg-green-500"
                           }`}
                           onClick={() => toggleStatus(customer.id, customer.is_active)}
@@ -144,7 +144,7 @@ export default function CustomerList() {
                           {customer.is_active ? "Deactivate" : "Activate"}
                         </button>
                         <button
-                          className="px-4 py-2 text-white bg-yellow-500 rounded"
+                          className="px-3 py-1 md:px-4 md:py-2 text-white bg-yellow-500 rounded"
                           onClick={() => handleEditClick(customer)}
                         >
                           Edit
@@ -165,31 +165,36 @@ export default function CustomerList() {
         </div>
       </div>
 
-      {/* Edit Modal */}
       {editingCustomer && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg w-1/3">
+          <div className="bg-white p-6 rounded shadow-lg w-11/12 max-w-md">
             <h2 className="text-xl font-bold mb-4">Edit Customer</h2>
             <label className="block">Name</label>
             <input
               type="text"
               className="border p-2 w-full mb-3"
               value={editingCustomer.name}
-              onChange={(e) => setEditingCustomer({ ...editingCustomer, name: e.target.value })}
+              onChange={(e) =>
+                setEditingCustomer({ ...editingCustomer, name: e.target.value })
+              }
             />
             <label className="block">Email</label>
             <input
               type="email"
               className="border p-2 w-full mb-3"
               value={editingCustomer.email}
-              onChange={(e) => setEditingCustomer({ ...editingCustomer, email: e.target.value })}
+              onChange={(e) =>
+                setEditingCustomer({ ...editingCustomer, email: e.target.value })
+              }
             />
             <label className="block">Phone</label>
             <input
               type="text"
               className="border p-2 w-full mb-3"
               value={editingCustomer.phone}
-              onChange={(e) => setEditingCustomer({ ...editingCustomer, phone: e.target.value })}
+              onChange={(e) =>
+                setEditingCustomer({ ...editingCustomer, phone: e.target.value })
+              }
             />
             <div className="flex justify-end space-x-2">
               <button

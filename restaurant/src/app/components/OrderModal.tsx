@@ -3,21 +3,21 @@ import React, { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 
 interface FoodItem {
-    id: number;
-    foodName: string;
-    description: string;
-    price: number;
-    image: string;
-    category: string; // Include missing properties
-    token: string;
-  }
-  
-  interface OrderModalProps {
-    item: FoodItem; 
-    onClose: () => void;
-    onAddToCart: (item: FoodItem, quantity: number, specialNote: string) => void;
-  }
-  
+  item_id: number;
+  name: string;
+  description: string;
+  price: number;
+  image_url: string;
+  category_id: number;
+  quantity: string;
+  spicy_level: string;
+}
+
+interface OrderModalProps {
+  item: FoodItem;
+  onClose: () => void;
+  onAddToCart: (item: FoodItem, quantity: number, specialNote: string) => void;
+}
 
 const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) => {
   const [quantity, setQuantity] = useState(1);
@@ -26,7 +26,6 @@ const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) =
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white w-full max-w-5xl h-[90%] rounded-lg shadow-lg flex flex-col overflow-hidden relative">
-        
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -38,16 +37,12 @@ const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) =
         <div className="flex flex-grow">
           {/* Image Section (55-60% width) */}
           <div className="w-[55%] md:w-[60%]">
-            <img
-              src={item.image}
-              alt={item.foodName}
-              className="w-full h-full object-cover"
-            />
+            <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
           </div>
 
           {/* Details Section */}
           <div className="w-[45%] md:w-[40%] p-6 flex flex-col">
-            <h2 className="text-3xl font-bold text-gray-900">{item.foodName}</h2>
+            <h2 className="text-3xl font-bold text-gray-900">{item.name}</h2>
             <p className="text-gray-600 mt-2">{item.description}</p>
 
             {/* Special Instructions */}
@@ -84,7 +79,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) =
             <div className="mt-8">
               <button
                 onClick={() => {
-                  onAddToCart(item, quantity, specialNote); // ✅ Updated function call
+                  onAddToCart(item, quantity, specialNote);
                   onClose();
                 }}
                 className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg text-lg hover:bg-blue-500 transition"

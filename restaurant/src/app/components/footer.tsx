@@ -101,15 +101,15 @@ export default function Footer() {
       </div>
 
       <div className="w-full text-center p-4">
-        <p className="text-sm sm:text-base flex flex-col sm:flex-row sm:justify-between items-center">
-          <span className="sm:absolute sm:left-1/2 sm:transform sm:-translate-x-1/2">
+        <p className="text-sm sm:text-base flex flex-col lg:flex-row lg:items-center relative">
+          <span className="w-full lg:w-auto lg:absolute lg:left-1/2 lg:-translate-x-1/2">
             © {new Date().getFullYear()} Bluemoon Restaurant. All rights reserved.
           </span>
-          <span className="block sm:inline mt-2 sm:mt-0 sm:text-right sm:ml-auto">
-            Designed by Qodes Systems
-          </span>
+          <span className="mt-2 lg:mt-0 lg:ml-auto lg:pr-4">Designed by Qodes Systems</span>
         </p>
-        </div>
+      </div>
+
+
 
       {/* Popup Modal */}
       <SubscribeModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
