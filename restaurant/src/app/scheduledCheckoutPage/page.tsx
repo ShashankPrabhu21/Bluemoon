@@ -4,7 +4,6 @@
 import React, { useEffect, useState } from "react";
 import { IoChevronBack } from "react-icons/io5";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 interface ScheduledCartItem {
   scheduled_cart_id: number;
@@ -19,8 +18,6 @@ interface ScheduledCartItem {
 }
 
 const ScheduledCheckoutPage = () => {
-  const router = useRouter();
-  const [scheduledCartItems, setScheduledCartItems] = useState<ScheduledCartItem[]>([]);
   const [orderType, setOrderType] = useState<string>("");
   const [totalAmount, setTotalAmount] = useState(0);
 
@@ -30,7 +27,6 @@ const ScheduledCheckoutPage = () => {
         const res = await fetch("/api/scheduledcart/get");
         if (res.ok) {
           const data = await res.json();
-          setScheduledCartItems(data);
           if (data.length > 0) {
             setOrderType(data[0].service_type);
             const total = data.reduce((acc: number, item: ScheduledCartItem) => acc + item.price * item.quantity, 0);
