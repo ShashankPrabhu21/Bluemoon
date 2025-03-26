@@ -4,47 +4,73 @@ import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
 
-interface FoodItem {
-  item_id: number;
-  name: string;
+interface CartItem {
+  cart_id: number;
+  food_name: string;
   price: number;
-  image_url: string;
-  quantity?: number;
-  specialNote?: string;
+  image: string;
+  quantity: number;
+  special_note: string;
 }
 
 const CartPage = () => {
-  const [cart, setCart] = useState<FoodItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [orderType, setOrderType] = useState<"pickup" | "delivery">("delivery");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedCart = localStorage.getItem("cartItems");
-      const storedOrderType = localStorage.getItem("orderType");
-      if (storedCart) setCart(JSON.parse(storedCart));
-      if (storedOrderType) setOrderType(storedOrderType as "pickup" | "delivery");
-    }
+    const fetchCartItems = async () => {
+      try {
+        const res = await fetch("/api/cart/get");
+        if (res.ok) {
+          const cartData = await res.json();
+          setCart(cartData);
+        }
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+      }
+    };
+    fetchCartItems();
   }, []);
 
   const handleOrderTypeChange = (type: "pickup" | "delivery") => {
     setOrderType(type);
-    localStorage.setItem("orderType", type);
   };
 
-  const removeItem = (index: number) => {
-    const updatedCart = cart.filter((_, i) => i !== index);
-    setCart(updatedCart);
-    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+  const removeItem = async (cartId: number) => {
+    try {
+      const response = await fetch('/api/cart/remove', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cart_id: cartId }),
+      });
+      if (response.ok) {
+        const cartData = await (await fetch('/api/cart/get')).json();
+        setCart(cartData);
+      }
+    } catch (error) {
+      console.error('Error removing item:', error);
+    }
   };
 
-  const clearCart = () => {
-    localStorage.removeItem("cartItems");
-    setCart([]);
+  const clearCart = async () => {
+    try {
+      const response = await fetch('/api/cart/clear', {
+        method: 'POST',
+      });
+      if (response.ok) {
+        const cartData = await (await fetch('/api/cart/get')).json();
+        setCart(cartData);
+      }
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+    }
   };
 
-  const totalAmount = cart.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
+  const totalAmount = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const discount = orderType === "pickup" ? totalAmount * 0.1 : 0;
-  const deliveryCharge = orderType === "delivery" ? 0 : 0; // Example: $5 delivery charge
+  const deliveryCharge = orderType === "delivery" ? 0 : 0;
   const finalTotal = totalAmount - discount + deliveryCharge;
 
   return (
@@ -54,66 +80,41 @@ const CartPage = () => {
       {cart.length === 0 ? (
         <div className="text-center text-gray-600">
           <p className="text-lg">Your cart is empty.</p>
-          <Link
-            href="/viewMenu"
-            className="text-blue-600 mt-4 inline-block text-lg font-semibold hover:underline"
-          >
+          <Link href="/viewMenu" className="text-blue-600 mt-4 inline-block text-lg font-semibold hover:underline">
             Continue Shopping
           </Link>
         </div>
       ) : (
         <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
           <div className="space-y-6">
-            {cart.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center space-x-4 p-4 border-b bg-gray-50 rounded-lg shadow-sm"
-              >
-                <img src={item.image_url} alt={item.name} className="w-20 h-20 rounded-md object-cover" />
+            {cart.map((item) => (
+              <div key={item.cart_id} className="flex items-center space-x-4 p-4 border-b bg-gray-50 rounded-lg shadow-sm">
+                <img src={item.image} alt={item.food_name} className="w-20 h-20 rounded-md object-cover" />
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-gray-800">{item.name}</h3>
-                  <p className="text-sm text-gray-600">Qty: {item.quantity || 1}</p>
-                  {item.specialNote && (
-                    <p className="text-sm italic text-gray-500">Note: {item.specialNote}</p>
-                  )}
-                  <p className="text-lg font-bold text-blue-600">
-                    ${(item.price * (item.quantity || 1)).toFixed(2)}
-                  </p>
+                  <h3 className="text-lg font-bold text-gray-800">{item.food_name}</h3>
+                  <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                  {item.special_note && <p className="text-sm italic text-gray-500">Note: {item.special_note}</p>}
+                  <p className="text-lg font-bold text-blue-600">${(item.price * item.quantity).toFixed(2)}</p>
                 </div>
-                <button
-                  onClick={() => removeItem(index)}
-                  className="text-red-500 hover:text-red-700 transition"
-                >
+                <button onClick={() => removeItem(item.cart_id)} className="text-red-500 hover:text-red-700 transition">
                   <IoClose size={24} />
                 </button>
               </div>
             ))}
           </div>
 
-          {/* Order Type Selection */}
           <div className="mt-6">
             <h2 className="text-xl font-bold mb-2">Order Type</h2>
             <div className="flex space-x-4">
-              <button
-                onClick={() => handleOrderTypeChange("pickup")}
-                className={`w-1/2 py-3 text-lg font-medium rounded-lg transition shadow-md ${
-                  orderType === "pickup" ? "bg-blue-600 text-gray-100" : "bg-gray-300 text-gray-700"
-                }`}
-              >
+              <button onClick={() => handleOrderTypeChange("pickup")} className={`w-1/2 py-3 text-lg font-medium rounded-lg transition shadow-md ${orderType === "pickup" ? "bg-blue-600 text-gray-100" : "bg-gray-300 text-gray-700"}`}>
                 PICKUP
               </button>
-              <button
-                onClick={() => handleOrderTypeChange("delivery")}
-                className={`w-1/2 py-3 text-lg font-medium rounded-lg transition shadow-md ${
-                  orderType === "delivery" ? "bg-blue-600 text-gray-100" : "bg-gray-300 text-gray-700"
-                }`}
-              >
+              <button onClick={() => handleOrderTypeChange("delivery")} className={`w-1/2 py-3 text-lg font-medium rounded-lg transition shadow-md ${orderType === "delivery" ? "bg-blue-600 text-gray-100" : "bg-gray-300 text-gray-700"}`}>
                 DELIVERY
               </button>
             </div>
           </div>
 
-          {/* Price Breakdown */}
           <div className="mt-6 border-t pt-4">
             <div className="flex justify-between text-lg text-gray-900 px-2 py-2">
               <span>Sub-Total:</span>
@@ -137,28 +138,20 @@ const CartPage = () => {
             </div>
           </div>
 
-          {/* Buttons */}
           <Link href="/checkout">
             <button className="w-full mt-4 py-3 text-white font-medium bg-green-600 hover:bg-green-500 rounded-lg transition text-lg shadow-md">
               Proceed to Checkout
             </button>
           </Link>
 
-          <button
-            onClick={clearCart}
-            className="w-full mt-3 py-3 text-white font-medium bg-red-500 hover:bg-red-400 rounded-lg transition text-lg shadow-md"
-          >
+          <button onClick={clearCart} className="w-full mt-3 py-3 text-white font-medium bg-red-500 hover:bg-red-400 rounded-lg transition text-lg shadow-md">
             Clear Cart
           </button>
         </div>
       )}
 
-      {/* Back Button (Centered at Bottom) */}
       <div className="flex justify-center mt-8">
-        <Link
-          href="/viewMenu"
-          className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg shadow-md hover:bg-blue-900 transition"
-        >
+        <Link href="/viewMenu" className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg shadow-md hover:bg-blue-900 transition">
           Add More Items
         </Link>
       </div>

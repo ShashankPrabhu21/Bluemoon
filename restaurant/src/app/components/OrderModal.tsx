@@ -7,9 +7,9 @@ interface FoodItem {
   name: string;
   description: string;
   price: number;
-  image_url: string;
+  image_url: string; // Use image_url from your database
   category_id: number;
-  quantity: string;
+  quantity:number;
   spicy_level: string;
 }
 
@@ -26,7 +26,6 @@ const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) =
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white w-full max-w-5xl h-[90%] rounded-lg shadow-lg flex flex-col overflow-hidden relative">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 p-2 rounded-full transition"
@@ -35,17 +34,18 @@ const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) =
         </button>
 
         <div className="flex flex-grow">
-          {/* Image Section (55-60% width) */}
           <div className="w-[55%] md:w-[60%]">
-            <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+            <img
+              src={item.image_url || "/placeholder.jpg"} // Use image_url with fallback
+              alt={item.name}
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          {/* Details Section */}
           <div className="w-[45%] md:w-[40%] p-6 flex flex-col">
             <h2 className="text-3xl font-bold text-gray-900">{item.name}</h2>
             <p className="text-gray-600 mt-2">{item.description}</p>
 
-            {/* Special Instructions */}
             <div className="mt-4">
               <label className="text-gray-800 font-semibold">Special Instructions</label>
               <textarea
@@ -57,7 +57,6 @@ const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) =
               ></textarea>
             </div>
 
-            {/* Quantity and Price */}
             <div className="mt-6 flex items-center space-x-4">
               <button
                 onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
@@ -75,7 +74,6 @@ const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) =
               <span className="text-xl font-bold text-gray-800">${(item.price * quantity).toFixed(2)}</span>
             </div>
 
-            {/* Add to Cart Button */}
             <div className="mt-8">
               <button
                 onClick={() => {

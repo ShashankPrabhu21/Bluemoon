@@ -11,11 +11,9 @@ interface FoodItem {
   name: string;
   description: string;
   price: number;
-  image_url: string;
-  quantity: string;
+  image_url: string; // Use image_url from your database
   spicy_level: string;
-  quantityAdded?: number;
-  specialNote?: string;
+  quantity:number;
 }
 
 const categoryMapping: Record<number, string> = {
@@ -26,11 +24,12 @@ const categoryMapping: Record<number, string> = {
   5: "Drinks",
 };
 
+const categories = Object.values(categoryMapping); // Define categories array
+
 const OnlineOrderPage = () => {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
-  const [cart, setCart] = useState<FoodItem[]>([]);
-  const categories = Object.values(categoryMapping);
+  const [cart, setCart] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -44,23 +43,46 @@ const OnlineOrderPage = () => {
       }
     };
 
-    fetchMenuItems();
-
-    if (typeof window !== "undefined") {
-      const storedCart = localStorage.getItem("cartItems");
-      if (storedCart) {
-        setCart(JSON.parse(storedCart));
+    const fetchCartItems = async () => {
+      try {
+        const res = await fetch("/api/cart/get");
+        if (res.ok) {
+          const cartData = await res.json();
+          setCart(cartData);
+        }
+      } catch (error) {
+        console.error("Error fetching cart:", error);
       }
-    }
+    };
+
+    fetchMenuItems();
+    fetchCartItems();
   }, []);
 
-  const addToCart = (item: FoodItem, quantity: number, specialNote: string) => {
-    const newItem = { ...item, quantityAdded: quantity, specialNote };
-    const updatedCart = [...cart, newItem];
+  const addToCart = async (item: FoodItem, quantity: number, specialNote: string) => {
+    try {
+        const response = await fetch('/api/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                item_id: item.item_id,
+                quantity: quantity,
+                special_note: specialNote,
+            }),
+        });
 
-    setCart(updatedCart);
-    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-  };
+        if (!response.ok) {
+            const errorData = await response.json(); // Try to get error details from the response
+            throw new Error(`Failed to add to cart: ${response.status} - ${response.statusText} - ${JSON.stringify(errorData)}`);
+        }
+        const cartData = await (await fetch('/api/cart/get')).json();
+        setCart(cartData);
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+    }
+};
 
   return (
     <div className="min-h-screen bg-white p-6 mt-32">
@@ -88,13 +110,17 @@ const OnlineOrderPage = () => {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 {filteredItems.map((item) => (
                   <div key={item.item_id} className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 w-56 h-75 mx-auto transform transition duration-300 hover:scale-105">
-                    <img src={item.image_url} alt={item.name} className="w-full h-40 object-cover" />
+                    <img
+                      src={item.image_url || "/placeholder.jpg"} // Use image_url with fallback
+                      alt={item.name}
+                      className="w-full h-40 object-cover"
+                    />
                     <div className="p-3 text-center">
                       <h3 className="text-md font-bold text-gray-900 mb-1">{item.name}</h3>
                       <p className="text-xs text-gray-600 mb-2">{item.description}</p>
                       <div className="flex justify-between items-center text-sm font-semibold text-gray-800 bg-gray-100 p-2 rounded-md">
                         <span>${item.price}</span>
-                        <span>Quantity: {item.quantity}</span>
+                        <span>Item: {item.quantity}</span>
                       </div>
                       <button
                         onClick={() => setSelectedItem(item)}
