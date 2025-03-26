@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { FiShoppingCart } from "react-icons/fi";
 import ScheduleOrderModal from "../components/ScheduleOrderModal";
 import { useSearchParams } from 'next/navigation';
@@ -41,7 +41,17 @@ const categoryMapping: Record<number, string> = {
 
 const categories = Object.values(categoryMapping);
 
+
 const ViewScheduleMenuPage = () => {
+    return (
+      <Suspense fallback={<p>Loading...</p>}>
+        <ViewScheduleMenuContent />
+      </Suspense>
+    );
+  };
+  
+  const ViewScheduleMenuContent = () => {
+  
   const searchParams = useSearchParams();
   const service = searchParams.get('service');
   const date = searchParams.get('date');
