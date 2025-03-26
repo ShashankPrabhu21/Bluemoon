@@ -16,20 +16,18 @@ export default function SchedulePage() {
     "08:00 PM", "08:15 PM", "08:30 PM", "08:45 PM",
     "09:00 PM", "09:15 PM", "09:30 PM"
   ];
+    // ✅ Disable the button if any required field is missing
+    const isConfirmDisabled = !selectedDate || !service || !selectedTime;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4 mt-24">
       <div className="backdrop-blur-lg bg-white/50 border border-white/30 shadow-xl p-6 rounded-2xl w-full max-w-md">
         
-      <div className="w-[112%] bg-blue-700 py-4 px-3 rounded-t-2xl mb-5 -ml-6">
-  <h2 className="text-xl font-semibold text-white text-center">
-    Schedule Order
-  </h2>
-</div>
-
-
-
-
+        <div className="w-[112%] bg-blue-700 py-4 px-3 rounded-t-2xl mb-5 -ml-6">
+          <h2 className="text-xl font-semibold text-white text-center">
+            Schedule Order
+          </h2>
+        </div>
 
         {/* Date Picker */}
         <div className="mb-4">
@@ -86,11 +84,18 @@ export default function SchedulePage() {
           </div>
         </div>
 
-        {/* Confirm Button */}
-        <Link href="/viewScheduleMenu">
-        <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-all shadow-md">
-          CONFIRM
-        </button>
+        {/* Confirm Button (Disabled if any field is missing) */}
+        <Link href={isConfirmDisabled ? "#" : `/viewScheduleMenu?service=${service}&date=${selectedDate?.toLocaleDateString()}&time=${selectedTime}`}>
+          <button
+            className={`w-full py-3 rounded-lg font-medium transition-all shadow-md ${
+              isConfirmDisabled
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+            disabled={isConfirmDisabled}
+          >
+            CONFIRM
+          </button>
         </Link>
       </div>
     </div>

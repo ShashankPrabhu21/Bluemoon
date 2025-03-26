@@ -7,7 +7,7 @@ interface FoodItem {
   item_id: number;
   name: string;
   image_url: string;
-  quantity:number;
+  quantity: number;
 }
 
 interface Offer {
@@ -23,6 +23,8 @@ const OffersCarousel = () => {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false); // ✅ Added state to track hover
+
   const totalSlides = offers.length;
 
   useEffect(() => {
@@ -50,14 +52,14 @@ const OffersCarousel = () => {
   }, []);
 
   useEffect(() => {
-    if (offers.length > 1) {
+    if (offers.length > 1 && !isHovered) { // ✅ Auto-slide only if not hovered
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % offers.length);
       }, 3000);
 
       return () => clearInterval(interval);
     }
-  }, [offers]);
+  }, [offers, isHovered]); // ✅ Dependency array updated with isHovered
 
   if (loading) return <p>Loading offers...</p>;
   if (offers.length === 0) return <p>No offers available.</p>;
@@ -78,7 +80,11 @@ const OffersCarousel = () => {
   };
 
   return (
-    <div className="relative w-full h-[500px] flex items-center justify-center bg-gradient-to-br from-white to-white overflow-hidden">
+    <div 
+      className="relative w-full h-[500px] flex items-center justify-center bg-gradient-to-br from-white to-white overflow-hidden"
+      onMouseEnter={() => setIsHovered(true)} // ✅ Pause on hover
+      onMouseLeave={() => setIsHovered(false)} // ✅ Resume on leave
+    >
       <AnimatePresence>
         {/* Previous Slide */}
         <motion.div
@@ -127,13 +133,12 @@ const OffersCarousel = () => {
           transition={{ duration: 1, ease: "easeOut" }}
         >
           <h2 className="text-2xl bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-semibold px-5 py-3 rounded-xl mb-6 mt-[-40px] w-full text-center flex items-center justify-center gap-3 shadow-lg">
-            <MdLocalOffer className="text-white text-3xl" /> {/* Premium offer icon */}
+            <MdLocalOffer className="text-white text-3xl" /> 
             {offers[currentIndex].offer_type} Offer
           </h2>
           <div className="flex justify-center gap-8 mt-2">
-          {getSelectedItems(offers[currentIndex]).map((item) => (
+            {getSelectedItems(offers[currentIndex]).map((item) => (
               <div key={item.item_id} className="text-center">
-                {/* Image Wrapper */}
                 <div className="relative w-40 h-40 rounded-full overflow-hidden border-2 border-gray-400 shadow-md">
                   <img
                     src={item.image_url}
@@ -142,11 +147,7 @@ const OffersCarousel = () => {
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-10"></div>
                 </div>
-
-                {/* Item Name */}
                 <p className="mt-2 text-lg font-bold text-yellow-500">{item.name}</p>
-
-                {/* Quantity - Clean & Elegant */}
                 <div className="mt-1 text-sm font-medium text-gray-300 border border-orange-500 px-3 py-1 rounded-md inline-block">
                   Item No: {item.quantity}
                 </div>
@@ -196,7 +197,9 @@ const OffersCarousel = () => {
             <p className="text-yellow-300 font-bold text-2xl">Discounted Price: ${offers[nextIndex].discounted_price}</p>
             </div>
 </motion.div>
-</AnimatePresence>
-</div>
-);
-};export default OffersCarousel;
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default OffersCarousel;

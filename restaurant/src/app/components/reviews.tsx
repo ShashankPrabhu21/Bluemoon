@@ -15,6 +15,7 @@ export default function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1); // 1 for next, -1 for previous
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -35,13 +36,13 @@ export default function Reviews() {
   }, []);
 
   useEffect(() => {
-    if (reviews.length > 1) {
+    if (reviews.length > 1 && !isHovered) {
       const interval = setInterval(() => {
         nextSlide();
-      }, 3000);
+      }, 2000);
       return () => clearInterval(interval);
     }
-  }, [reviews, currentIndex]);
+  }, [reviews, currentIndex,isHovered]);
 
   const nextSlide = () => {
     setDirection(1);
@@ -53,7 +54,11 @@ export default function Reviews() {
   const nextIndex = (currentIndex + 1) % reviews.length;
 
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-6">
+    <div 
+      className="flex flex-col items-center justify-center py-16 px-6"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <h2 className="text-4xl font-bold mb-8 text-[#2A4D80] text-center">
         ⭐ CUSTOMER REVIEWS ⭐
       </h2>
