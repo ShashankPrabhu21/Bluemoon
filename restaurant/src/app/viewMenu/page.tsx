@@ -15,6 +15,17 @@ interface FoodItem {
   spicy_level: string;
   quantity:number;
 }
+interface CartItem {
+  cart_id: number;
+  food_name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  special_note: string;
+  item_id: number; // Add item_id if needed
+  user_id: number; // Add user_id if needed
+  // Add any other properties your cart items have
+}
 
 const categoryMapping: Record<number, string> = {
   1: "Breakfast",
@@ -29,7 +40,7 @@ const categories = Object.values(categoryMapping); // Define categories array
 const OnlineOrderPage = () => {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
