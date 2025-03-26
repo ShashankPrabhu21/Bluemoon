@@ -101,7 +101,7 @@ const ViewScheduleMenuPage = () => {
         try {
           const errorData = await response.json();
           errorMessage += ` - ${JSON.stringify(errorData)}`;
-        } catch (jsonError) {
+        } catch  {
           errorMessage += ` - Could not parse error response`;
         }
         throw new Error(errorMessage);

@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db'; // Replace with your database connection
 
-export async function POST(req: Request) {
+export async function POST() { // Removed req parameter
   try {
     const user_id = 1; // Replace with your user authentication logic
     const query = 'DELETE FROM scheduled_carts WHERE user_id = $1';
