@@ -21,6 +21,7 @@ interface ScheduledCartItem {
 const ScheduledCheckoutPage = () => {
   const [orderType, setOrderType] = useState<string>("");
   const [totalAmount, setTotalAmount] = useState(0);
+  const [guestLoginSuccess, setGuestLoginSuccess] = useState<boolean>(false);
   const [authOption, setAuthOption] = useState<"google" | "email" | "guest" | "signup" | "forgotPassword" | null>(null);
   const [guestInfo, setGuestInfo] = useState({
     firstName: "",
@@ -182,6 +183,30 @@ const ScheduledCheckoutPage = () => {
     }
   };
 
+  const handleGuestSubmit = async () => {
+    try {
+        const response = await fetch("/api/guestOrder", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(guestInfo),
+        });
+
+        if (response.ok) {
+            setGuestLoginSuccess(true);
+            setLoginSuccess(true);
+           
+        } else {
+            const errorData = await response.json();
+            setAuthError(errorData.error || "Failed to save guest info.");
+        }
+    } catch (error) {
+        console.error("Guest info error:", error);
+        setAuthError("Failed to save guest info.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 p-6 mt-32">
       <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg">
@@ -249,34 +274,42 @@ const ScheduledCheckoutPage = () => {
           </div>
         ) : authOption === "guest" ? (
           <div className="max-w-xl mx-auto space-y-4">
-            <input
-              type="text"
-              placeholder="First Name"
-              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              value={guestInfo.firstName}
-              onChange={(e) => setGuestInfo({ ...guestInfo, firstName: e.target.value })}
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              value={guestInfo.lastName}
-              onChange={(e) => setGuestInfo({ ...guestInfo, lastName: e.target.value })}
-            />
-            <input
-              type="tel"
-              placeholder="Mobile Number"
-              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              value={guestInfo.mobileNumber}
-              onChange={(e) => setGuestInfo({ ...guestInfo, mobileNumber: e.target.value })}
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              value={guestInfo.email}
-              onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
-            />
+              <input
+                  type="text"
+                  placeholder="First Name"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={guestInfo.firstName}
+                  onChange={(e) => setGuestInfo({ ...guestInfo, firstName: e.target.value })}
+              />
+              <input
+                  type="text"
+                  placeholder="Last Name"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={guestInfo.lastName}
+                  onChange={(e) => setGuestInfo({ ...guestInfo, lastName: e.target.value })}
+              />
+              <input
+                  type="tel"
+                  placeholder="Mobile Number"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={guestInfo.mobileNumber}
+                  onChange={(e) => setGuestInfo({ ...guestInfo, mobileNumber: e.target.value })}
+              />
+              <input
+                  type="email"
+                  placeholder="Email"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={guestInfo.email}
+                  onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
+              />
+              <button
+                  className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
+                  onClick={handleGuestSubmit}
+              >
+                  Submit
+              </button>
+              {guestLoginSuccess && <p className="text-green-500 mt-2">Login successful</p>}
+              {authError && <p className="text-red-500 mt-2">{authError}</p>}
           </div>
         ) : authOption === "signup" ? (
           <div className="max-w-xl mx-auto space-y-4">
@@ -398,7 +431,7 @@ const ScheduledCheckoutPage = () => {
             Proceed To Payment
           </button>
           
-          {authError && <p className="text-red-500 mt-2">{authError}</p>}
+          
         </div>
 
         {/* Back to Scheduled Cart Button */}
