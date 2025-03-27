@@ -11,10 +11,11 @@ interface FoodItem {
   name: string;
   description: string;
   price: number;
-  image_url: string; // Use image_url from your database
+  image_url: string;
   spicy_level: string;
-  quantity:number;
+  quantity: number;
 }
+
 interface CartItem {
   cart_id: number;
   food_name: string;
@@ -22,9 +23,9 @@ interface CartItem {
   image: string;
   quantity: number;
   special_note: string;
-  item_id: number; // Add item_id if needed
-  user_id: number; // Add user_id if needed
-  // Add any other properties your cart items have
+  item_id: number;
+  user_id: number;
+  service_type: string; // Added service_type
 }
 
 const categoryMapping: Record<number, string> = {
@@ -35,12 +36,13 @@ const categoryMapping: Record<number, string> = {
   5: "Drinks",
 };
 
-const categories = Object.values(categoryMapping); // Define categories array
+const categories = Object.values(categoryMapping);
 
 const OnlineOrderPage = () => {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [serviceType, setServiceType] = useState<string>("delivery"); // Default service type
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -66,34 +68,57 @@ const OnlineOrderPage = () => {
       }
     };
 
-    fetchMenuItems();
-    fetchCartItems();
+    const clearCart = async () => {
+      try {
+        await fetch("/api/cart/clear", {
+          method: "POST",
+        });
+        setCart([]);
+      } catch (error) {
+        console.error("Error clearing cart:", error);
+      }
+    };
+
+    const handleCartLogic = async () => {
+      fetchMenuItems();
+
+      if (sessionStorage.getItem("fromCart") === "true") {
+        await fetchCartItems();
+        sessionStorage.removeItem("fromCart"); // Clear the flag after fetching
+      } else {
+        await clearCart(); // Clear cart unless coming from cart page.
+      }
+      await fetchCartItems(); // Fetch cart in any case.
+    };
+
+    handleCartLogic();
   }, []);
 
   const addToCart = async (item: FoodItem, quantity: number, specialNote: string) => {
     try {
-        const response = await fetch('/api/cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                item_id: item.item_id,
-                quantity: quantity,
-                special_note: specialNote,
-            }),
-        });
+      const response = await fetch("/api/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          item_id: item.item_id,
+          quantity: quantity,
+          special_note: specialNote,
+          service_type: serviceType, // Include service type
+        }),
+      });
 
-        if (!response.ok) {
-            const errorData = await response.json(); // Try to get error details from the response
-            throw new Error(`Failed to add to cart: ${response.status} - ${response.statusText} - ${JSON.stringify(errorData)}`);
-        }
-        const cartData = await (await fetch('/api/cart/get')).json();
-        setCart(cartData);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to add to cart: ${response.status} - ${response.statusText} - ${JSON.stringify(errorData)}`);
+      }
+      const cartData = await (await fetch("/api/cart/get")).json();
+      setCart(cartData);
     } catch (error) {
-        console.error('Error adding to cart:', error);
+      console.error("Error adding to cart:", error);
     }
-};
+  };
 
   return (
     <div className="min-h-screen bg-white p-6 mt-32">
@@ -106,6 +131,22 @@ const OnlineOrderPage = () => {
           <FiShoppingCart size={26} />
           <span className="text-lg font-semibold">Cart ({cart.length})</span>
         </Link>
+      </div>
+
+      {/* Service Type Selection */}
+      <div className="flex justify-center mb-6">
+        <button
+          onClick={() => setServiceType("pickup")}
+          className={`px-4 py-2 rounded-lg mr-2 ${serviceType === "pickup" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+        >
+          Pickup
+        </button>
+        <button
+          onClick={() => setServiceType("delivery")}
+          className={`px-4 py-2 rounded-lg ${serviceType === "delivery" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+        >
+          Delivery
+        </button>
       </div>
 
       {categories.map((category) => {
@@ -122,7 +163,7 @@ const OnlineOrderPage = () => {
                 {filteredItems.map((item) => (
                   <div key={item.item_id} className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 w-56 h-75 mx-auto transform transition duration-300 hover:scale-105">
                     <img
-                      src={item.image_url || "/placeholder.jpg"} // Use image_url with fallback
+                      src={item.image_url || "/placeholder.jpg"}
                       alt={item.name}
                       className="w-full h-40 object-cover"
                     />
@@ -150,8 +191,8 @@ const OnlineOrderPage = () => {
         );
       })}
 
-      {selectedItem && (
-        <OrderModal item={selectedItem} onClose={() => setSelectedItem(null)} onAddToCart={addToCart} />
+{selectedItem && (
+        <OrderModal item={selectedItem} onClose={() => setSelectedItem(null)} onAddToCart={addToCart} serviceType={serviceType}/>
       )}
     </div>
   );

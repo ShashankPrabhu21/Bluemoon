@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { IoChevronBack } from "react-icons/io5";
 import Link from "next/link";
-import { FcGoogle } from "react-icons/fc";
+
 
 interface ScheduledCartItem {
   scheduled_cart_id: number;
@@ -79,10 +79,7 @@ const ScheduledCheckoutPage = () => {
   const deliveryCharge = orderType === "delivery" ? 0 : 0;
   const finalTotal = totalAmount - discount + deliveryCharge;
 
-  const handleGoogleSignIn = () => {
-    window.location.href =
-      "https://accounts.google.com/o/oauth2/auth/oauthchooseaccount?response_type=code&client_id=27035243415-m9eqo7qhnm5d9752jcu4p421p5p6ht6f.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fonecorner-customer-production.firebaseapp.com%2F__%2Fauth%2Fhandler&state=AMbdmDk1GOC9zDUcUVrNK5FXC4aGSB21-UfXDFleKoMIxPBeONdOJv03tv7Sx9MXfhYiDr84DWfHafNvlJlYYDtjPM9i53Dxkfu4ajH_OGI1D-UvSzZN3tVKVjR6m_vjMoahAN2qOETyGAH4metpGsszHkfPy6L4h2-hoM2gErcLoKd7g0QhqrHnKiiERY0woEYW8oBOq2SgaN0ZHt-kdZ3y2UidBbxYcl7WBJ14Q01c2TFUAwTwg2PjGxRdjy65w3W6gdyVZaTHjnyQ1djdOg_SqFk4A-wdjNSUs4xEa3gaUYlLkw2RuPJSZGpOnYU0Bd-mS9CqI_UkZrr1U-hE5WJVCKvKivzv&scope=openid%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20profile&context_uri=https%3A%2F%2Fonecorner.app&service=lso&o2v=1&ddm=1&flowName=GeneralOAuthFlow";
-  };
+
 
   const handleProceedToPayment = () => {
     if (!loginSuccess && !signupSuccess) {
@@ -212,12 +209,7 @@ const ScheduledCheckoutPage = () => {
       <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg">
         {authOption === null ? (
           <div className="max-w-xl mx-auto space-y-4">
-            <button
-              className="flex items-center justify-center w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
-              onClick={handleGoogleSignIn}
-            >
-              <FcGoogle className="mr-2 text-2xl" /> SIGN IN WITH GOOGLE
-            </button>
+            
             <button
               className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
               onClick={() => setAuthOption("email")}

@@ -7,9 +7,9 @@ interface FoodItem {
   name: string;
   description: string;
   price: number;
-  image_url: string; // Use image_url from your database
+  image_url: string;
   category_id: number;
-  quantity:number;
+  quantity: number;
   spicy_level: string;
 }
 
@@ -17,9 +17,10 @@ interface OrderModalProps {
   item: FoodItem;
   onClose: () => void;
   onAddToCart: (item: FoodItem, quantity: number, specialNote: string) => void;
+  serviceType: string; // Add serviceType prop
 }
 
-const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) => {
+const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart, serviceType }) => {
   const [quantity, setQuantity] = useState(1);
   const [specialNote, setSpecialNote] = useState("");
 
@@ -36,7 +37,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) =
         <div className="flex flex-grow">
           <div className="w-[55%] md:w-[60%]">
             <img
-              src={item.image_url || "/placeholder.jpg"} // Use image_url with fallback
+              src={item.image_url || "/placeholder.jpg"}
               alt={item.name}
               className="w-full h-full object-cover"
             />
@@ -45,6 +46,12 @@ const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart }) =
           <div className="w-[45%] md:w-[40%] p-6 flex flex-col">
             <h2 className="text-3xl font-bold text-gray-900">{item.name}</h2>
             <p className="text-gray-600 mt-2">{item.description}</p>
+
+            {/* Display Service Type */}
+            <div className="mt-4">
+              <p className="text-gray-800 font-semibold">Service Type:</p>
+              <p className="text-blue-600">{serviceType}</p>
+            </div>
 
             <div className="mt-4">
               <label className="text-gray-800 font-semibold">Special Instructions</label>

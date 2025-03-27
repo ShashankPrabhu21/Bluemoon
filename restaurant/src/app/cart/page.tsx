@@ -11,11 +11,12 @@ interface CartItem {
   image: string;
   quantity: number;
   special_note: string;
+  service_type: string; // Add service_type
 }
 
 const CartPage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [orderType, setOrderType] = useState<"pickup" | "delivery">("delivery");
+  const [serviceType, setServiceType] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -24,6 +25,9 @@ const CartPage = () => {
         if (res.ok) {
           const cartData = await res.json();
           setCart(cartData);
+          if (cartData.length > 0) {
+            setServiceType(cartData[0].service_type); // Get service_type from first item
+          }
         }
       } catch (error) {
         console.error("Error fetching cart:", error);
@@ -31,10 +35,6 @@ const CartPage = () => {
     };
     fetchCartItems();
   }, []);
-
-  const handleOrderTypeChange = (type: "pickup" | "delivery") => {
-    setOrderType(type);
-  };
 
   const removeItem = async (cartId: number) => {
     try {
@@ -48,6 +48,11 @@ const CartPage = () => {
       if (response.ok) {
         const cartData = await (await fetch('/api/cart/get')).json();
         setCart(cartData);
+        if (cartData.length > 0) {
+          setServiceType(cartData[0].service_type);
+        } else {
+          setServiceType(null);
+        }
       }
     } catch (error) {
       console.error('Error removing item:', error);
@@ -62,6 +67,7 @@ const CartPage = () => {
       if (response.ok) {
         const cartData = await (await fetch('/api/cart/get')).json();
         setCart(cartData);
+        setServiceType(null); // Clear service type when cart is cleared
       }
     } catch (error) {
       console.error('Error clearing cart:', error);
@@ -69,9 +75,7 @@ const CartPage = () => {
   };
 
   const totalAmount = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const discount = orderType === "pickup" ? totalAmount * 0.1 : 0;
-  const deliveryCharge = orderType === "delivery" ? 0 : 0;
-  const finalTotal = totalAmount - discount + deliveryCharge;
+  const finalTotal = totalAmount;
 
   return (
     <div className="min-h-screen bg-gray-100 p-8 mt-32">
@@ -80,9 +84,6 @@ const CartPage = () => {
       {cart.length === 0 ? (
         <div className="text-center text-gray-600">
           <p className="text-lg">Your cart is empty.</p>
-          <Link href="/viewMenu" className="text-blue-600 mt-4 inline-block text-lg font-semibold hover:underline">
-            Continue Shopping
-          </Link>
         </div>
       ) : (
         <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
@@ -103,35 +104,18 @@ const CartPage = () => {
             ))}
           </div>
 
-          <div className="mt-6">
-            <h2 className="text-xl font-bold mb-2">Order Type</h2>
-            <div className="flex space-x-4">
-              <button onClick={() => handleOrderTypeChange("pickup")} className={`w-1/2 py-3 text-lg font-medium rounded-lg transition shadow-md ${orderType === "pickup" ? "bg-blue-600 text-gray-100" : "bg-gray-300 text-gray-700"}`}>
-                PICKUP
-              </button>
-              <button onClick={() => handleOrderTypeChange("delivery")} className={`w-1/2 py-3 text-lg font-medium rounded-lg transition shadow-md ${orderType === "delivery" ? "bg-blue-600 text-gray-100" : "bg-gray-300 text-gray-700"}`}>
-                DELIVERY
-              </button>
-            </div>
-          </div>
-
           <div className="mt-6 border-t pt-4">
+            {serviceType && (
+              <div className="flex justify-between text-lg text-gray-900 px-2 py-2">
+                <span>Service Type:</span>
+                <span style={{ color: "green", textTransform: "uppercase" }}>{serviceType}</span>
+              </div>
+            )}
             <div className="flex justify-between text-lg text-gray-900 px-2 py-2">
               <span>Sub-Total:</span>
               <span>${totalAmount.toFixed(2)}</span>
             </div>
-            {orderType === "pickup" && (
-              <div className="flex justify-between text-lg text-green-600 px-2 py-2">
-                <span>Discount (Pickup -10%):</span>
-                <span>-${discount.toFixed(2)}</span>
-              </div>
-            )}
-            {orderType === "delivery" && (
-              <div className="flex justify-between text-lg text-gray-900 px-2 py-2">
-                <span>Delivery Charge:</span>
-                <span>${deliveryCharge.toFixed(2)}</span>
-              </div>
-            )}
+
             <div className="flex justify-between text-2xl font-bold text-gray-900 px-2 py-3 bg-gray-100 rounded-md shadow">
               <span>Total:</span>
               <span>${finalTotal.toFixed(2)}</span>
@@ -151,7 +135,7 @@ const CartPage = () => {
       )}
 
       <div className="flex justify-center mt-8">
-        <Link href="/viewMenu" className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg shadow-md hover:bg-blue-900 transition">
+        <Link href="/viewMenu" onClick={() => sessionStorage.setItem("fromCart", "true")} className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg shadow-md hover:bg-blue-900 transition">
           Add More Items
         </Link>
       </div>

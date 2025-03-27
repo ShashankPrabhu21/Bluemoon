@@ -4,7 +4,7 @@ import pool from '@/lib/db'; // Import your PostgreSQL pool
 
 export async function POST(req: Request) {
   try {
-    const { item_id, quantity, special_note } = await req.json();
+    const { item_id, quantity, special_note, service_type } = await req.json(); // Added service_type
 
     // Assuming you have user authentication and can get the user_id
     // Replace '1' with your actual user_id retrieval logic
@@ -22,12 +22,12 @@ export async function POST(req: Request) {
 
     // Insert the item into the cart
     const insertQuery = `
-      INSERT INTO carts (user_id, food_name, price, image, quantity, special_note, item_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO carts (user_id, food_name, price, image, quantity, special_note, item_id, service_type)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *;
     `;
 
-    const values = [user_id, name, price, image_url, quantity || 1, special_note, item_id]; // Default quantity to 1 if not provided
+    const values = [user_id, name, price, image_url, quantity || 1, special_note, item_id, service_type]; // Added service_type
 
     const result = await pool.query(insertQuery, values);
 
