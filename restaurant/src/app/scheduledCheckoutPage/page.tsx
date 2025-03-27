@@ -238,7 +238,7 @@ const ScheduledCheckoutPage = () => {
             {authError && <p className="text-red-500 mt-2">{authError}</p>}
             {loginSuccess && <p className="text-green-500 mt-2">Login successful</p>}
             <p className="text-center">
-              Don't have an account?{" "}
+              Don`&apos;`t have an account?{" "}
               <button className="text-blue-600 hover:underline" onClick={() => setAuthOption("signup")}>
                 Create one
               </button>
