@@ -59,7 +59,7 @@ const ViewScheduleMenuContent = () => {
     const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
     const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
     const [cart, setCart] = useState<CartItem[]>([]);
-    const [isFromCart, setIsFromCart] = useState(false);
+    const [, setIsFromCart] = useState(false);
 
     useEffect(() => {
         const fetchMenuItems = async () => {

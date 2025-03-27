@@ -32,7 +32,7 @@ const CheckoutPage = () => {
   const [authError, setAuthError] = useState<string | null>(null);
   const [loginSuccess, setLoginSuccess] = useState<boolean>(false);
   const [guestLoginSuccess, setGuestLoginSuccess] = useState<boolean>(false);
-  const [stripe, setStripe] = useState<any>(null);
+
   const [signupInfo, setSignupInfo] = useState({
     firstName: "",
     lastName: "",
