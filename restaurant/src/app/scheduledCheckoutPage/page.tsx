@@ -92,6 +92,9 @@ const ScheduledCheckoutPage = () => {
     setAuthError(null);
     // Proceed to payment logic here
     console.log("Proceeding to payment...");
+     // If all conditions are met, redirect to the Stripe payment link
+     window.location.href = "https://buy.stripe.com/test_3cs7vB6NI5xlgkU6oo";
+    
   };
 
   const handleForgotPassword = async () => {
@@ -238,7 +241,7 @@ const ScheduledCheckoutPage = () => {
             {authError && <p className="text-red-500 mt-2">{authError}</p>}
             {loginSuccess && <p className="text-green-500 mt-2">Login successful</p>}
             <p className="text-center">
-              Don`&apos;`t have an account?{" "}
+              Don&apos;t have an account?{" "}
               <button className="text-blue-600 hover:underline" onClick={() => setAuthOption("signup")}>
                 Create one
               </button>
@@ -394,6 +397,7 @@ const ScheduledCheckoutPage = () => {
           >
             Proceed To Payment
           </button>
+          
           {authError && <p className="text-red-500 mt-2">{authError}</p>}
         </div>
 

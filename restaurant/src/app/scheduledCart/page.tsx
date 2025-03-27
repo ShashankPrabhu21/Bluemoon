@@ -195,14 +195,22 @@ const ScheduledCart = () => {
               </div>
           )}
   
-          <div className="flex justify-center mt-8">
-              <Link
-                  href="/viewScheduleMenu"
-                  className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg shadow-md hover:bg-blue-900 transition"
-              >
-                  Add More Items
-              </Link>
-          </div>
+            <div className="flex justify-center mt-8">
+                <Link
+                    href={{
+                        pathname: "/viewScheduleMenu",
+                        query: {
+                            service: service,
+                            date: date,
+                            time: time,
+                            fromCart: true,
+                        },
+                    }}
+                    className="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg shadow-md hover:bg-blue-900 transition"
+                >
+                    Add More Items
+                </Link>
+            </div>
       </div>
   );
 };
