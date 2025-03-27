@@ -123,7 +123,10 @@ const OnlineOrderPage = () => {
   return (
     <div className="min-h-screen bg-white p-6 mt-32">
       <div className="flex justify-center items-center relative mb-10">
-        <h1 className="text-5xl font-extrabold text-gray-900 tracking-wide">Online Order</h1>
+      <h1 className="text-6xl font-extrabold text-gray-900 tracking-wide bg-gradient-to-r from-black to-gray-700 text-transparent bg-clip-text drop-shadow-lg">
+        Online Order
+      </h1>
+
         <Link
           href="/cart"
           className="absolute right-0 flex items-center space-x-2 bg-blue-600 text-white px-5 py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
@@ -134,20 +137,32 @@ const OnlineOrderPage = () => {
       </div>
 
       {/* Service Type Selection */}
-      <div className="flex justify-center mb-6">
-        <button
-          onClick={() => setServiceType("pickup")}
-          className={`px-4 py-2 rounded-lg mr-2 ${serviceType === "pickup" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
-        >
-          Pickup
-        </button>
-        <button
-          onClick={() => setServiceType("delivery")}
-          className={`px-4 py-2 rounded-lg ${serviceType === "delivery" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
-        >
-          Delivery
-        </button>
-      </div>
+      <div className="flex justify-center items-center mb-6">
+  <span className="mr-4 text-xl font-semibold text-gray-900">Select Service Type:</span>
+  <div className="flex bg-gray-200 p-1 rounded-full shadow-lg border border-gray-300">
+    <button
+      onClick={() => setServiceType("pickup")}
+      className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out 
+        ${serviceType === "pickup"
+          ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
+          : "bg-transparent text-gray-700 hover:text-blue-500"
+        }`}
+    >
+      Pickup
+    </button>
+    <button
+      onClick={() => setServiceType("delivery")}
+      className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out 
+        ${serviceType === "delivery"
+          ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
+          : "bg-transparent text-gray-700 hover:text-blue-500"
+        }`}
+    >
+      Delivery
+    </button>
+  </div>
+</div>
+
 
       {categories.map((category) => {
         const filteredItems = foodItems.filter((item) => categoryMapping[item.category_id] === category);

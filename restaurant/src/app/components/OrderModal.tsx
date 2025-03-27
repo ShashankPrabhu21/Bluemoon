@@ -44,13 +44,13 @@ const OrderModal: React.FC<OrderModalProps> = ({ item, onClose, onAddToCart, ser
           </div>
 
           <div className="w-[45%] md:w-[40%] p-6 flex flex-col">
-            <h2 className="text-3xl font-bold text-gray-900">{item.name}</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mt-5">{item.name}</h2>
             <p className="text-gray-600 mt-2">{item.description}</p>
 
             {/* Display Service Type */}
-            <div className="mt-4">
-              <p className="text-gray-800 font-semibold">Service Type:</p>
-              <p className="text-blue-600">{serviceType}</p>
+            <div className="mt-4 flex items-center">
+              <p className="text-gray-800 font-semibold mr-2">Service Type:</p>
+              <p className="text-blue-600 font-bold uppercase">{serviceType}</p>
             </div>
 
             <div className="mt-4">
