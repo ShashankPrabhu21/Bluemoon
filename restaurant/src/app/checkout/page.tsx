@@ -212,7 +212,7 @@ const CheckoutPage = () => {
               LOGIN WITH EMAIL
             </button>
             <button
-              className="w-full bg-blue-70 text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
+              className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
               onClick={() => setAuthOption("guest")}
             >
               PROCEED AS GUEST
