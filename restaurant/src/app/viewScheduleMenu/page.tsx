@@ -134,11 +134,12 @@ const ViewScheduleMenuPage = () => {
     <div className="min-h-screen bg-white p-6 mt-32">
       <div className="flex justify-center flex-col items-center relative mb-10">
         <h1 className="text-5xl font-extrabold text-gray-900 tracking-wide">Scheduled Order</h1>
-        <div className="mt-4 text-center">
-          <p className="text-lg font-semibold">Service: {service}</p>
-          <p className="text-lg">Date: {date}</p>
-          <p className="text-lg">Time: {time}</p>
+        <div className="mt-6 text-center space-y-2 bg-gray-100 p-4 rounded-lg shadow-md">
+          <p className="text-xl font-bold text-gray-800">Service: <span className="text-blue-600">{service}</span></p>
+          <p className="text-lg text-gray-700">📅 Date: <span className="font-medium">{date}</span></p>
+          <p className="text-lg text-gray-700">⏰ Time: <span className="font-medium">{time}</span></p>
         </div>
+
         <Link
           href="/scheduledCart" // Link to ScheduledCart component
           className="absolute right-0 flex items-center space-x-2 bg-blue-600 text-white px-5 py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
