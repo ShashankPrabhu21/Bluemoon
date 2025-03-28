@@ -7,10 +7,17 @@ export async function POST(req) {
     try {
         const { firstName, lastName, email, password, phoneNumber, address, city, postCode, state, serviceType } = await req.json();
 
-        if (!firstName || !lastName || !email || !password || !phoneNumber) {
+        if (!firstName || !lastName || !email || !password || !phoneNumber || !serviceType) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
+        // Check if email already exists
+        const existingUser = await pool.query("SELECT email FROM users_order WHERE email = $1", [email]);
+        if (existingUser.rows.length > 0) {
+            return NextResponse.json({ error: "Email address already exists" }, { status: 400 });
+        }
+
+        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
         let insertQuery;
@@ -22,18 +29,18 @@ export async function POST(req) {
             }
 
             insertQuery = `
-                INSERT INTO users_order (first_name, last_name, email, password, phone_number, address, city, postCode, state)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                INSERT INTO users_order (first_name, last_name, email, password, phone_number, address, city, "postCode", state, service_type)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 RETURNING *;
             `;
-            values = [firstName, lastName, email, hashedPassword, phoneNumber, address, city, postCode, state];
+            values = [firstName, lastName, email, hashedPassword, phoneNumber, address, city, postCode, state, serviceType];
         } else {
             insertQuery = `
-                INSERT INTO users_order (first_name, last_name, email, password, phone_number)
-                VALUES ($1, $2, $3, $4, $5)
+                INSERT INTO users_order (first_name, last_name, email, password, phone_number, service_type)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 RETURNING *;
             `;
-            values = [firstName, lastName, email, hashedPassword, phoneNumber];
+            values = [firstName, lastName, email, hashedPassword, phoneNumber, serviceType];
         }
 
         console.log("SQL Query:", insertQuery);
@@ -41,12 +48,11 @@ export async function POST(req) {
 
         const result = await pool.query(insertQuery, values);
 
-        console.log("Database Result:", result);
+        console.log("Database Result:", result.rows[0]);
 
         return NextResponse.json(result.rows[0]);
     } catch (error) {
         console.error("Error creating account:", error);
-        console.error("Error details:", error);
-        return NextResponse.json({ error: "Failed to create account. " + error.message, status: 500 });
+        return NextResponse.json({ error: "Failed to create account. " + error.message }, { status: 500 });
     }
 }

@@ -114,38 +114,45 @@ const CheckoutPage = () => {
 
   const handleGuestSubmit = async () => {
     try {
-      if (serviceType === "delivery" && (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.state || !deliveryInfo.postCode)) {
-        setAuthError("Please fill in all delivery information.");
-        setGuestLoginSuccess(false);
-        setLoginSuccess(false);
-        return;
-      }
+        if (!guestInfo.firstName || !guestInfo.lastName || !guestInfo.email) {
+            setAuthError("Please fill in all required fields.");
+            setGuestLoginSuccess(false);
+            setLoginSuccess(false);
+            return;
+        }
 
-      const response = await fetch("/api/guestOrder", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...guestInfo, ...deliveryInfo, serviceType }),
-      });
+        if (serviceType === "delivery" && (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.state || !deliveryInfo.postCode)) {
+            setAuthError("Please fill in all delivery information.");
+            setGuestLoginSuccess(false);
+            setLoginSuccess(false);
+            return;
+        }
 
-      if (response.ok) {
-        setGuestLoginSuccess(true);
-        setLoginSuccess(true);
-        setAuthError(null);
-      } else {
-        const errorData = await response.json();
-        setAuthError(errorData.error || "Failed to save guest info.");
-        setGuestLoginSuccess(false);
-        setLoginSuccess(false);
-      }
+        const response = await fetch("/api/guestOrder", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ ...guestInfo, ...deliveryInfo, serviceType }),
+        });
+
+        if (response.ok) {
+            setGuestLoginSuccess(true);
+            setLoginSuccess(true);
+            setAuthError(null);
+        } else {
+            const errorData = await response.json();
+            setAuthError(errorData.error || "Failed to save guest info.");
+            setGuestLoginSuccess(false);
+            setLoginSuccess(false);
+        }
     } catch (error) {
-      console.error("Guest info error:", error);
-      setAuthError("Failed to save guest info.");
-      setGuestLoginSuccess(false);
-      setLoginSuccess(false);
+        console.error("Guest info error:", error);
+        setAuthError("Failed to save guest info.");
+        setGuestLoginSuccess(false);
+        setLoginSuccess(false);
     }
-  };
+};
 
   const handleSignup = async () => {
     try {
