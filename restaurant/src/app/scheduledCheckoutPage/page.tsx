@@ -89,6 +89,13 @@ const ScheduledCheckoutPage = () => {
   const deliveryCharge = orderType === "delivery" ? 0 : 0;
   const finalTotal = totalAmount - discount + deliveryCharge;
 
+    const [deliveryInfo, setDeliveryInfo] = useState({
+      address: "",
+      city: "",
+      state: "",
+      postCode: "",
+    });
+
 
 
   const handleProceedToPayment = () => {
@@ -140,12 +147,18 @@ const ScheduledCheckoutPage = () => {
 
   const handleSignup = async () => {
     try {
+      if (orderType === "DELIVERY" && (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.state || !deliveryInfo.postCode)) {
+        setAuthError("Please fill in all delivery information.");
+        setSignupSuccess(false);
+        return;
+      }
+
       const response = await fetch("/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...signupInfo, serviceType: orderType }),
+        body: JSON.stringify({ ...signupInfo, ...deliveryInfo,serviceType: orderType }),
       });
 
       if (response.ok) {
@@ -192,12 +205,27 @@ const ScheduledCheckoutPage = () => {
 
   const handleGuestSubmit = async () => {
     try {
+
+      if (!guestInfo.firstName || !guestInfo.lastName || !guestInfo.email) {
+        setAuthError("Please fill in all required fields.");
+        setGuestLoginSuccess(false);
+        setLoginSuccess(false);
+        return;
+    }
+
+    if (orderType === "DELIVERY" && (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.state || !deliveryInfo.postCode)) {
+        setAuthError("Please fill in all delivery information.");
+        setGuestLoginSuccess(false);
+        setLoginSuccess(false);
+        return;
+    }
+
         const response = await fetch("/api/guestOrder", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ ...guestInfo, serviceType: orderType }),
+            body: JSON.stringify({ ...guestInfo,...deliveryInfo, serviceType: orderType }),
         });
 
         if (response.ok) {
@@ -217,9 +245,8 @@ const ScheduledCheckoutPage = () => {
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 p-6 mt-32">
       <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg">
-        {authOption === null ? (
+      {authOption === null ? (
           <div className="max-w-xl mx-auto space-y-4">
-            
             <button
               className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
               onClick={() => setAuthOption("email")}
@@ -233,10 +260,6 @@ const ScheduledCheckoutPage = () => {
               PROCEED AS GUEST
             </button>
           </div>
-        ) : authOption === "google" ? (
-          <div>
-            <p>Google Sign-in and User Info</p>
-          </div>
         ) : authOption === "email" ? (
           <div className="max-w-xl mx-auto space-y-4">
             <input
@@ -249,15 +272,14 @@ const ScheduledCheckoutPage = () => {
             <input
               type="password"
               placeholder="Password"
-              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              value={emailLoginInfo.password}
+              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" value={emailLoginInfo.password}
               onChange={(e) => setEmailLoginInfo({ ...emailLoginInfo, password: e.target.value })}
             />
             <button
-                className="text-sm text-blue-600 hover:underline"
-                onClick={() => setAuthOption("forgotPassword")}
+              className="text-sm text-blue-600 hover:underline"
+              onClick={() => setAuthOption("forgotPassword")}
             >
-                Forgot Password?
+              Forgot Password?
             </button>
             <button
               className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
@@ -276,42 +298,75 @@ const ScheduledCheckoutPage = () => {
           </div>
         ) : authOption === "guest" ? (
           <div className="max-w-xl mx-auto space-y-4">
-              <input
+            <input
+              type="text"
+              placeholder="First Name"
+              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={guestInfo.firstName}
+              onChange={(e) => setGuestInfo({ ...guestInfo, firstName: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={guestInfo.lastName}
+              onChange={(e) => setGuestInfo({ ...guestInfo, lastName: e.target.value })}
+            />
+            <input
+              type="tel"
+              placeholder="Mobile Number"
+              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={guestInfo.mobileNumber}
+              onChange={(e) => setGuestInfo({ ...guestInfo, mobileNumber: e.target.value })}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={guestInfo.email}
+              onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
+            />
+            {orderType === "DELIVERY" && (
+              <>
+                <input
                   type="text"
-                  placeholder="First Name"
+                  placeholder="Address"
                   className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  value={guestInfo.firstName}
-                  onChange={(e) => setGuestInfo({ ...guestInfo, firstName: e.target.value })}
-              />
-              <input
+                  value={deliveryInfo.address}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, address: e.target.value })}
+                />
+                <input
                   type="text"
-                  placeholder="Last Name"
+                  placeholder="City"
                   className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  value={guestInfo.lastName}
-                  onChange={(e) => setGuestInfo({ ...guestInfo, lastName: e.target.value })}
-              />
-              <input
-                  type="tel"
-                  placeholder="Mobile Number"
+                  value={deliveryInfo.city}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, city: e.target.value })}
+                />
+                 <input
+                  type="text"
+                  placeholder="Post Code"
                   className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  value={guestInfo.mobileNumber}
-                  onChange={(e) => setGuestInfo({ ...guestInfo, mobileNumber: e.target.value })}
-              />
-              <input
-                  type="email"
-                  placeholder="Email"
+                  value={deliveryInfo.postCode}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, postCode: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="State"
                   className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  value={guestInfo.email}
-                  onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
-              />
-              <button
-                  className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
-                  onClick={handleGuestSubmit}
-              >
-                  Submit
-              </button>
-              {guestLoginSuccess && <p className="text-green-500 mt-2">Login successful</p>}
-              {authError && <p className="text-red-500 mt-2">{authError}</p>}
+                  value={deliveryInfo.state}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, state: e.target.value })}
+                />
+               
+              </>
+            )}
+            <button
+              className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
+              onClick={handleGuestSubmit}
+            >
+              Submit
+            </button>
+            {guestLoginSuccess && <p className="text-green-500 mt-2">Login successful</p>}
+            {authError && <p className="text-red-500 mt-2">{authError}</p>}
           </div>
         ) : authOption === "signup" ? (
           <div className="max-w-xl mx-auto space-y-4">
@@ -357,8 +412,39 @@ const ScheduledCheckoutPage = () => {
               value={signupInfo.phoneNumber}
               onChange={(e) => setSignupInfo({ ...signupInfo, phoneNumber: e.target.value })}
             />
-            <button
-              className="w-full bg-green-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-green-900 transition"
+            {orderType === "DELIVERY" && (
+              <>
+                <input
+                  type="text"
+                  placeholder="Address"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.address}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, address: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="City"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.city}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, city: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="State"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.state}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, state: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="Post Code"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.postCode}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, postCode: e.target.value })}
+                />
+              </>
+            )}
+            <button className="w-full bg-green-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-green-900 transition"
               onClick={handleSignup}
             >
               Sign Up
@@ -366,33 +452,37 @@ const ScheduledCheckoutPage = () => {
             {signupSuccess && <p className="text-green-500 mt-2">Successfully created!</p>}
           </div>
         ) : authOption === "forgotPassword" ? (
-            <div className="max-w-xl mx-auto space-y-4">
-                <input
-                    type="email"
-                    placeholder="Email"
-                    className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                    value={forgotPasswordInfo.email}
-                    onChange={(e) => setForgotPasswordInfo({ ...forgotPasswordInfo, email: e.target.value })}
-                />
-                <input
-                    type="password"
-                    placeholder="New Password"
-                    className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                    value={forgotPasswordInfo.newPassword}
-                    onChange={(e) => setForgotPasswordInfo({ ...forgotPasswordInfo, newPassword: e.target.value })}
-                />
-                <button
-                    className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
-                    onClick={handleForgotPassword}
-                >
-                    Change Password
-                </button>
-                {forgotPasswordMessage && (
-                    <p className={`mt-4 text-center ${forgotPasswordMessage === "Successfully created!" ? "text-green-500" : "text-red-500"}`}>
-                        {forgotPasswordMessage}
-                    </p>
-                )}
-            </div>
+          <div className="max-w-xl mx-auto space-y-4">
+            <input
+              type="email"
+              placeholder="Email"
+              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={forgotPasswordInfo.email}
+              onChange={(e) => setForgotPasswordInfo({ ...forgotPasswordInfo, email: e.target.value })}
+            />
+            <input
+              type="password"
+              placeholder="New Password"
+              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={forgotPasswordInfo.newPassword}
+              onChange={(e) => setForgotPasswordInfo({ ...forgotPasswordInfo, newPassword: e.target.value })}
+            />
+            <button
+              className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
+              onClick={handleForgotPassword}
+            >
+              Change Password
+            </button>
+            {forgotPasswordMessage && (
+              <p
+                className={`mt-4 text-center ${
+                  forgotPasswordMessage === "Successfully created!" ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                {forgotPasswordMessage}
+              </p>
+            )}
+          </div>
         ) : null}
 
         {/* Order Summary */}
