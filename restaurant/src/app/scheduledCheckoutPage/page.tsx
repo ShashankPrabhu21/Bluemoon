@@ -28,6 +28,11 @@ const ScheduledCheckoutPage = () => {
     lastName: "",
     mobileNumber: "",
     email: "",
+    address: "",
+    city: "",
+    postCode: "",
+    state: "",
+    serviceType: "", 
   });
   const [emailLoginInfo, setEmailLoginInfo] = useState({
     email: "",
@@ -40,6 +45,11 @@ const ScheduledCheckoutPage = () => {
     password: "",
     confirmPassword: "",
     phoneNumber: "",
+    address: "",
+    city: "",
+    postCode: "",
+    state: "",
+    serviceType: "", 
   });
     const [forgotPasswordInfo, setForgotPasswordInfo] = useState({
         email: "",
@@ -135,7 +145,7 @@ const ScheduledCheckoutPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(signupInfo),
+        body: JSON.stringify({ ...signupInfo, serviceType: orderType }),
       });
 
       if (response.ok) {
@@ -187,7 +197,7 @@ const ScheduledCheckoutPage = () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(guestInfo),
+            body: JSON.stringify({ ...guestInfo, serviceType: orderType }),
         });
 
         if (response.ok) {
