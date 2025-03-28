@@ -4,16 +4,12 @@ import React, { useEffect, useState } from "react";
 import { IoChevronBack } from "react-icons/io5";
 import Link from "next/link";
 
-
-
 const CheckoutPage = () => {
-
-  const [orderType, setOrderType] = useState<"pickup" | "delivery">("delivery");
+  
   const [totalAmount, setTotalAmount] = useState(0);
+  const [serviceType, setServiceType] = useState<string | null>(null);
   const [deliveryInfo, setDeliveryInfo] = useState({
-    locationPin: "",
-    floorUnit: "",
-    street: "",
+    address: "",
     city: "",
     state: "",
     postCode: "",
@@ -50,32 +46,41 @@ const CheckoutPage = () => {
 
   interface CartItem {
     price: number;
-    quantity?: number;
+    quantity: number;
+    service_type: string;
   }
 
+  const [, setCart] = useState<CartItem[]>([]);
+
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedOrderType = localStorage.getItem("orderType");
-      const storedCart = localStorage.getItem("cartItems");
-
-      if (storedOrderType) setOrderType(storedOrderType as "pickup" | "delivery");
-
-      if (storedCart) {
-        const cartItems = JSON.parse(storedCart);
-        const total = cartItems.reduce(
-          (acc: number, item: CartItem) => acc + item.price * (item.quantity || 1),
-          0
-        );
-        setTotalAmount(total);
+    const fetchCartData = async () => {
+      try {
+        const res = await fetch("/api/cart/get");
+        if (res.ok) {
+          const cartData = await res.json();
+          setCart(cartData);
+          if (cartData.length > 0) {
+            setServiceType(cartData[0].service_type);
+            const total = cartData.reduce(
+              (acc: number, item: CartItem) => acc + item.price * item.quantity,
+              0
+            );
+            setTotalAmount(total);
+          } else {
+            setServiceType(null);
+            setTotalAmount(0);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching cart data:", error);
       }
-    }
+    };
+
+    fetchCartData();
   }, []);
 
-
-  const deliveryCharge = orderType === "delivery" ? 0 : 0; // Adjust delivery charge as needed
+  const deliveryCharge = serviceType === "delivery" ? 0 : 0;
   const finalTotal = totalAmount + deliveryCharge;
-
- 
 
   const handleLogin = async () => {
     try {
@@ -109,26 +114,70 @@ const CheckoutPage = () => {
 
   const handleGuestSubmit = async () => {
     try {
+      if (serviceType === "delivery" && (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.state || !deliveryInfo.postCode)) {
+        setAuthError("Please fill in all delivery information.");
+        setGuestLoginSuccess(false);
+        setLoginSuccess(false);
+        return;
+      }
+
       const response = await fetch("/api/guestOrder", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(guestInfo),
+        body: JSON.stringify({ ...guestInfo, ...deliveryInfo, serviceType }),
       });
 
       if (response.ok) {
         setGuestLoginSuccess(true);
         setLoginSuccess(true);
+        setAuthError(null);
       } else {
         const errorData = await response.json();
         setAuthError(errorData.error || "Failed to save guest info.");
+        setGuestLoginSuccess(false);
+        setLoginSuccess(false);
       }
     } catch (error) {
       console.error("Guest info error:", error);
       setAuthError("Failed to save guest info.");
+      setGuestLoginSuccess(false);
+      setLoginSuccess(false);
     }
   };
+
+  const handleSignup = async () => {
+    try {
+      if (serviceType === "delivery" && (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.state || !deliveryInfo.postCode)) {
+        setAuthError("Please fill in all delivery information.");
+        setSignupSuccess(false);
+        return;
+      }
+
+      const response = await fetch("/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...signupInfo, ...deliveryInfo, serviceType }),
+      });
+
+      if (response.ok) {
+        setSignupSuccess(true);
+        setAuthError(null);
+      } else {
+        const errorData = await response.json();
+        setAuthError(errorData.error || "Failed to create account.");
+        setSignupSuccess(false);
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      setAuthError("Failed to create account.");
+      setSignupSuccess(false);
+    }
+  };
+
 
   const handleProceedToPayment = () => {
     if (!loginSuccess && !signupSuccess) {
@@ -137,11 +186,8 @@ const CheckoutPage = () => {
     }
 
     setAuthError(null);
-    // Proceed to payment logic here
     console.log("Proceeding to payment...");
-     // If all conditions are met, redirect to the Stripe payment link
-     window.location.href = "https://buy.stripe.com/test_3cs7vB6NI5xlgkU6oo";
-    
+    window.location.href = "https://buy.stripe.com/test_3cs7vB6NI5xlgkU6oo";
   };
 
   const handleForgotPassword = async () => {
@@ -177,32 +223,11 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleSignup = async () => {
-    try {
-      const response = await fetch("/api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(signupInfo),
-      });
-
-      if (response.ok) {
-        setSignupSuccess(true);
-      } else {
-        const errorData = await response.json();
-        setAuthError(errorData.error || "Failed to create account.");
-      }
-    } catch (error) {
-      console.error("Signup error:", error);
-      setAuthError("Failed to create account.");
-    }
-  };
+ 
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 p-6 mt-32">
       <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg">
-
         {authOption === null ? (
           <div className="max-w-xl mx-auto space-y-4">
             <button
@@ -230,8 +255,7 @@ const CheckoutPage = () => {
             <input
               type="password"
               placeholder="Password"
-              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              value={emailLoginInfo.password}
+              className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500" value={emailLoginInfo.password}
               onChange={(e) => setEmailLoginInfo({ ...emailLoginInfo, password: e.target.value })}
             />
             <button
@@ -249,7 +273,7 @@ const CheckoutPage = () => {
             {authError && <p className="text-red-500 mt-2">{authError}</p>}
             {loginSuccess && <p className="text-green-500 mt-2">Login successful</p>}
             <p className="text-center">
-              Don&apos;t have an account?{" "}
+              Don't have an account?{" "}
               <button className="text-blue-600 hover:underline" onClick={() => setAuthOption("signup")}>
                 Create one
               </button>
@@ -285,6 +309,39 @@ const CheckoutPage = () => {
               value={guestInfo.email}
               onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
             />
+            {serviceType === "delivery" && (
+              <>
+                <input
+                  type="text"
+                  placeholder="Address"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.address}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, address: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="City"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.city}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, city: e.target.value })}
+                />
+                 <input
+                  type="text"
+                  placeholder="Post Code"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.postCode}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, postCode: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="State"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.state}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, state: e.target.value })}
+                />
+               
+              </>
+            )}
             <button
               className="w-full bg-blue-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-blue-900 transition"
               onClick={handleGuestSubmit}
@@ -338,8 +395,39 @@ const CheckoutPage = () => {
               value={signupInfo.phoneNumber}
               onChange={(e) => setSignupInfo({ ...signupInfo, phoneNumber: e.target.value })}
             />
-            <button
-              className="w-full bg-green-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-green-900 transition"
+            {serviceType === "delivery" && (
+              <>
+                <input
+                  type="text"
+                  placeholder="Address"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.address}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, address: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="City"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.city}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, city: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="State"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.state}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, state: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="Post Code"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={deliveryInfo.postCode}
+                  onChange={(e) => setDeliveryInfo({ ...deliveryInfo, postCode: e.target.value })}
+                />
+              </>
+            )}
+            <button className="w-full bg-green-700 text-white text-lg font-medium py-3 rounded-lg shadow-md hover:bg-green-900 transition"
               onClick={handleSignup}
             >
               Sign Up
@@ -380,72 +468,21 @@ const CheckoutPage = () => {
           </div>
         ) : null}
 
-        {/* Delivery Information Section (Visible for Delivery Orders) */}
-        {orderType === "delivery" && (
-          <div className="max-w-3xl mx-auto mt-6 bg-white p-6 rounded -lg shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Delivery Information</h2>
-
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Location Pin"
-                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                value={deliveryInfo.locationPin}
-                onChange={(e) => setDeliveryInfo({ ...deliveryInfo, locationPin: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Floor/Unit No (Optional)"
-                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                value={deliveryInfo.floorUnit}
-                onChange={(e) => setDeliveryInfo({ ...deliveryInfo, floorUnit: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Street Number & Street Name"
-                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                value={deliveryInfo.street}
-                onChange={(e) => setDeliveryInfo({ ...deliveryInfo, street: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Town / City / Suburb"
-                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                value={deliveryInfo.city}
-                onChange={(e) => setDeliveryInfo({ ...deliveryInfo, city: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="State"
-                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                value={deliveryInfo.state}
-                onChange={(e) => setDeliveryInfo({ ...deliveryInfo, state: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Post Code"
-                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                value={deliveryInfo.postCode}
-                onChange={(e) => setDeliveryInfo({ ...deliveryInfo, postCode: e.target.value })}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Order Summary */}
         <div className="max-w-xl mx-auto mt-6 bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-bold mb-2">
-            Order Type: <span className="ml-2 text-yellow-600 capitalize">{orderType}</span>
-          </h2>
+          
+          {serviceType && (
+            <h2 className="text-xl font-bold mb-2">
+              Service Type: <span className="ml-2 text-green-600 capitalize">{serviceType}</span>
+            </h2>
+          )}
 
-          {/* Price Breakdown */}
           <div className="mt-6 border-t pt-4">
             <div className="flex justify-between text-lg text-gray-900 px-2 py-2">
               <span>Sub-Total:</span>
               <span>${totalAmount.toFixed(2)}</span>
             </div>
-            
-            {orderType === "delivery" && (
+
+            {serviceType === "delivery" && (
               <div className="flex justify-between text-lg text-gray-900 px-2 py-2">
                 <span>Delivery Charge:</span>
                 <span>${deliveryCharge.toFixed(2)}</span>
@@ -457,7 +494,6 @@ const CheckoutPage = () => {
             </div>
           </div>
 
-          {/* Place Order Button */}
           <button
             className="w-full mt-4 py-3 text-white font-medium bg-green-600 hover:bg-green-500 rounded-lg transition text-lg shadow-md"
             onClick={handleProceedToPayment}
@@ -466,7 +502,6 @@ const CheckoutPage = () => {
           </button>
         </div>
 
-        {/* Back to Cart Button */}
         <div className="flex justify-center mt-8">
           <Link
             href="/cart"
