@@ -47,10 +47,7 @@ export async function POST(req) {
         return NextResponse.json(result.rows[0]);
     } catch (error) {
         console.error("Error saving guest order:", error);
-        console.error("Error details:", error);
-        if (error.code === '23505') {
-            return NextResponse.json({ error: "Email address already exists" }, { status: 400 });
-        }
+    
         return NextResponse.json({ error: "Failed to save guest order. " + error.message, status: 500 });
     }
 }
