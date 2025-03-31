@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
+// Check if API key is present
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error("❌ STRIPE_SECRET_KEY is missing!");
+} else {
+  console.log("✅ Stripe API Key Loaded");
+}
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
 export async function POST(req: Request) {
   try {
     const { amount } = await req.json();
+
+    if (!amount || amount <= 0) {
+      throw new Error("Invalid amount");
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -14,7 +25,7 @@ export async function POST(req: Request) {
           price_data: {
             currency: "usd",
             product_data: { name: "Restaurant Bill" },
-            unit_amount: Math.round(amount * 100), // Convert to cents
+            unit_amount: Math.round(amount * 100), // Convert dollars to cents
           },
           quantity: 1,
         },
@@ -26,6 +37,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
+    console.error("❌ Stripe Checkout Error:", error);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
