@@ -98,19 +98,50 @@ const ScheduledCheckoutPage = () => {
 
 
 
-  const handleProceedToPayment = () => {
-    if (!loginSuccess && !signupSuccess) {
-      alert("Please login or signup first.");
-      return;
-    }
-
-    setAuthError(null);
-    // Proceed to payment logic here
-    console.log("Proceeding to payment...");
-     // If all conditions are met, redirect to the Stripe payment link
-     window.location.href = "https://buy.stripe.com/test_3cs7vB6NI5xlgkU6oo";
+    const handleProceedToPayment = async () => {
+      if (!loginSuccess && !signupSuccess) {
+        alert("Please login or signup first.");
+        return;
+      }
     
-  };
+      setAuthError(null);
+      console.log("Proceeding to payment...");
+    
+      try {
+        const response = await fetch("/api/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: finalTotal, // Send total bill amount
+          }),
+        });
+    
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status} ${response.statusText}`);
+        }
+    
+        const text = await response.text(); // Read raw response as text
+        console.log("Response Text:", text);
+    
+        try {
+          const data = JSON.parse(text); // Parse JSON response
+          console.log("Parsed JSON:", data);
+    
+          if (data.url) {
+            window.location.href = data.url; // Redirect to Stripe checkout
+          } else {
+            throw new Error("No checkout URL received.");
+          }
+        } catch (jsonError) {
+          throw new Error(`JSON Parse Error: ${(jsonError as Error).message}`);
+        }
+      } catch (error) {
+        console.error("Payment Error:", (error as Error).message);
+        alert(`Payment error: ${(error as Error).message}`);
+      }
+    };
 
   const handleForgotPassword = async () => {
     try {
