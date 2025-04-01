@@ -48,9 +48,11 @@ const CheckoutPage = () => {
     price: number;
     quantity: number;
     service_type: string;
+    food_name: string;
   }
 
-  const [, setCart] = useState<CartItem[]>([]);
+ 
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   useEffect(() => {
     const fetchCartData = async () => {
@@ -520,6 +522,24 @@ const CheckoutPage = () => {
               Service Type: <span className="ml-2 text-green-600 capitalize">{serviceType}</span>
             </h2>
           )}
+
+          {/* Display Cart Items */}
+      <div className="mt-4 bg-gradient-to-br from-blue-50 to-blue-100 shadow-md rounded-lg p-5">
+        <h3 className="text-xl font-bold mb-4 text-blue-800">🛒 Order Summary</h3>
+        <ul className="divide-y divide-blue-300">
+          {cart.map((item, index) => (
+            <li key={index} className="flex items-center justify-between py-3">
+              <div className="flex items-center gap-4">
+                <span className="text-blue-900 font-medium">{item.food_name}</span>
+                <span className="text-blue-700 bg-blue-200 px-2 py-1 rounded-md text-sm">x {item.quantity}</span>
+              </div>
+              <span className="text-green-700 font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+
 
           <div className="mt-6 border-t pt-4">
             <div className="flex justify-between text-lg text-gray-900 px-2 py-2">
