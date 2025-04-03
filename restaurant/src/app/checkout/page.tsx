@@ -549,7 +549,7 @@ const CheckoutPage = () => {
 
             {serviceType === "delivery" && (
               <div className="flex justify-between text-lg text-gray-900 px-2 py-2">
-                <span>Delivery Charge:</span>
+                <span>Delivery Charge :</span>
                 <span>${deliveryCharge.toFixed(2)}</span>
               </div>
             )}

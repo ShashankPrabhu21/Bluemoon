@@ -21,7 +21,7 @@ export default function Footer() {
                 { name: "Home", href: "/" },
                 { name: "About Us", href: "/about" },
                 { name: "Menu", href: "/menu" },
-                { name: "Events", href: "/events" },
+               
                 { name: "Gallery", href: "/gallery" },
                 { name: "Contact Us", href: "/contact" },
               ].map((link, index) => (

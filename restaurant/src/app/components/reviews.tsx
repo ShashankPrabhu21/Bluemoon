@@ -55,7 +55,7 @@ export default function Reviews() {
 
   return (
     <div 
-      className="flex flex-col items-center justify-center py-16 px-6"
+      className="flex flex-col items-center justify-center py-16 px-6 bg-white"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
