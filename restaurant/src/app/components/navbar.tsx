@@ -123,9 +123,8 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* Mobile Menu (Appears when menuOpen is true) */}
       {menuOpen && isMobile && (
-  <div className="absolute top-0 left-0 w-full h-screen bg-gradient-to-b from-black/90 to-black/90 backdrop-blur-lg p-6">
+  <div className="absolute top-0 left-0 w-full h-screen bg-gradient-to-b from-black/90 to-black/90 backdrop-blur-lg p-6 z-50">
     {/* Logo & Close Button */}
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center gap-2">
@@ -142,19 +141,30 @@ export default function Navbar() {
 
     {/* Navigation Links */}
     <ul className="flex flex-col items-center space-y-4 text-lg font-medium">
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/">Home</Link></li>
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/menu">Menu</Link></li>
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/about">About Us</Link></li>
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/delivery">Delivery</Link></li>
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/cooking">Cooking Videos</Link></li>
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/blog">Blog</Link></li>
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/gallery">Gallery</Link></li>
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/table">Table Reservation</Link></li>
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/contact">Contact Us</Link></li>
-      <li className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"><Link href="/order">Online Order</Link></li>
+      {[
+        { href: "/", label: "Home" },
+        { href: "/menu", label: "Menu" },
+        { href: "/about", label: "About Us" },
+        { href: "/delivery", label: "Delivery" },
+        { href: "/cooking", label: "Cooking Videos" },
+        { href: "/blog", label: "Blog" },
+        { href: "/gallery", label: "Gallery" },
+        { href: "/table", label: "Table Reservation" },
+        { href: "/contact", label: "Contact Us" },
+        { href: "/order", label: "Online Order" },
+      ].map((item) => (
+        <li
+          key={item.href}
+          onClick={() => setMenuOpen(false)}
+          className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"
+        >
+          <Link href={item.href}>{item.label}</Link>
+        </li>
+      ))}
     </ul>
   </div>
 )}
+
 
     </header>
   );
