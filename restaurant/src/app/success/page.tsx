@@ -19,12 +19,7 @@ export default function SuccessPage() {
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("credit-card");
   const [finalTotal, setFinalTotal] = useState(0);
-  const [deliveryInfo, setDeliveryInfo] = useState({
-    address: "",
-    city: "",
-    state: "",
-    postCode: "",
-  });
+ 
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -49,11 +44,7 @@ export default function SuccessPage() {
           setPaymentMethod(paymentData.method);
         }
 
-        const deliveryRes = await fetch("/api/delivery/get");
-        if (deliveryRes.ok) {
-          const deliveryData = await deliveryRes.json();
-          setDeliveryInfo(deliveryData);
-        }
+        
       } catch (error) {
         console.error("Error fetching order details:", error);
       }
