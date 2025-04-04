@@ -174,6 +174,14 @@ export default function OfferSetup() {
   return (
     <div className="container mx-auto p-4 mt-20">
       <h1 className="text-2xl font-bold mb-4">Offer Setup</h1>
+      <div className="flex justify-center mb-6">
+        <button
+          onClick={() => (window.location.href = "/adminDashboard")}
+          className="bg-blue-800 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition-all duration-300"
+        >
+          ⬅️ Back to Dashboard
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
   {foodItems.length > 0 ? (
