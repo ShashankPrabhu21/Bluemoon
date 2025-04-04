@@ -56,7 +56,7 @@ export default function ReservationForm() {
 
     setLoading(false);
   };
-
+  
   return (
     <div className="bg-gray-100 p-8 rounded-xl shadow-2xl w-full max-w-xl">
       <h2 className="text-3xl font-bold text-center mb-6 text-blue-900">RESERVE A TABLE</h2>
@@ -114,7 +114,7 @@ export default function ReservationForm() {
           >
             <option value="" disabled>Select table</option>
             {[...Array(8)].map((_, i) => (
-              <option key={i} value={i + 1}>Table {i + 1}</option>
+              <option key={i} value={`Table ${i + 1}`}>Table {i + 1}</option> // Store "Table 1" instead of just 1.
             ))}
           </select>
         </div>
