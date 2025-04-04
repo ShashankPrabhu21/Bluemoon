@@ -162,7 +162,7 @@ const OffersCarousel = () => {
                   {item.name}
                 </p>
                 {/* Item Number */}
-                <div className="mt-3 text-xs sm:text-sm lg:text-base font-medium text-gray-300 border border-gray-500 px-3 py-1 rounded-md">
+                <div className="mt-3  text-xs sm:text-sm lg:text-base font-medium text-gray-300 border border-gray-500 px-3 py-1 rounded-md">
                   Item No: {item.quantity}
                 </div>
               </div>
