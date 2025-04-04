@@ -59,9 +59,10 @@ export default function Reviews() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <h2 className="text-4xl font-bold mb-8 text-[#2A4D80] text-center">
-        ⭐ CUSTOMER REVIEWS ⭐
-      </h2>
+    <h2 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold  text-[#2A4D80] text-center">
+  ⭐ CUSTOMER REVIEWS ⭐
+</h2>
+
 
       {reviews.length > 0 ? (
         <div className="relative w-full mx-auto overflow-hidden h-[500px] flex items-center justify-center">
@@ -69,7 +70,7 @@ export default function Reviews() {
             {/* Previous Review */}
             <motion.div
               key={prevIndex}
-              className="absolute left-[15%] w-[400px] h-[400px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 text-gray-800 shadow-lg rounded-xl p-6 opacity-70 border border-gray-200"
+              className="absolute left-[15%] w-[400px] h-[400px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 text-gray-800 shadow-lg rounded-xl p-6 opacity-70 border border-gray-200 hidden xl:flex"
               initial={{ x: "-100vw" }}
               animate={{ x: "-25vw" }}
               exit={{ x: "-100vw" }}
@@ -100,14 +101,19 @@ export default function Reviews() {
               </p>
             </motion.div>
 
+
+  {/* Center Review */}
             <motion.div
                 key={currentIndex}
-                className="absolute w-[650px] h-[450px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 text-gray-900 shadow-2xl rounded-2xl p-8 border border-gray-300"
+                className="absolute w-[90%] max-w-[650px] h-auto sm:h-[400px] lg:h-[450px] flex flex-col items-center justify-center 
+                          bg-gradient-to-br from-blue-100 to-blue-200 text-gray-900 shadow-2xl rounded-2xl 
+                          p-5 sm:p-8 border border-gray-300"
                 initial={{ x: "100vw" }}
                 animate={{ x: "0vw" }}
                 exit={{ x: direction > 0 ? "-25vw" : "25vw" }}
                 transition={{ duration: 1, ease: "easeOut" }}
               >
+                {/* Profile Image */}
                 <img
                   src={
                     reviews[currentIndex].gender?.toLowerCase() === "male"
@@ -115,18 +121,26 @@ export default function Reviews() {
                       : "/female.png"
                   }
                   alt="Gender Icon"
-                  className="w-24 h-24 object-cover mb-4 rounded-full shadow-md border-2 border-gray-300"
+                  className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-cover mb-3 sm:mb-4 rounded-full shadow-md border-2 border-gray-300"
                 />
-                <h3 className="text-2xl font-semibold">{reviews[currentIndex].name}</h3>
+
+                {/* Name */}
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold">{reviews[currentIndex].name}</h3>
+
+                {/* Star Ratings */}
                 <div className="flex gap-1 mt-2">
                   {Array.from({ length: reviews[currentIndex].rating }).map((_, index) => (
-                    <span key={index} className="text-yellow-400 text-3xl">⭐</span>
+                    <span key={index} className="text-yellow-400 text-lg sm:text-xl lg:text-3xl">⭐</span>
                   ))}
                 </div>
-                <p className="italic text-gray-700 mt-4 text-center text-lg leading-relaxed max-w-[500px]">
-                `&quot;`{reviews[currentIndex].experience}`&quot;`
+
+                {/* Experience Text */}
+                <p className="italic text-gray-700 mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg text-center leading-relaxed max-w-[90%] sm:max-w-[500px]">
+                  “{reviews[currentIndex].experience}”
                 </p>
-                <p className="text-sm text-gray-500 mt-6">
+
+                {/* Date */}
+                <p className="text-xs sm:text-sm text-gray-500 mt-4 sm:mt-6">
                   {new Date(reviews[currentIndex].created_at).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
@@ -136,10 +150,11 @@ export default function Reviews() {
               </motion.div>
 
 
+
             {/* Next Review */}
             <motion.div
               key={nextIndex}
-              className="absolute right-[15%] w-[400px] h-[400px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 text-gray-800 shadow-lg rounded-xl p-6 opacity-70 border border-gray-200"
+              className="absolute right-[15%] w-[400px] h-[400px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 text-gray-800 shadow-lg rounded-xl p-6 opacity-70 border border-gray-200 hidden xl:flex"
               initial={{ x: "100vw" }}
               animate={{ x: "25vw" }}
               exit={{ x: "100vw" }}

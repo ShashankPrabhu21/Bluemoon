@@ -137,7 +137,7 @@ export default function Home() {
         <span className="absolute inset-0 -z-10 bg-white rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.2)] px-6 py-2"></span>
 
         {/* Main Heading */}
-        <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500 uppercase drop-shadow-md">
+        <h2 className="text-3xl lg:text-4xl  font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500 uppercase drop-shadow-md">
           Feast-Worthy Deal!
         </h2>
 
@@ -147,7 +147,7 @@ export default function Home() {
       <OfferItem/>
 
 
-      <div className="relative z-10 w-full">
+      <div className="relative z-10 w-full lg:mt-12">
         {/** First Section */}
         <div className="w-full relative py-12 md:py-16 overflow-hidden bg-cover bg-center bg-[url('/sec11.jpg')]">
           {/* Overlay for opacity effect */}
