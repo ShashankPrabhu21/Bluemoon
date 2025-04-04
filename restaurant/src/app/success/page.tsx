@@ -76,7 +76,7 @@ export default function SuccessPage() {
         {/* Title & Message */}
         <h1 className="text-2xl font-semibold mb-2">Payment Successful</h1>
         <p className="text-sm text-gray-200 mb-4">
-          Thank you for your order! It's being processed and will be delivered soon.
+          Thank you for your order! It&apos;s being processed and will be delivered soon.
         </p>
 
         {/* Order Summary */}
