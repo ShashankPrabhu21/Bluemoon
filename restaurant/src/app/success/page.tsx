@@ -92,16 +92,24 @@ export default function SuccessPage() {
           Thank you for your order! It&apos;s being processed and will be delivered soon.
         </p>
 
-        <div className="mb-6 text-left text-sm text-gray-200">
-  <p><span className="font-medium text-white">Cardholder:</span> {cardholderName}</p>
-  <p><span className="font-medium text-white">Email:</span> {customerEmail}</p>
+        <div className="mb-6 bg-gradient-to-r from-[#1A2E66] to-[#203A8E] px-6 py-4 rounded-lg shadow-lg shadow-blue-500/30 border border-blue-400/50 text-left">
+  <h3 className="text-lg font-semibold text-white mb-4">👤 Customer Info</h3>
+  <div className="flex items-center gap-3 mb-2">
+    <span className="text-white font-medium w-28">Cardholder:</span>
+    <span className="text-gray-200 text-sm truncate">{cardholderName || "N/A"}</span>
+  </div>
+  <div className="flex items-center gap-3">
+    <span className="text-white font-medium w-28">Email:</span>
+    <span className="text-gray-200 text-sm truncate">{customerEmail || "N/A"}</span>
+  </div>
 </div>
+
 
 
         {/* Order Summary */}
         <div className="bg-gradient-to-r from-[#1A2E66] to-[#203A8E] px-6 py-4 rounded-lg text-left shadow-lg shadow-blue-500/30 border border-blue-400/50">
         <h3 className="text-lg font-medium text-white mb-2">🛒 Order Summary</h3>
-        <p className="text-lg font-medium text-yellow-200 mb-2 ">Service Type - {serviceType}</p>
+        <p className="text-lg font-medium text-yellow-200 mb-2 uppercase">Service Type - {serviceType}</p>
           <ul className="divide-y divide-gray-500/50">
             {cart.map((item, index) => (
               <li key={index} className="flex items-center justify-between py-3">
