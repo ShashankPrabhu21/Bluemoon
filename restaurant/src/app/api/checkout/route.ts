@@ -11,6 +11,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2023-10-16" as Stripe.LatestApiVersion,
 });
 
+// Create Stripe checkout session (POST)
 export async function POST(req: Request) {
   try {
     const { amount } = await req.json();
@@ -40,5 +41,27 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("❌ Stripe Checkout Error:", error);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  }
+}
+
+// ✅ Fetch session details by session_id (GET)
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const session_id = searchParams.get("session_id");
+
+  if (!session_id) {
+    return NextResponse.json({ error: "Session ID is required" }, { status: 400 });
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+
+    return NextResponse.json({
+      email: session.customer_details?.email || "",
+      name: session.customer_details?.name || "",
+    });
+  } catch (error) {
+    console.error("❌ Error fetching session details:", error);
+    return NextResponse.json({ error: "Failed to fetch session details" }, { status: 500 });
   }
 }

@@ -60,7 +60,7 @@ export default function SuccessPage() {
   
         // ✅ fetch stripe session details
         if (sessionId) {
-          const stripeRes = await fetch(`/api/checkout-session?session_id=${sessionId}`);
+          const stripeRes = await fetch(`/api/checkout?session_id=${sessionId}`);
           if (stripeRes.ok) {
             const stripeData = await stripeRes.json();
             setCustomerEmail(stripeData.email);
