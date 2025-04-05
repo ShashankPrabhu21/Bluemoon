@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-// Check if API key is present
 if (!process.env.STRIPE_SECRET_KEY) {
   console.error("❌ STRIPE_SECRET_KEY is missing!");
 } else {
@@ -9,7 +8,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2023-10-16" as Stripe.LatestApiVersion, // 👈 Fix here
+  apiVersion: "2023-10-16" as Stripe.LatestApiVersion,
 });
 
 export async function POST(req: Request) {
@@ -27,13 +26,13 @@ export async function POST(req: Request) {
           price_data: {
             currency: "usd",
             product_data: { name: "Restaurant Bill" },
-            unit_amount: Math.round(amount * 100), // Convert dollars to cents
+            unit_amount: Math.round(amount * 100),
           },
           quantity: 1,
         },
       ],
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_DOMAIN}/success`,
+      success_url: `${process.env.NEXT_PUBLIC_DOMAIN}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_DOMAIN}/cancel`,
     });
 

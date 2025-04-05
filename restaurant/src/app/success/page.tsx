@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { FaCheckCircle } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+
 
 interface CartItem {
   price: number;
@@ -19,11 +21,16 @@ export default function SuccessPage() {
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("credit-card");
   const [finalTotal, setFinalTotal] = useState(0);
- 
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get("session_id");
+  
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [cardholderName, setCardholderName] = useState("");
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
+        // fetch cart
         const res = await fetch("/api/cart/get");
         if (res.ok) {
           const cartData = await res.json();
@@ -37,21 +44,30 @@ export default function SuccessPage() {
             setTotalAmount(total);
           }
         }
-
+  
+        // fetch payment
         const paymentRes = await fetch("/api/payment/get");
         if (paymentRes.ok) {
           const paymentData = await paymentRes.json();
           setPaymentMethod(paymentData.method);
         }
-
-        
-      } catch (error) {
-        console.error("Error fetching order details:", error);
+  
+        // ✅ fetch stripe session details
+        if (sessionId) {
+          const stripeRes = await fetch(`/api/checkout-session?session_id=${sessionId}`);
+          if (stripeRes.ok) {
+            const stripeData = await stripeRes.json();
+            setCustomerEmail(stripeData.email);
+            setCardholderName(stripeData.name);
+          }
+        }
+      } catch (err) {
+        console.error("Error:", err);
       }
     };
-
+  
     fetchOrderDetails();
-  }, []);
+  }, [sessionId]);
 
   useEffect(() => {
     setDeliveryCharge(serviceType === "delivery" ? 5 : 0);
@@ -70,9 +86,16 @@ export default function SuccessPage() {
           Thank you for your order! It&apos;s being processed and will be delivered soon.
         </p>
 
+        <div className="mb-6 text-left text-sm text-gray-200">
+  <p><span className="font-medium text-white">Cardholder:</span> {cardholderName}</p>
+  <p><span className="font-medium text-white">Email:</span> {customerEmail}</p>
+</div>
+
+
         {/* Order Summary */}
         <div className="bg-gradient-to-r from-[#1A2E66] to-[#203A8E] px-6 py-4 rounded-lg text-left shadow-lg shadow-blue-500/30 border border-blue-400/50">
-          <h3 className="text-lg font-medium text-white mb-2">🛒 Order Summary</h3>
+        <h3 className="text-lg font-medium text-white mb-2">🛒 Order Summary</h3>
+        <p className="text-lg font-medium text-yellow-200 mb-2 ">Service Type - {serviceType}</p>
           <ul className="divide-y divide-gray-500/50">
             {cart.map((item, index) => (
               <li key={index} className="flex items-center justify-between py-3">
