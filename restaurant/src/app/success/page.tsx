@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FaCheckCircle } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+
 
 
 interface CartItem {
