@@ -21,8 +21,14 @@ export default function SuccessPage() {
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("credit-card");
   const [finalTotal, setFinalTotal] = useState(0);
-  const searchParams = useSearchParams();
-  const sessionId = searchParams.get("session_id");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sessionIdFromUrl = params.get("session_id");
+    setSessionId(sessionIdFromUrl);
+  }, []);
+  
   
   const [customerEmail, setCustomerEmail] = useState("");
   const [cardholderName, setCardholderName] = useState("");
