@@ -4,8 +4,6 @@ import Link from "next/link";
 import { FaCheckCircle } from "react-icons/fa";
 import { useEffect, useState } from "react";
 
-
-
 interface CartItem {
   price: number;
   quantity: number;
@@ -22,21 +20,18 @@ export default function SuccessPage() {
   const [paymentMethod, setPaymentMethod] = useState("credit-card");
   const [finalTotal, setFinalTotal] = useState(0);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [cardholderName, setCardholderName] = useState("");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sessionIdFromUrl = params.get("session_id");
     setSessionId(sessionIdFromUrl);
   }, []);
-  
-  
-  const [customerEmail, setCustomerEmail] = useState("");
-  const [cardholderName, setCardholderName] = useState("");
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        // fetch cart
         const res = await fetch("/api/cart/get");
         if (res.ok) {
           const cartData = await res.json();
@@ -50,15 +45,13 @@ export default function SuccessPage() {
             setTotalAmount(total);
           }
         }
-  
-        // fetch payment
+
         const paymentRes = await fetch("/api/payment/get");
         if (paymentRes.ok) {
           const paymentData = await paymentRes.json();
           setPaymentMethod(paymentData.method);
         }
-  
-        // ✅ fetch stripe session details
+
         if (sessionId) {
           const stripeRes = await fetch(`/api/checkout?session_id=${sessionId}`);
           if (stripeRes.ok) {
@@ -71,7 +64,7 @@ export default function SuccessPage() {
         console.error("Error:", err);
       }
     };
-  
+
     fetchOrderDetails();
   }, [sessionId]);
 
@@ -80,36 +73,68 @@ export default function SuccessPage() {
     setFinalTotal(totalAmount + deliveryCharge);
   }, [totalAmount, serviceType]);
 
+  useEffect(() => {
+    const saveOrderToDatabase = async () => {
+      if (cart.length > 0 && customerEmail && cardholderName) {
+        try {
+          const cartItemsForDatabase = cart.map((item) => ({
+            food_name: item.food_name,
+            quantity: item.quantity,
+            price: item.price,
+          }));
+
+          const orderData = {
+            name: cardholderName,
+            email: customerEmail,
+            cart_items: cartItemsForDatabase,
+            service_type: serviceType,
+            total_amount: finalTotal,
+          };
+
+          const saveOrderRes = await fetch("/api/orders", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(orderData),
+          });
+
+          if (!saveOrderRes.ok) {
+            console.error("Failed to save order to database");
+          }
+        } catch (error) {
+          console.error("Error saving order:", error);
+        }
+      }
+    };
+
+    saveOrderToDatabase();
+  }, [cart, customerEmail, cardholderName, serviceType, finalTotal]);
+
   return (
     <div className="flex items-center justify-center min-h-screen px-4 mt-[140px] bg-gray-100 mb-12">
       <div className="relative bg-[#1E3A8A] text-white shadow-lg rounded-xl p-8 max-w-xl w-full text-center border border-gray-700">
-        {/* Success Icon */}
         <FaCheckCircle className="text-green-400 text-6xl mb-4 mx-auto drop-shadow-lg" />
-        
-        {/* Title & Message */}
         <h1 className="text-3xl font-semibold mb-3">Payment Successful</h1>
         <p className="text-sm text-gray-200 mb-6">
           Thank you for your order! It&apos;s being processed and will be delivered soon.
         </p>
 
         <div className="mb-6 bg-gradient-to-r from-[#1A2E66] to-[#203A8E] px-6 py-4 rounded-lg shadow-lg shadow-blue-500/30 border border-blue-400/50 text-left">
-  <h3 className="text-lg font-semibold text-white mb-4">👤 Customer Info</h3>
-  <div className="flex items-center gap-3 mb-2">
-    <span className="text-white font-medium w-28">Cardholder:</span>
-    <span className="text-gray-200 text-sm truncate">{cardholderName || "N/A"}</span>
-  </div>
-  <div className="flex items-center gap-3">
-    <span className="text-white font-medium w-28">Email:</span>
-    <span className="text-gray-200 text-sm truncate">{customerEmail || "N/A"}</span>
-  </div>
-</div>
+          <h3 className="text-lg font-semibold text-white mb-4">👤 Customer Info</h3>
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-white font-medium w-28">Cardholder:</span>
+            <span className="text-gray-200 text-sm truncate">{cardholderName || ""}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-white font-medium w-28">Email:</span>
+            <span className="text-gray-200 text-sm truncate">{customerEmail || ""}</span>
+          </div>
+        </div>
 
-
-
-        {/* Order Summary */}
         <div className="bg-gradient-to-r from-[#1A2E66] to-[#203A8E] px-6 py-4 rounded-lg text-left shadow-lg shadow-blue-500/30 border border-blue-400/50">
-        <h3 className="text-lg font-medium text-white mb-2">🛒 Order Summary</h3>
-        <p className="text-lg font-medium text-yellow-200 mb-2 uppercase">Service Type - {serviceType}</p>
+          <h3 className="text-lg font-medium text-white mb-2">🛒 Order Summary</h3>
+          <p className="text-lg font-medium text-yellow-200 mb-2 uppercase">Service Type - {serviceType}</p>
           <ul className="divide-y divide-gray-500/50">
             {cart.map((item, index) => (
               <li key={index} className="flex items-center justify-between py-3">
@@ -123,7 +148,6 @@ export default function SuccessPage() {
           </ul>
         </div>
 
-        {/* Payment Details */}
         <div className="mt-6 bg-gradient-to-r from-[#1A2E66] to-[#203A8E] px-6 py-4 rounded-lg text-left shadow-lg shadow-blue-500/30 border border-blue-400/50">
           <h3 className="text-md font-medium text-white">💳 Payment Details</h3>
           <p className="text-gray-200 text-sm">
@@ -131,7 +155,6 @@ export default function SuccessPage() {
           </p>
         </div>
 
-        {/* Pricing Details */}
         <div className="mt-6 bg-gradient-to-r from-[#1A2E66] to-[#203A8E] px-6 py-4 rounded-lg text-left shadow-lg shadow-blue-500/30 border border-blue-400/50">
           <div className="flex justify-between text-sm text-gray-200">
             <span>Sub-Total:</span>
@@ -149,7 +172,6 @@ export default function SuccessPage() {
           </div>
         </div>
 
-        {/* Back Button */}
         <Link
           href="/"
           className="inline-block bg-white text-blue-700 font-medium px-6 py-3 rounded-full shadow-md mt-5 text-md border border-white hover:bg-[#1A2E66] hover:text-white transition duration-300"

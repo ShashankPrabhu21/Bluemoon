@@ -51,11 +51,11 @@ export default function Footer() {
 
             {/* Social Media Links */}
             <div className="flex justify-center md:justify-start gap-4">
-              <Link href="https://facebook.com" target="_blank"><Facebook size={24} className="cursor-pointer hover:text-gray-200" /></Link>
+              <Link href="https://www.facebook.com/bluemmoonrestaurant/" target="_blank"><Facebook size={24} className="cursor-pointer hover:text-gray-200" /></Link>
               <a href="https://www.instagram.com/bluemoonrestaurant1/" target="_blank" rel="noopener noreferrer">
                 <FaInstagram className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
               </a>
-              <Link href="https://twitter.com" target="_blank"><Youtube size={24} className="cursor-pointer hover:text-gray-200" /></Link>
+              <Link href="https://www.youtube.com/@metromtv" target="_blank"><Youtube size={24} className="cursor-pointer hover:text-gray-200" /></Link>
               <a href="/QRCode.jpg" target="_blank" rel="noopener noreferrer">
                 <FaWhatsapp className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
               </a>
