@@ -37,6 +37,9 @@ export default function AdminDashboard() {
           <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg" onClick={() => router.push("/admin/customer-management/roles-permissions")}>
             👤 CUSTOMER MANAGEMENT
           </button>
+          <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg" onClick={() => router.push("/admin/edit/editBlog")}>
+           ✏️ EDIT
+          </button>
           <LogoutButton/>
         </nav>
       </aside>
@@ -83,23 +86,21 @@ export default function AdminDashboard() {
           {/* Setup Menu */}
           <section 
             className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
-            onClick={() => router.push("/menuSetup")}
+            
           >
-            <h3 className="text-2xl font-bold text-blue-900 mb-4">🍽️ SETUP MENU CARD</h3>
+            <h3 className="text-2xl font-bold text-blue-900 mb-4">✏️ EDIT</h3>
             <div className="flex flex-col gap-4 items-center">
-              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🍳 BREAKFAST
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/edit/editBlog")}>
+                🍳 BLOGS
               </button>
               <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🍛 MAIN COURSE
+              🍽️ COOKING VEDIOS
               </button>
               <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🍹 DRINKS
+              🖼️ GALLERY
               </button>
 
-              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🍰 DESSERTS
-              </button>
+              
             </div>
           </section>
 
