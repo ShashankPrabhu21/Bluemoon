@@ -139,31 +139,7 @@ export default function EditBlog() {
     }
   };
 
-  const handleEdit = (blog: Blog) => {
-    setBlogData(blog);
-    setIsEditing(true);
-    if (formRef.current) {
-      formRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
-  const handleDelete = async (id: number) => {
-    try {
-      const res = await fetch(`/api/blogs/${id}`, {
-        method: "DELETE",
-      });
-      const resData = await res.json();
-      if (res.ok) {
-        setPublishedBlogs(publishedBlogs.filter((blog) => blog.id !== id));
-      }
-      if (resData.alert){
-        alert("Blog Deleted Successfully!");
-      }
-    } catch (err) {
-      console.error("Error deleting blog:", err);
-      alert("Error deleting blog!");
-    }
-  };
 
   return (
     
@@ -322,20 +298,7 @@ export default function EditBlog() {
                   {blog.subtitle}
                 </p>
 
-                <div className="flex gap-2 mt-3">
-                  <button
-                    onClick={() => handleEdit(blog)}
-                    className="px-3 py-1 rounded-lg text-sm bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(blog.id!)}
-                    className="px-3 py-1 rounded-lg text-sm bg-red-100 text-red-700 hover:bg-red-200"
-                  >
-                    🗑️ Delete
-                  </button>
-                </div>
+                
               </div>
             </div>
           ))}
