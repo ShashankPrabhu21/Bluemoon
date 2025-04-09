@@ -21,6 +21,14 @@ export default function ReservationForm() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, type, value } = e.target;
 
+    if (name === 'name' && !/^[A-Za-z\s]*$/.test(value)) {
+      return;
+    }
+
+    if (name === 'phone' && !/^[0-9\s]*$/.test(value)) {
+      return;
+    }
+
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
@@ -63,12 +71,15 @@ export default function ReservationForm() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="flex space-x-4">
-          <input
+        <input
             type="text" name="name" placeholder="Name" required
+            pattern="[A-Za-z\s]+"
+            title="Please enter only letters and spaces"
             className="w-1/2 p-3 border rounded-lg text-lg" value={formData.name} onChange={handleChange}
           />
           <input
             type="tel" name="phone" placeholder="Phone" required
+            pattern="[0-9]+"
             className="w-1/2 p-3 border rounded-lg text-lg" value={formData.phone} onChange={handleChange}
           />
         </div>
