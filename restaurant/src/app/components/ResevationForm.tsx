@@ -81,6 +81,7 @@ export default function ReservationForm() {
         <div className="flex space-x-4">
           <input
             type="date" name="date" required
+            min={new Date().toISOString().split('T')[0]}
             className="w-1/2 p-3 border rounded-lg text-lg" value={formData.date} onChange={handleChange}
           />
 
