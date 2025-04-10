@@ -112,33 +112,31 @@ export default function UserAuth() {
               />
             )}
 
-<input
-  type="email"
-  name={isLogin ? "username" : "email"} // dynamically set name
-  placeholder="Email"
-  className="w-full p-2 border rounded"
-  value={isLogin ? credentials.username : userData.email}
-  onChange={handleChange}
-  required
-/>
-{!isLogin && (
-  <select
-    name="role"
-    className="w-full p-2 border rounded"
-    value={(userData as any).role || ""}
-    onChange={(e) => setUserData({ ...userData, role: e.target.value })}
-    required
-  >
-    <option value="">Select Role</option>
-    <option value="Admin">Admin</option>
-    <option value="Manager">Manager</option>
-    <option value="Chef">Chef</option>
-    <option value="Waiter">Waiter</option>
-    <option value="Cashier">Cashier</option>
-  </select>
-)}
-
-
+          <input
+            type="email"
+            name={isLogin ? "username" : "email"} // dynamically set name
+            placeholder="Email"
+            className="w-full p-2 border rounded"
+            value={isLogin ? credentials.username : userData.email}
+            onChange={handleChange}
+            required
+          />
+          {!isLogin && (
+            <select
+            name="role"
+            className="w-full p-2 border rounded"
+            value={userData.role}
+            onChange={(e) => setUserData({ ...userData, role: e.target.value })}
+            required
+          >
+            <option value="">Select Role</option>
+            <option value="Admin">Admin</option>
+            <option value="Manager">Manager</option>
+            <option value="Staff">Staff</option>
+            <option value="Customer">Customer</option>
+          </select>
+          
+          )}
 
             <input
               type="password"
