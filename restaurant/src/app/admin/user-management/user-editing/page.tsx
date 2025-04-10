@@ -9,7 +9,9 @@ type User = {
   name: string;
   email: string;
   is_active: boolean;
+  role: string;
 };
+
 
 export default function UserList() {
   const [search, setSearch] = useState("");
@@ -119,6 +121,7 @@ export default function UserList() {
                   <th className="p-3 md:p-4">Name</th>
                   <th className="p-3 md:p-4">Email</th>
                   <th className="p-3 md:p-4">Status</th>
+                  <th className="p-3 md:p-4">Role</th>
                   <th className="p-3 md:p-4">Actions</th>
                 </tr>
               </thead>
@@ -131,6 +134,7 @@ export default function UserList() {
                       <td className="p-3 md:p-4">
                         {user.is_active ? "Active" : "Inactive"}
                       </td>
+                      <td className="p-3 md:p-4">{user.role}</td>
                       <td className="p-3 md:p-4 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full">
                         <button
                           className={`px-4 py-2 text-white rounded ${

@@ -8,11 +8,12 @@ type User = {
   name: string;
   email: string;
   password: string;
+  role?: string;
 };
 
 export default function UserAuth() {
   const [isLogin, setIsLogin] = useState(true);
-  const [userData, setUserData] = useState<User>({ name: "", email: "", password: "" });
+  const [userData, setUserData] = useState<User>({ name: "", email: "", password: "",role: "" });
   const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [message, setMessage] = useState(""); // ✅ Added state for messages
 
@@ -45,7 +46,7 @@ export default function UserAuth() {
       if (res.ok) {
         alert("Registration successful! You can now log in.");
         setIsLogin(true);
-        setUserData({ name: "", email: "", password: "" });
+        setUserData({ name: "", email: "", password: "",role:"" });
         setMessage("");
       } else {
         setMessage(result.message || "Registration failed.");
@@ -120,6 +121,23 @@ export default function UserAuth() {
   onChange={handleChange}
   required
 />
+{!isLogin && (
+  <select
+    name="role"
+    className="w-full p-2 border rounded"
+    value={(userData as any).role || ""}
+    onChange={(e) => setUserData({ ...userData, role: e.target.value })}
+    required
+  >
+    <option value="">Select Role</option>
+    <option value="Admin">Admin</option>
+    <option value="Manager">Manager</option>
+    <option value="Chef">Chef</option>
+    <option value="Waiter">Waiter</option>
+    <option value="Cashier">Cashier</option>
+  </select>
+)}
+
 
 
             <input

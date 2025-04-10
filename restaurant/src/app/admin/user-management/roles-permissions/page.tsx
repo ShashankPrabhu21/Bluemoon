@@ -3,16 +3,15 @@ import { useState, useEffect } from "react";
 import AdminUserSidebar from "@/app/components/AdminUserSidebar";
 
 export default function RolesPermissions() {
-  const LOCAL_STORAGE_KEY = "user_roles";
-
-  // State for roles
   const [roles, setRoles] = useState<{
+    id: number; // Add ID
     name: string;
     description: string;
     permissions: string[];
   }[]>([]);
 
   const [newRole, setNewRole] = useState<{
+    id?: number; // Add ID
     name: string;
     description: string;
     permissions: string[];
@@ -26,22 +25,20 @@ export default function RolesPermissions() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
 
-  // Load roles from local storage on the client side
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedRoles = localStorage.getItem(LOCAL_STORAGE_KEY);
-      setRoles(storedRoles ? JSON.parse(storedRoles) : []);
-    }
+    const fetchRoles = async () => {
+      try {
+        const res = await fetch("/api/roles");
+        const data = await res.json();
+        setRoles(data);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+
+    fetchRoles();
   }, []);
 
-  // Save roles to local storage when roles change
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(roles));
-    }
-  }, [roles]);
-
-  // Open Create Role Modal
   const openModal = () => {
     setNewRole({ name: "", description: "", permissions: [] });
     setIsEditMode(false);
@@ -54,33 +51,62 @@ export default function RolesPermissions() {
     setEditIndex(null);
   };
 
-  // Create or Update Role
-  const handleSaveRole = () => {
-    if (!newRole.name) return;
+
+
+const handleSaveRole = async () => {
+  if (!newRole.name) return;
+
+  try {
+    let res;
+    const permissionsString = JSON.stringify(newRole.permissions); // Stringify permissions
 
     if (isEditMode && editIndex !== null) {
-      const updatedRoles = [...roles];
-      updatedRoles[editIndex] = newRole;
-      setRoles(updatedRoles);
+      res = await fetch("/api/roles", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...newRole, id: roles[editIndex].id, permissions: permissionsString }), // Send stringified permissions
+      });
+      if (!res.ok) throw new Error("Failed to update role");
+      const updatedRole = await res.json();
+      setRoles(roles.map((role) => (role.id === updatedRole.id ? updatedRole : role)));
     } else {
-      setRoles([...roles, newRole]);
+      res = await fetch("/api/roles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...newRole, permissions: permissionsString }), // Send stringified permissions
+      });
+      if (!res.ok) throw new Error("Failed to create role");
+      const createdRole = await res.json();
+      setRoles([...roles, createdRole]);
     }
-
     closeModal();
-  };
+  } catch (error) {
+    console.error("Error saving role:", error);
+  }
+};
 
-  // Open Edit Modal
   const handleEditRole = (index: number) => {
-    setNewRole(roles[index]); // Preserve permissions
+    setNewRole(roles[index]);
     setEditIndex(index);
     setIsEditMode(true);
     setIsModalOpen(true);
   };
 
-  // Delete Role
-  const handleDeleteRole = (index: number) => {
-    setRoles(roles.filter((_, i) => i !== index));
+  const handleDeleteRole = async (index: number) => {
+    try {
+      const res = await fetch("/api/roles", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: roles[index].id }),
+      });
+      if (!res.ok) throw new Error("Failed to delete role");
+      setRoles(roles.filter((_, i) => i !== index));
+    } catch (error) {
+      console.error("Error deleting role:", error);
+    }
   };
+
+
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">

@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import pool from "@/lib/db"; // Ensure your DB connection is set up
 
 // ✅ Fetch all users
+// ✅ Updated GET in /api/useredit
 export async function GET() {
   try {
     const result = await pool.query(
-      "SELECT user_id AS id, name, email, is_active FROM users"
+      "SELECT user_id AS id, name, email, is_active, role FROM users"
     );
     return NextResponse.json(result.rows, { status: 200 });
   } catch (error) {
@@ -13,6 +14,7 @@ export async function GET() {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
 
 // ✅ Update user status or details
 export async function PATCH(req) {
