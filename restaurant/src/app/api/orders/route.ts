@@ -4,7 +4,7 @@ import pool from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, cart_items, service_type, total_amount } = body;
+    const { name, email, cart_items, service_type, total_amount, scheduled_date, scheduled_time } = body;
 
     console.log("cart_items received:", cart_items);
 
@@ -19,12 +19,12 @@ export async function POST(req: Request) {
     const stringifiedCartItems = JSON.stringify(cart_items);
 
     const insertQuery = `
-      INSERT INTO "order" (name, email, cart_items, service_type, total_amount)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO "order" (name, email, cart_items, service_type, total_amount, scheduled_date, scheduled_time)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *;
     `;
 
-    const values = [name, email, stringifiedCartItems, service_type, total_amount];
+    const values = [name, email, stringifiedCartItems, service_type, total_amount, scheduled_date, scheduled_time];
 
     const result = await pool.query(insertQuery, values);
 

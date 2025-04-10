@@ -35,6 +35,8 @@ export default function SuccessPage() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [cardholderName, setCardholderName] = useState("");
   const [isScheduledOrder, setIsScheduledOrder] = useState(false);
+  const [scheduledDate, setScheduledDate] = useState<string | null>(null);
+  const [scheduledTime, setScheduledTime] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -65,6 +67,8 @@ export default function SuccessPage() {
                 0
               );
               setTotalAmount(total);
+              setScheduledDate(new Date(scheduledCartData[0].scheduled_date).toLocaleDateString());
+              setScheduledTime(scheduledCartData[0].scheduled_time);
             }
           } else {
             console.error("Failed to fetch scheduled cart items");
@@ -99,9 +103,6 @@ export default function SuccessPage() {
           }
         }
 
-
-  
-        // ... (rest of your useEffect)
       } catch (err) {
         console.error("Error:", err);
       }
@@ -144,6 +145,8 @@ export default function SuccessPage() {
             cart_items: cartItemsForDatabase,
             service_type: serviceType,
             total_amount: finalTotal,
+            scheduled_date: scheduledDate,
+            scheduled_time: scheduledTime,
           };
 
           const saveOrderRes = await fetch("/api/orders", {
@@ -164,7 +167,7 @@ export default function SuccessPage() {
     };
 
     saveOrderToDatabase();
-  }, [cart, scheduledCart, customerEmail, cardholderName, serviceType, finalTotal, isScheduledOrder]);
+  }, [cart, scheduledCart, customerEmail, cardholderName, serviceType, finalTotal, isScheduledOrder, scheduledDate, scheduledTime]);
 
 
   return (
@@ -222,9 +225,46 @@ export default function SuccessPage() {
           </ul>
         </div>
 
+        {isScheduledOrder && (
+          <div className="mt-8 rounded-xl border border-blue-400/40 bg-gradient-to-br from-[#1A2E66] to-[#203A8E] p-6 shadow-lg shadow-blue-500/30 transition-all duration-300 hover:shadow-blue-600/40">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <svg
+                className="w-5 h-5 text-yellow-300"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              Scheduled Order Details
+            </h3>
+
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-300">📅 Scheduled Date:</span>
+                <span className="text-sm font-medium text-yellow-300">
+                  {scheduledDate || "N/A"}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-300">⏰ Scheduled Time:</span>
+                <span className="text-sm font-medium text-yellow-300">
+                  {scheduledTime || "N/A"}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+
         <div className="mt-6 bg-gradient-to-r from-[#1A2E66] to-[#203A8E] px-6 py-4 rounded-lg text-left shadow-lg shadow-blue-500/30 border border-blue-400/50">
           <h3 className="text-md font-medium text-white">💳 Payment Details</h3>
-          <p className="text-gray-200 text-sm">
+          <p className="text-gray-200 text-sm mt-2">
             Payment Method: <span className="font-medium capitalize text-orange-400">{paymentMethod.replace("-", " ")}</span>
           </p>
         </div>

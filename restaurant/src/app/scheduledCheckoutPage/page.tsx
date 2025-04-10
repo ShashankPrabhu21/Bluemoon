@@ -20,6 +20,8 @@ interface ScheduledCartItem {
 
 const ScheduledCheckoutPage = () => {
   const [orderType, setOrderType] = useState<string>("");
+  const [scheduledDate, setScheduledDate] = useState<string>("");
+  const [scheduledTime, setScheduledTime] = useState<string>("");
   const [totalAmount, setTotalAmount] = useState(0);
   const [guestLoginSuccess, setGuestLoginSuccess] = useState<boolean>(false);
   const [authOption, setAuthOption] = useState<"google" | "email" | "guest" | "signup" | "forgotPassword" | null>(null);
@@ -75,6 +77,8 @@ const ScheduledCheckoutPage = () => {
               0
             );
             setTotalAmount(total);
+            setScheduledDate(new Date(data[0].scheduled_date).toLocaleDateString());
+            setScheduledTime(data[0].scheduled_time);
           }
         } else {
           console.error("Failed to fetch scheduled cart items");
@@ -525,18 +529,49 @@ const ScheduledCheckoutPage = () => {
             Order Type: <span className="ml-2 text-yellow-600 capitalize">{orderType}</span>
           </h2>
 
+          {/* Scheduled Date and Time */}
+          <div className="mt-6 bg-gradient-to-br from-sky-50 to-sky-100 shadow-md rounded-lg p-5">
+            <h3 className="text-xl font-bold mb-4 text-sky-800">📅 Scheduled Order</h3>
+            <div className="space-y-2">
+            <p className="text-sm text-sky-900">
+              <span className="font-semibold">Scheduled Date:</span>{" "}
+              <span className="bg-sky-100 text-sky-700 font-medium px-2 py-1 rounded-md">
+                {scheduledDate || "N/A"}
+              </span>
+            </p>
+            <p className="text-sm text-sky-900">
+              <span className="font-semibold">Scheduled Time:</span>{" "}
+              <span className="bg-sky-100 text-sky-700 font-medium px-2 py-1 rounded-md">
+                {scheduledTime || "N/A"}
+              </span>
+            </p>
+          </div>
+          </div>
+
+
           {/* Display Menu Items */}
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold mb-2">Menu Items:</h3>
-            <ul>
+          <div className="mt-6 bg-gradient-to-br from-sky-50 to-sky-100 shadow-md rounded-lg p-5">
+            <h3 className="text-xl font-bold mb-4 text-sky-800">🍽️ Menu Items</h3>
+            <ul className="divide-y divide-sky-300">
               {scheduledCartItems.map((item) => (
-                <li key={item.scheduled_cart_id} className="flex justify-between items-center py-2 border-b">
-                  <span>{item.food_name} x {item.quantity}</span>
-                  <span>${(item.price * item.quantity).toFixed(2)}</span>
+                <li
+                  key={item.scheduled_cart_id}
+                  className="flex justify-between items-center py-3"
+                >
+                  <div className="flex items-center gap-2 text-sky-900 font-medium">
+                    {item.food_name}
+                    <span className="bg-sky-200 text-sky-800 text-sm px-2 py-1 rounded-md">
+                      x {item.quantity}
+                    </span>
+                  </div>
+                  <span className="text-green-700 font-semibold">
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
+
 
           {/* Price Breakdown */}
           <div className="mt-6 border-t pt-4">
