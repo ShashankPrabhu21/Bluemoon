@@ -6,7 +6,7 @@ import { FaUser, FaLock } from "react-icons/fa";
 export default function LoginPage() {
   const router = useRouter();
   const [credentials, setCredentials] = useState({ username: "", password: "" });
-  const [rememberMe, setRememberMe] = useState(false);
+
   const [showResetForm, setShowResetForm] = useState(false);
   const [resetData, setResetData] = useState({ email: "", newPassword: "" });
   const [message, setMessage] = useState("");
@@ -32,9 +32,14 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || "Login failed");
 
       router.push("/adminDashboard");
-    } catch (err: any) {
-      setMessage("❌ " + err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMessage("❌ " + err.message);
+      } else {
+        setMessage("❌ An unexpected error occurred.");
+      }
     }
+    
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
