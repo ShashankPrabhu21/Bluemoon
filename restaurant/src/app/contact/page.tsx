@@ -17,6 +17,17 @@ const ContactUs = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
+
+    // Validation for name field - only letters and spaces
+    if (id === 'name' && !/^[A-Za-z\s]*$/.test(value)) {
+      return;
+    }
+
+    // Validation for email field
+    if (id === 'phone' && value && !/^[0-9]+$/.test(value)) {
+      return;
+    }
+
     setFormData({ ...formData, [id]: value });
   };
 

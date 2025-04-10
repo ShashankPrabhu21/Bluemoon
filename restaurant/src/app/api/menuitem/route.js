@@ -13,6 +13,7 @@ export async function GET() {
 }
 
 // ✅ Handle POST requests (Add a new menu item)
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -20,6 +21,12 @@ export async function POST(req) {
 
     if (!category_id || !name || !description || !price || !availability || !image_url || !quantity || !spicy_level) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+    }
+
+    // Check for duplicate quantity
+    const quantityCheck = await db.query("SELECT * FROM menu_items WHERE quantity = $1", [quantity]);
+    if (quantityCheck.rows.length > 0) {
+        return NextResponse.json({ error: "Item with this number already exists." }, { status: 400 });
     }
 
     const result = await db.query(
@@ -33,8 +40,8 @@ export async function POST(req) {
     console.error("Database Error:", error);
     return NextResponse.json({ error: "Failed to save menu item" }, { status: 500 });
   }
-  
 }
+
 export async function DELETE(req) {
   try {
     const body = await req.json();

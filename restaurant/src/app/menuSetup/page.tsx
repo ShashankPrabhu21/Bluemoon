@@ -66,6 +66,7 @@ const AdminPage = () => {
   // 🔹 Submit Food Data (Add/Update)
   const handleFoodSubmit = async () => {
     try {
+      
       const category_id = categoryMapping[category] || 1;
       const method = editingId ? "PUT" : "POST";
       const url = "/api/menuitem"; // ✅ Use same URL for both POST and PUT
@@ -100,8 +101,17 @@ const AdminPage = () => {
   
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save menu item");
+        if (errorData.error && errorData.error.includes("already exists")) {
+          alert("A food item with this number already exists.");
+        } else {
+          alert(errorData.error || "Failed to save menu item");
+        }
+        return;
       }
+      if(method === "POST"){
+        alert("Item added successfully");
+    }
+      
   
       console.log("Update successful! Refreshing food list...");
       await fetchFoodItems(); // ✅ Refresh the menu list after update
