@@ -89,7 +89,7 @@ export default function LoginPage() {
               <input
                 type="text"
                 className="w-full pl-10 p-3 border border-gray-300 rounded-lg bg-gray-50"
-                placeholder="Username or Email"
+                placeholder=" Email"
                 value={credentials.username}
                 onChange={(e) =>
                   setCredentials({ ...credentials, username: e.target.value })
