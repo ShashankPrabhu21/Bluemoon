@@ -13,51 +13,74 @@ type User = {
 export default function UserAuth() {
   const [isLogin, setIsLogin] = useState(true);
   const [userData, setUserData] = useState<User>({ name: "", email: "", password: "" });
+  const [credentials, setCredentials] = useState({ username: "", password: "" });
+  const [message, setMessage] = useState(""); // ✅ Added state for messages
 
   // Handle Input Change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserData({ ...userData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (isLogin) {
+      setCredentials({ ...credentials, [name]: value });
+    } else {
+      setUserData({ ...userData, [name]: value });
+    }
   };
 
   // Handle Registration
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Get existing users from localStorage
-    const storedUsers: User[] = JSON.parse(localStorage.getItem("users") || "[]");
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
 
-    // Check if the user already exists
-    if (storedUsers.some((user) => user.email === userData.email)) {
-      alert("User already registered. Please login.");
-      setIsLogin(true);
-      return;
+      const result = await res.json();
+
+      if (res.ok) {
+        alert("Registration successful! You can now log in.");
+        setIsLogin(true);
+        setUserData({ name: "", email: "", password: "" });
+        setMessage("");
+      } else {
+        setMessage(result.message || "Registration failed.");
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
+      setMessage("❌ An error occurred. Please try again.");
     }
-
-    // Store new user
-    const updatedUsers: User[] = [...storedUsers, userData];
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-
-    alert("Registration successful! You can now log in.");
-    setIsLogin(true); // Switch to login mode
-    setUserData({ name: "", email: "", password: "" }); // Reset form
   };
 
   // Handle Login
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!credentials.username.trim() || !credentials.password.trim()) {
+      setMessage("⚠️ Please fill all fields.");
+      return;
+    }
 
-    // Get users from localStorage
-    const storedUsers: User[] = JSON.parse(localStorage.getItem("users") || "[]");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          usernameOrEmail: credentials.username,
+          password: credentials.password,
+        }),
+      });
 
-    // Find user
-    const user = storedUsers.find((user) => user.email === userData.email && user.password === userData.password);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Login failed");
 
-    if (user) {
-      alert(`Welcome, ${user.name}!`);
-      localStorage.setItem("loggedInUser", JSON.stringify(user)); // Store logged-in user
-      // Redirect or navigate to another page if needed
-    } else {
-      alert("Invalid credentials or user not registered.");
+      // ✅ On successful login, clear message or redirect as needed
+      setMessage("🎉 Welcome back! You’ve logged in successfully.");
+    } catch (err: any) {
+      setMessage("❌ " + err.message);
     }
   };
 
@@ -83,22 +106,23 @@ export default function UserAuth() {
               />
             )}
 
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              className="w-full p-2 border rounded"
-              value={userData.email}
-              onChange={handleChange}
-              required
-            />
+<input
+  type="email"
+  name={isLogin ? "username" : "email"} // dynamically set name
+  placeholder="Email"
+  className="w-full p-2 border rounded"
+  value={isLogin ? credentials.username : userData.email}
+  onChange={handleChange}
+  required
+/>
+
 
             <input
               type="password"
               name="password"
               placeholder="Password"
               className="w-full p-2 border rounded"
-              value={userData.password}
+              value={isLogin ? credentials.password : userData.password}
               onChange={handleChange}
               required
             />
@@ -108,9 +132,18 @@ export default function UserAuth() {
             </button>
           </form>
 
+          {message && (
+            <div className="mt-4 text-red-600 text-sm">
+              {message}
+            </div>
+          )}
+
           <p className="mt-4 text-gray-600">
             {isLogin ? "New user?" : "Already have an account?"}{" "}
-            <span className="text-blue-600 cursor-pointer" onClick={() => setIsLogin(!isLogin)}>
+            <span className="text-blue-600 cursor-pointer" onClick={() => {
+              setIsLogin(!isLogin);
+              setMessage(""); // Clear message on toggle
+            }}>
               {isLogin ? "Register" : "Login"}
             </span>
           </p>
