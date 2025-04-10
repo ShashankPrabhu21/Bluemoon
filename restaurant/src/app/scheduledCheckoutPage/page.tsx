@@ -59,6 +59,7 @@ const ScheduledCheckoutPage = () => {
   const [signupSuccess, setSignupSuccess] = useState<boolean>(false);
   const [loginSuccess, setLoginSuccess] = useState<boolean>(false);
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState<string | null>(null);
+  const [scheduledCartItems, setScheduledCartItems] = useState<ScheduledCartItem[]>([]);
 
   useEffect(() => {
     const fetchScheduledCartItems = async () => {
@@ -66,6 +67,7 @@ const ScheduledCheckoutPage = () => {
         const res = await fetch("/api/scheduledcart/get");
         if (res.ok) {
           const data = await res.json();
+          setScheduledCartItems(data);
           if (data.length > 0) {
             setOrderType(data[0].service_type);
             const total = data.reduce(
@@ -115,6 +117,7 @@ const ScheduledCheckoutPage = () => {
           },
           body: JSON.stringify({
             amount: finalTotal, // Send total bill amount
+            scheduled: true,
           }),
         });
     
@@ -130,7 +133,7 @@ const ScheduledCheckoutPage = () => {
           console.log("Parsed JSON:", data);
     
           if (data.url) {
-            window.location.href = data.url; // Redirect to Stripe checkout
+            window.location.href = data.url;
           } else {
             throw new Error("No checkout URL received.");
           }
@@ -521,6 +524,19 @@ const ScheduledCheckoutPage = () => {
           <h2 className="text-xl font-bold mb-2">
             Order Type: <span className="ml-2 text-yellow-600 capitalize">{orderType}</span>
           </h2>
+
+          {/* Display Menu Items */}
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold mb-2">Menu Items:</h3>
+            <ul>
+              {scheduledCartItems.map((item) => (
+                <li key={item.scheduled_cart_id} className="flex justify-between items-center py-2 border-b">
+                  <span>{item.food_name} x {item.quantity}</span>
+                  <span>${(item.price * item.quantity).toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* Price Breakdown */}
           <div className="mt-6 border-t pt-4">

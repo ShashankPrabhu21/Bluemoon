@@ -1,3 +1,5 @@
+//api/checkout/route.ts
+
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -12,12 +14,19 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 });
 
 // Create Stripe checkout session (POST)
+
 export async function POST(req: Request) {
   try {
-    const { amount } = await req.json();
+    const { amount, scheduled } = await req.json(); // add scheduled to the json data.
 
     if (!amount || amount <= 0) {
       throw new Error("Invalid amount");
+    }
+
+    let successUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/success?session_id={CHECKOUT_SESSION_ID}`;
+
+    if (scheduled) {
+      successUrl += '&scheduled=true';
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -33,7 +42,7 @@ export async function POST(req: Request) {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_DOMAIN}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: successUrl,
       cancel_url: `${process.env.NEXT_PUBLIC_DOMAIN}/cancel`,
     });
 

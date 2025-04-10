@@ -12,8 +12,20 @@ interface CartItem {
   image: string;
 }
 
+interface ScheduledCartItem {
+  price: number;
+  quantity: number;
+  service_type: string;
+  food_name: string;
+  scheduled_cart_id: number;
+  special_note: string;
+  scheduled_date: string;
+  scheduled_time: string;
+}
+
 export default function SuccessPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [scheduledCart, setScheduledCart] = useState<ScheduledCartItem[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [serviceType, setServiceType] = useState<string | null>(null);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
@@ -22,51 +34,85 @@ export default function SuccessPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [customerEmail, setCustomerEmail] = useState("");
   const [cardholderName, setCardholderName] = useState("");
+  const [isScheduledOrder, setIsScheduledOrder] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sessionIdFromUrl = params.get("session_id");
     setSessionId(sessionIdFromUrl);
+    setIsScheduledOrder(params.get("scheduled") === "true");
+    console.log("Session ID from URL:", sessionIdFromUrl); // Debugging
   }, []);
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const res = await fetch("/api/cart/get");
-        if (res.ok) {
-          const cartData = await res.json();
-          setCart(cartData);
-          if (cartData.length > 0) {
-            setServiceType(cartData[0].service_type);
-            const total = cartData.reduce(
-              (acc: number, item: CartItem) => acc + item.price * item.quantity,
-              0
-            );
-            setTotalAmount(total);
+        const params = new URLSearchParams(window.location.search);
+        const isScheduled = params.get("scheduled") === "true";
+  
+        console.log("isScheduled:", isScheduled); // Important debug line
+  
+        if (isScheduled) {
+          const res = await fetch("/api/scheduledcart/get");
+          if (res.ok) {
+            const scheduledCartData = await res.json();
+            setScheduledCart(scheduledCartData);
+            console.log("Scheduled Cart Data:", scheduledCartData); // Debug line
+            if (scheduledCartData.length > 0) {
+              setServiceType(scheduledCartData[0].service_type);
+              const total = scheduledCartData.reduce(
+                (acc: number, item: ScheduledCartItem) => acc + item.price * item.quantity,
+                0
+              );
+              setTotalAmount(total);
+            }
+          } else {
+            console.error("Failed to fetch scheduled cart items");
+          }
+        } else {
+          const res = await fetch("/api/cart/get");
+          if (res.ok) {
+            const cartData = await res.json();
+            setCart(cartData);
+            console.log("Cart Data:", cartData); // Debug line
+            if (cartData.length > 0) {
+              setServiceType(cartData[0].service_type);
+              const total = cartData.reduce(
+                (acc: number, item: CartItem) => acc + item.price * item.quantity,
+                0
+              );
+              setTotalAmount(total);
+            }
+          } else {
+            console.error("Failed to fetch cart items");
           }
         }
-
-        const paymentRes = await fetch("/api/payment/get");
-        if (paymentRes.ok) {
-          const paymentData = await paymentRes.json();
-          setPaymentMethod(paymentData.method);
-        }
-
         if (sessionId) {
+          console.log("Fetching session details for session ID:", sessionId); // Debugging
           const stripeRes = await fetch(`/api/checkout?session_id=${sessionId}`);
+          console.log("Stripe API response:", stripeRes); // Debugging
           if (stripeRes.ok) {
             const stripeData = await stripeRes.json();
+            console.log("Stripe API data:", stripeData); // Debugging
             setCustomerEmail(stripeData.email);
             setCardholderName(stripeData.name);
           }
         }
+
+
+  
+        // ... (rest of your useEffect)
       } catch (err) {
         console.error("Error:", err);
       }
     };
-
+  
     fetchOrderDetails();
-  }, [sessionId]);
+  }, [sessionId, isScheduledOrder]);
+  
+  useEffect(()=>{
+      console.log("scheduledCart state: ", scheduledCart);
+  },[scheduledCart]);
 
   useEffect(() => {
     setDeliveryCharge(serviceType === "delivery" ? 5 : 0);
@@ -75,13 +121,22 @@ export default function SuccessPage() {
 
   useEffect(() => {
     const saveOrderToDatabase = async () => {
-      if (cart.length > 0 && customerEmail && cardholderName) {
+      if ((cart.length > 0 || scheduledCart.length > 0) && customerEmail && cardholderName) {
         try {
-          const cartItemsForDatabase = cart.map((item) => ({
-            food_name: item.food_name,
-            quantity: item.quantity,
-            price: item.price,
-          }));
+          let cartItemsForDatabase;
+          if (isScheduledOrder) {
+            cartItemsForDatabase = scheduledCart.map((item) => ({
+              food_name: item.food_name,
+              quantity: item.quantity,
+              price: item.price,
+            }));
+          } else {
+            cartItemsForDatabase = cart.map((item) => ({
+              food_name: item.food_name,
+              quantity: item.quantity,
+              price: item.price,
+            }));
+          }
 
           const orderData = {
             name: cardholderName,
@@ -109,7 +164,8 @@ export default function SuccessPage() {
     };
 
     saveOrderToDatabase();
-  }, [cart, customerEmail, cardholderName, serviceType, finalTotal]);
+  }, [cart, scheduledCart, customerEmail, cardholderName, serviceType, finalTotal, isScheduledOrder]);
+
 
   return (
     <div className="flex items-center justify-center min-h-screen px-4 mt-[140px] bg-gray-100 mb-12">
@@ -136,15 +192,33 @@ export default function SuccessPage() {
           <h3 className="text-lg font-medium text-white mb-2">🛒 Order Summary</h3>
           <p className="text-lg font-medium text-yellow-200 mb-2 uppercase">Service Type - {serviceType}</p>
           <ul className="divide-y divide-gray-500/50">
-            {cart.map((item, index) => (
-              <li key={index} className="flex items-center justify-between py-3">
-                <div className="flex items-center gap-4">
-                  <img src={item.image} alt={item.food_name} className="w-12 h-12 rounded-lg shadow-md" />
-                  <span className="text-gray-100 text-sm font-medium">{item.food_name} × {item.quantity}</span>
-                </div>
-                <span className="text-green-300 font-semibold text-md">${(item.price * item.quantity).toFixed(2)}</span>
-              </li>
-            ))}
+            {isScheduledOrder
+              ? scheduledCart.map((item, index) => (
+                  <li key={index} className="flex items-center justify-between py-3">
+                    <div className="flex items-center gap-4">
+                     
+                      <span className="text-gray-100 text-sm font-medium">
+                        {item.food_name} × {item.quantity}
+                      </span>
+                    </div>
+                    <span className="text-green-300 font-semibold text-md">
+                      ${(item.price * item.quantity).toFixed(2)}
+                    </span>
+                  </li>
+                ))
+              : cart.map((item, index) => (
+                  <li key={index} className="flex items-center justify-between py-3">
+                    <div className="flex items-center gap-4">
+                      <img src={item.image} alt={item.food_name} className="w-12 h-12 rounded-lg shadow-md" />
+                      <span className="text-gray-100 text-sm font-medium">
+                        {item.food_name} × {item.quantity}
+                      </span>
+                    </div>
+                    <span className="text-green-300 font-semibold text-md">
+                      ${(item.price * item.quantity).toFixed(2)}
+                    </span>
+                  </li>
+                ))}
           </ul>
         </div>
 
