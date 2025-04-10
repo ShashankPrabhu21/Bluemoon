@@ -1,19 +1,38 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import AdminUserSidebar from "@/app/components/AdminUserSidebar";
+
+type User = {
+  name: string;
+  email: string;
+};
 
 export default function UserList() {
   const [search, setSearch] = useState("");
-  const [users, setUsers] = useState<{ name: string; email: string }[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch users from localStorage on component mount
+  // Fetch users from the backend
   useEffect(() => {
-    const storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
-    setUsers(storedUsers);
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch("/api/userlist");
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message || "Failed to fetch users");
+
+        setUsers(data.users); // assuming response is { users: [...] }
+      } catch (err) {
+        console.error("Error loading users:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
-  // Filter users based on search query
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -44,7 +63,13 @@ export default function UserList() {
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={2} className="p-4 text-center text-gray-500">
+                    Loading users...
+                  </td>
+                </tr>
+              ) : filteredUsers.length > 0 ? (
                 filteredUsers.map((user, index) => (
                   <tr key={index} className="border-b">
                     <td className="p-3 md:p-4">{user.name}</td>

@@ -1,3 +1,4 @@
+//api/auth/register/route.ts
 import { NextResponse } from "next/server";
 import  pool  from "@/lib/db"; // assumes you have a shared PostgreSQL pool instance
 import bcrypt from "bcrypt";
