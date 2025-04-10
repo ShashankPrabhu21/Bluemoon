@@ -132,8 +132,9 @@ export default function UserAuth() {
             <option value="">Select Role</option>
             <option value="Admin">Admin</option>
             <option value="Manager">Manager</option>
-            <option value="Staff">Staff</option>
-            <option value="Customer">Customer</option>
+            <option value="Staff">Cashier</option>
+            <option value="Customer">Chef</option>
+            <option value="Customer">Waiter</option>
           </select>
           
           )}
