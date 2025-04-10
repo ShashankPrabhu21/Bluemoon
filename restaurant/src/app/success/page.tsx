@@ -29,7 +29,7 @@ export default function SuccessPage() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [serviceType, setServiceType] = useState<string | null>(null);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState("credit-card");
+  const [paymentMethod] = useState("credit-card");
   const [finalTotal, setFinalTotal] = useState(0);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [customerEmail, setCustomerEmail] = useState("");
