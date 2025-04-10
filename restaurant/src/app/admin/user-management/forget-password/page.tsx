@@ -82,7 +82,18 @@ export default function ResetPasswordPage() {
         <p className="text-center text-gray-400 text-sm mt-3">
           © {new Date().getFullYear()} Admin Panel. All rights reserved.
         </p>
+        
       </div>
+      <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
+  <button
+    onClick={() => (window.location.href = "/adminDashboard")}
+    className="bg-blue-800 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition-all duration-300"
+  >
+    ⬅️ Back to Dashboard
+  </button>
+</div>
+
     </div>
+    
   );
 }
