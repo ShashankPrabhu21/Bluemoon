@@ -64,8 +64,12 @@ export default function LoginPage() {
 
       setMessage("✅ Password updated. You can now login.");
       setShowResetForm(false);
-    } catch (err: any) {
-      setMessage("❌ " + err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMessage("❌ " + err.message);
+      } else {
+        setMessage("❌ An unexpected error occurred.");
+      }
     }
   };
 

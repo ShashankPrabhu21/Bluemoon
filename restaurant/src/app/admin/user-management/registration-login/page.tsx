@@ -79,9 +79,14 @@ export default function UserAuth() {
 
       // ✅ On successful login, clear message or redirect as needed
       setMessage("🎉 Welcome back! You’ve logged in successfully.");
-    } catch (err: any) {
-      setMessage("❌ " + err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setMessage("❌ " + err.message);
+      } else {
+        setMessage("❌ An unexpected error occurred.");
+      }
     }
+    
   };
 
   return (
