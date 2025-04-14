@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-
+import EditUserSidebar from "@/app/components/editSidebar";
 interface BlogSection {
   heading: string;
   text: string;
@@ -167,17 +167,11 @@ export default function EditBlog() {
 
   return (
     
-    <div className="flex min-h-screen bg-gradient-to-br from-[#f7faff] to-[#e5ecff] mt-24">     
+    <div className="flex flex-col md:flex-row min-h-screen mt-24">   
+    <EditUserSidebar />  
     {/* Blog Content */}
     <div className="flex-grow p-6 sm:p-12">
-    <div className="flex justify-center mb-6">
-        <button
-          onClick={() => (window.location.href = "/adminDashboard")}
-          className="bg-blue-800 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-900 transition-all duration-300"
-        >
-          ⬅️ Back to Dashboard
-        </button>
-      </div>
+    
       <div className="max-w-3xl mx-auto backdrop-blur-xl bg-white/80 border border-gray-200 rounded-3xl shadow-xl p-10 space-y-8">
         <h1 className="text-4xl font-extrabold text-center text-blue-800 drop-shadow-sm">
           {isEditing ? "✏️ Edit Blog" : "✍️ Create a New Blog"}

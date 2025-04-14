@@ -83,8 +83,45 @@ export default function AdminDashboard() {
             </div>
           </section>
 
-          {/* Setup Menu */}
-          <section 
+
+        {/*EDIT */}
+        <section 
+            className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
+            
+          >
+            <h3 className="text-2xl font-bold text-blue-900 mb-4">✏️ EDIT</h3>
+            <div className="flex flex-col gap-4 items-center">
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/edit/editBlog")}>
+                🍳 BLOGS
+              </button>
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+              🍽️ COOKING VEDIOS
+              </button>
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+              🖼️ GALLERY
+              </button>            
+            </div>
+          </section>
+
+          {/* User Management */}
+          <section className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200">
+            <h3 className="text-2xl font-bold text-blue-900 mb-4"> 👥 USER MANAGEMENT </h3>
+            <div className="flex flex-col gap-4 items-center">
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/roles-permissions")}>
+                🔐 User Roles & Permissions
+              </button>
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/registration-login")}>
+                🏷️ User Registration & Login
+              </button>
+              
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/user-editing")}>
+                ✏️ User Creation & Editing
+              </button>
+            </div>
+          </section>
+
+            {/* Setup Menu */}
+            <section 
             className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer" 
             onClick={() => router.push("/menuSetup")}>
             <h3 className="text-2xl font-bold text-blue-900 mb-4">🍽️ Setup Menu</h3>
@@ -104,43 +141,7 @@ export default function AdminDashboard() {
             </div>
           </section>
 
-          {/* User Management */}
-          <section className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200">
-            <h3 className="text-2xl font-bold text-blue-900 mb-4"> 👥 USER MANAGEMENT </h3>
-            <div className="flex flex-col gap-4 items-center">
-              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/roles-permissions")}>
-                🔐 User Roles & Permissions
-              </button>
-              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/registration-login")}>
-                🏷️ User Registration & Login
-              </button>
-              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/listing-search")}>
-                🔍 User Listing & Search
-              </button>
-              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/user-management/user-editing")}>
-                ✏️ User Creation & Editing
-              </button>
-            </div>
-          </section>
 
-{/*EDIT */}
-          <section 
-            className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
-            
-          >
-            <h3 className="text-2xl font-bold text-blue-900 mb-4">✏️ EDIT</h3>
-            <div className="flex flex-col gap-4 items-center">
-              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/edit/editBlog")}>
-                🍳 BLOGS
-              </button>
-              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-              🍽️ COOKING VEDIOS
-              </button>
-              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-              🖼️ GALLERY
-              </button>            
-            </div>
-          </section>
         </div>
       </main>
     </div>

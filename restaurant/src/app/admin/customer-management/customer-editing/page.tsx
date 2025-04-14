@@ -9,6 +9,7 @@ type Customer = {
   email: string;
   phone: string;
   is_active: boolean;
+  role?: string; // Add role field
 };
 
 export default function CustomerList() {
@@ -62,28 +63,34 @@ export default function CustomerList() {
 
   const handleSaveEdit = async () => {
     if (!editingCustomer) return;
-
+  
     try {
       const response = await fetch("/api/customeredit", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editingCustomer),
+        body: JSON.stringify({
+          id: editingCustomer.id,
+          name: editingCustomer.name,
+          email: editingCustomer.email,
+          phone: editingCustomer.phone,
+          role: editingCustomer.role,
+        }),
       });
-
+  
       if (!response.ok) throw new Error("Failed to update customer");
-
+  
       setCustomers((prev) =>
         prev.map((customer) =>
           customer.id === editingCustomer.id ? editingCustomer : customer
         )
       );
-
+  
       setEditingCustomer(null);
     } catch (err) {
       console.error("Error updating customer:", err);
     }
   };
-
+  
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -166,53 +173,67 @@ export default function CustomerList() {
       </div>
 
       {editingCustomer && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg w-11/12 max-w-md">
-            <h2 className="text-xl font-bold mb-4">Edit Customer</h2>
-            <label className="block">Name</label>
-            <input
-              type="text"
-              className="border p-2 w-full mb-3"
-              value={editingCustomer.name}
-              onChange={(e) =>
-                setEditingCustomer({ ...editingCustomer, name: e.target.value })
-              }
-            />
-            <label className="block">Email</label>
-            <input
-              type="email"
-              className="border p-2 w-full mb-3"
-              value={editingCustomer.email}
-              onChange={(e) =>
-                setEditingCustomer({ ...editingCustomer, email: e.target.value })
-              }
-            />
-            <label className="block">Phone</label>
-            <input
-              type="text"
-              className="border p-2 w-full mb-3"
-              value={editingCustomer.phone}
-              onChange={(e) =>
-                setEditingCustomer({ ...editingCustomer, phone: e.target.value })
-              }
-            />
-            <div className="flex justify-end space-x-2">
-              <button
-                className="px-4 py-2 bg-gray-500 text-white rounded"
-                onClick={() => setEditingCustomer(null)}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded"
-                onClick={handleSaveEdit}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded shadow-lg w-11/12 max-w-md">
+      <h2 className="text-xl font-bold mb-4">Edit Customer</h2>
+      <label className="block">Name</label>
+      <input
+        type="text"
+        className="border p-2 w-full mb-3"
+        value={editingCustomer.name}
+        onChange={(e) =>
+          setEditingCustomer({ ...editingCustomer, name: e.target.value })
+        }
+      />
+      <label className="block">Email</label>
+      <input
+        type="email"
+        className="border p-2 w-full mb-3"
+        value={editingCustomer.email}
+        onChange={(e) =>
+          setEditingCustomer({ ...editingCustomer, email: e.target.value })
+        }
+      />
+      <label className="block">Phone</label>
+      <input
+        type="text"
+        className="border p-2 w-full mb-3"
+        value={editingCustomer.phone}
+        onChange={(e) =>
+          setEditingCustomer({ ...editingCustomer, phone: e.target.value })
+        }
+      />
+      {/* Add role select field */}
+      <label className="block">Role</label>
+      <select
+        className="border p-2 w-full mb-3"
+        value={editingCustomer.role || ""}
+        onChange={(e) =>
+          setEditingCustomer({ ...editingCustomer, role: e.target.value })
+        }
+      >
+        <option value="">Select Role</option>
+        <option value="Privileged Customer">Privileged Customer</option>
+        <option value="Regular Customer">Regular Customer</option>
+        <option value="Normal Customer">Normal Customer</option>
+      </select>
+      <div className="flex justify-end space-x-2">
+        <button
+          className="px-4 py-2 bg-gray-500 text-white rounded"
+          onClick={() => setEditingCustomer(null)}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+          onClick={handleSaveEdit}
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

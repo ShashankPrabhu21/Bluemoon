@@ -3,9 +3,17 @@
 import { useState, useEffect } from "react";
 import CustomerUserSidebar from "@/app/components/customersidebar";
 
+type Customer = {
+  name: string;
+  email: string;
+  phone: number;
+  join_date: string;
+  role?: string; // Add role field
+};
+
 export default function CustomerList() {
   const [search, setSearch] = useState("");
-  const [customers, setCustomers] = useState<{ name: string; email: string; phone: number; join_date: string }[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -16,7 +24,7 @@ export default function CustomerList() {
         if (!response.ok) {
           throw new Error("Failed to fetch customers");
         }
-        const data = await response.json();
+        const data: Customer[] = await response.json();
         setCustomers(data);
       } catch (err) {
         setError("Error fetching customers");
@@ -58,33 +66,37 @@ export default function CustomerList() {
             <p className="text-center text-red-500 p-4">{error}</p>
           ) : (
             <table className="min-w-full text-left border-collapse">
-              <thead className="bg-blue-800 text-white">
-                <tr>
-                  <th className="p-4">Customer Name</th>
-                  <th className="p-4">Email</th>
-                  <th className="p-4">Phone</th>
-                  <th className="p-4">Join Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredCustomers.length > 0 ? (
-                  filteredCustomers.map((customer, index) => (
-                    <tr key={index} className="border-b">
-                      <td className="p-4">{customer.name}</td>
-                      <td className="p-4">{customer.email}</td>
-                      <td className="p-4">{customer.phone}</td>
-                      <td className="p-4">{customer.join_date}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="p-4 text-center text-gray-500">
-                      No customers found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+  <thead className="bg-blue-800 text-white">
+    <tr>
+      <th className="p-4">Customer Name</th>
+      <th className="p-4">Email</th>
+      <th className="p-4">Phone</th>
+      <th className="p-4">Join Date</th>
+      <th className="p-4">Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    {filteredCustomers.length > 0 ? (
+      filteredCustomers.map((customer, index) => (
+        <tr key={index} className="border-b">
+          <td className="p-4">{customer.name}</td>
+          <td className="p-4">{customer.email}</td>
+          <td className="p-4">{customer.phone}</td>
+          <td className="p-4">
+  {new Date(customer.join_date).toLocaleDateString("en-GB")}
+</td>
+          <td className="p-4">{customer.role || "N/A"}</td>
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan={5} className="p-4 text-center text-gray-500">
+          No customers found
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
           )}
         </div>
       </div>
