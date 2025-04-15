@@ -1,21 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
+// /app/api/gallery/update/[id]/route.ts
+import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 
-// ✅ Define your route context interface
-interface RouteContext {
-  params: {
-    id: string;
-  };
-}
-
-export async function DELETE(req: NextRequest, context: RouteContext) {
-  const id = context.params.id;
-
+export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
-    await pool.query("DELETE FROM gallery WHERE id = $1", [id]);
-    return NextResponse.json({ message: "Image deleted successfully" });
+    const { category, title, alt } = await req.json();
+    await pool.query("UPDATE gallery SET category = $1, title = $2, alt = $3 WHERE id = $4", [category, title, alt, params.id]);
+    return NextResponse.json({ message: "Image updated successfully" });
   } catch (err) {
-    console.error("Error deleting image:", err);
-    return NextResponse.json({ error: "Failed to delete image" }, { status: 500 });
+    console.error("Error updating image:", err);
+    return NextResponse.json({ error: "Failed to update image" }, { status: 500 });
   }
 }
