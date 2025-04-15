@@ -97,15 +97,6 @@ const UploadGalleryImages = () => {
   };
 
 
-
-  const handleEdit = (image: GalleryImage) => {
-    setEditingImage(image);
-    setCategory(image.category);
-    setTitle(image.title);
-    setAlt(image.alt);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   const handleUpdate = async () => {
     if (!editingImage) return;
 
@@ -313,15 +304,7 @@ const UploadGalleryImages = () => {
                   />
                 </div>
 
-                <div className="flex justify-center gap-3 mt-3">
-                  <button
-                    onClick={() => handleEdit(image)}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 rounded shadow transition-all"
-                  >
-                    Edit
-                  </button>
-                  
-                </div>
+               
 
                 <div className="text-center text-sm text-gray-800 font-semibold px-4 py-2 mt-2 w-full transition-colors duration-200 group-hover:bg-blue-800 group-hover:text-white">
                   {image.title}
