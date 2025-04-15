@@ -1,18 +1,12 @@
-// /app/api/gallery/delete/[id]/route.ts
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import pool from "@/lib/db";
 
-interface RouteParams {
-  params: { id: string };
-  searchParams: URLSearchParams;
-}
+export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
 
-export async function DELETE(
-  req: Request, // eslint-disable-line @typescript-eslint/no-unused-vars
-  { params, searchParams }: RouteParams // eslint-disable-line @typescript-eslint/no-unused-vars
-) {
   try {
-    await pool.query("DELETE FROM gallery WHERE id = $1", [params.id]);
+    await pool.query("DELETE FROM gallery WHERE id = $1", [id]);
     return NextResponse.json({ message: "Image deleted successfully" });
   } catch (err) {
     console.error("Error deleting image:", err);
