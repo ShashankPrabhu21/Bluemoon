@@ -4,10 +4,10 @@ import pool from "@/lib/db";
 
 interface RouteParams {
   params: { id: string };
-  searchParams: URLSearchParams;
+  [key: string]: any; // Allow any other properties
 }
 
-export async function DELETE(req: Request, { params, searchParams }: RouteParams) {
+export async function DELETE(req: Request, { params, ...rest }: RouteParams) {
   try {
     await pool.query("DELETE FROM gallery WHERE id = $1", [params.id]);
     return NextResponse.json({ message: "Image deleted successfully" });
