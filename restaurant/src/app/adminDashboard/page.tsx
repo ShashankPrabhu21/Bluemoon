@@ -95,9 +95,9 @@ export default function AdminDashboard() {
                 🍳 BLOGS
               </button>
               <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-              🍽️ COOKING VEDIOS
+              🍽️ COOKING VIDEOS
               </button>
-              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+              <button className="w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/edit/editGallery")}>
               🖼️ GALLERY
               </button>            
             </div>
