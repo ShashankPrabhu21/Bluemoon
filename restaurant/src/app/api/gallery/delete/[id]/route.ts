@@ -1,8 +1,14 @@
-// src/app/api/gallery/delete/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 
-export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
+// ✅ Define your route context interface
+interface RouteContext {
+  params: {
+    id: string;
+  };
+}
+
+export async function DELETE(req: NextRequest, context: RouteContext) {
   const id = context.params.id;
 
   try {
