@@ -28,7 +28,7 @@ const UploadGalleryImages = () => {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [uploadedImages, setUploadedImages] = useState<GalleryImage[]>([]);
-  const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
+  const [editingImage, ] = useState<GalleryImage | null>(null);
 
   useEffect(() => {
     const fetchUploadedImages = async () => {
