@@ -1,14 +1,16 @@
-// /app/api/gallery/update/[id]/route.ts
+// /app/api/gallery/delete/[id]/route.ts
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: Request, // You can still use req if needed in the future.
+  { params }: { params: { id: string } } // Correct type definition
+) {
   try {
-    const { category, title, alt } = await req.json();
-    await pool.query("UPDATE gallery SET category = $1, title = $2, alt = $3 WHERE id = $4", [category, title, alt, params.id]);
-    return NextResponse.json({ message: "Image updated successfully" });
+    await pool.query("DELETE FROM gallery WHERE id = $1", [params.id]);
+    return NextResponse.json({ message: "Image deleted successfully" });
   } catch (err) {
-    console.error("Error updating image:", err);
-    return NextResponse.json({ error: "Failed to update image" }, { status: 500 });
+    console.error("Error deleting image:", err);
+    return NextResponse.json({ error: "Failed to delete image" }, { status: 500 });
   }
 }
