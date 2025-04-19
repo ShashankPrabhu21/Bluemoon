@@ -22,16 +22,20 @@ export default function Navbar() {
     };
 
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 1280); // Mobile menu should activate at 1280px
+      setIsMobile(window.innerWidth <= 1440);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("resize", handleResize);
-    handleResize(); // Check on first render
+    if (typeof window !== 'undefined') {
+      window.addEventListener("scroll", handleScroll);
+      window.addEventListener("resize", handleResize);
+      handleResize(); // Check on first client render
+    }
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleResize);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener("scroll", handleScroll);
+        window.removeEventListener("resize", handleResize);
+      }
     };
   }, [lastScrollY]);
 
@@ -82,7 +86,7 @@ export default function Navbar() {
 
         </div>
 
-        {/* Desktop Navbar (Only visible if screen width > 1280px) */}
+        {/* Desktop Navbar (Only visible if screen width > 1440px) */}
         {!isMobile && (
           <ul className="flex space-x-6 text-lg font-medium items-center">
             <li className="cursor-pointer hover:text-gray-300"><Link href="/">Home</Link></li>
@@ -91,7 +95,7 @@ export default function Navbar() {
             <li className="cursor-pointer hover:text-gray-300"><Link href="/delivery">Delivery</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/gallery">Gallery</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/cooking">Cooking Videos</Link></li>
-            <li className="cursor-pointer hover:text-gray-300"><Link href="/contact">Contact Us</Link></li>
+            <li className="cursor-pointer hover:text-gray-300"><Link href="/contact">Contact</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/table">Table Reservation</Link></li>
 
             {/* Extra Links Toggle */}
@@ -124,7 +128,8 @@ export default function Navbar() {
       </nav>
 
       {menuOpen && isMobile && (
-  <div className="absolute top-0 left-0 w-full h-screen bg-gradient-to-b from-black/90 to-black/90 backdrop-blur-lg p-6 z-50">
+  <div className="absolute top-0 left-0 w-full h-screen bg-gradient-to-b from-black/90 to-black/90 backdrop-blur-lg p-6 z-50 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent">
+
     {/* Logo & Close Button */}
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center gap-2">
@@ -140,7 +145,7 @@ export default function Navbar() {
     </div>
 
     {/* Navigation Links */}
-    <ul className="flex flex-col items-center space-y-4 text-lg font-medium">
+    <ul className="flex flex-col items-center space-y-4  text-lg font-medium">
       {[
         { href: "/", label: "Home" },
         { href: "/menu", label: "Menu" },
@@ -156,7 +161,7 @@ export default function Navbar() {
         <li
           key={item.href}
           onClick={() => setMenuOpen(false)}
-          className="cursor-pointer border-b border-white/20 pb-2 w-full text-center"
+          className="cursor-pointer border-b border-white/20 w-full text-center py-4"
         >
           <Link href={item.href}>{item.label}</Link>
         </li>

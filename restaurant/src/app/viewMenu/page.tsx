@@ -136,7 +136,7 @@ const OnlineOrderPage = () => {
   </div>
 
   {/* Heading */}
-  <h1 className="text-5xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-wide bg-gradient-to-r from-black to-gray-700 text-transparent bg-clip-text drop-shadow-lg text-center">
+  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-wide bg-gradient-to-r from-black to-gray-700 text-transparent bg-clip-text drop-shadow-lg text-center">
     Online Order
   </h1>
 </div>
@@ -146,30 +146,30 @@ const OnlineOrderPage = () => {
 
       {/* Service Type Selection */}
       <div className="flex justify-center items-center mb-6">
-  <span className="mr-4 text-xl font-semibold text-gray-900">Select Service Type:</span>
-  <div className="flex bg-gray-200 p-1 rounded-full shadow-lg border border-gray-300">
-    <button
-      onClick={() => setServiceType("pickup")}
-      className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out 
-        ${serviceType === "pickup"
-          ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
-          : "bg-transparent text-gray-700 hover:text-blue-500"
-        }`}
-    >
-      Pickup
-    </button>
-    <button
-      onClick={() => setServiceType("delivery")}
-      className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out 
-        ${serviceType === "delivery"
-          ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
-          : "bg-transparent text-gray-700 hover:text-blue-500"
-        }`}
-    >
-      Delivery
-    </button>
-  </div>
-</div>
+          <span className="mr-4 text-xl font-semibold text-gray-900">Select Service Type:</span>
+          <div className="flex bg-gray-200 p-1 rounded-full shadow-lg border border-gray-300">
+            <button
+              onClick={() => setServiceType("pickup")}
+              className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out 
+                ${serviceType === "pickup"
+                  ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
+                  : "bg-transparent text-gray-700 hover:text-blue-500"
+                }`}
+            >
+              Pickup
+            </button>
+            <button
+              onClick={() => setServiceType("delivery")}
+              className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out 
+                ${serviceType === "delivery"
+                  ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
+                  : "bg-transparent text-gray-700 hover:text-blue-500"
+                }`}
+            >
+              Delivery
+            </button>
+          </div>
+        </div>
 
 
       {categories.map((category) => {
@@ -182,36 +182,34 @@ const OnlineOrderPage = () => {
             </h2>
 
             {filteredItems.length > 0 ? (
-  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-    {filteredItems.map((item) => (
-      <div key={item.item_id} className="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200 w-full max-w-xs mx-auto transform transition duration-200 hover:scale-105">
-        <img
-          src={item.image_url || "/placeholder.jpg"}
-          alt={item.name}
-          className="w-full h-36 object-cover"
-        />
-        <div className="p-3 text-center">
-          <h3 className="text-sm font-semibold text-gray-900 mb-1">{item.name}</h3>
-          <p className="text-xs text-gray-500 mb-2 line-clamp-2">{item.description}</p>
-          <div className="flex justify-between items-center text-sm font-semibold text-gray-700 bg-gray-100 p-1 rounded-md">
-            <span className="text-blue-600">${item.price}</span>
-            <span className="text-gray-500">Item: {item.quantity}</span>
-          </div>
-          <button
-            onClick={() => setSelectedItem(item)}
-            className="w-full mt-2 py-2 text-white font-semibold rounded-lg bg-blue-500 hover:bg-blue-600 transition"
-          >
-            Order Now
-          </button>
-        </div>
-      </div>
-    ))}
-  </div>
-) : (
-  <p className="text-center text-gray-500">No items found</p>
-)}
-
-
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {filteredItems.map((item) => (
+                    <div key={item.item_id} className="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200 w-full max-w-xs mx-auto transform transition duration-200 hover:scale-105">
+                      <img
+                        src={item.image_url || "/placeholder.jpg"}
+                        alt={item.name}
+                        className="w-full h-36 object-cover"
+                      />
+                      <div className="p-3 text-center">
+                        <h3 className="text-sm font-semibold text-gray-900 mb-1">{item.name}</h3>
+                        <p className="text-xs text-gray-500 mb-2 line-clamp-2">{item.description}</p>
+                        <div className="flex justify-between items-center text-sm font-semibold text-gray-700 bg-gray-100 p-1 rounded-md">
+                          <span className="text-blue-600">${item.price}</span>
+                          <span className="text-gray-500">Item: {item.quantity}</span>
+                        </div>
+                        <button
+                          onClick={() => setSelectedItem(item)}
+                          className="w-full mt-2 py-2 text-white font-semibold rounded-lg bg-blue-500 hover:bg-blue-600 transition"
+                        >
+                          Order Now
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-gray-500">No items found</p>
+              )}
           </div>
         );
       })}
