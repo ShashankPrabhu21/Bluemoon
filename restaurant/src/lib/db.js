@@ -1,23 +1,21 @@
-import dotenv from "dotenv";
 import { Pool } from "pg";
-
-dotenv.config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl: {
+    rejectUnauthorized: false, // Required for NeonDB
+  },
 });
 
-async function testConnection() {
+// Optional test connection (use only once if you want to verify)
+(async () => {
   try {
     const client = await pool.connect();
-    console.log("✅ Database connection established successfully");
+    console.log("✅ PostgreSQL connected!");
     client.release();
-  } catch (error) {
-    console.error("❌ Database connection failed:", error);
+  } catch (err) {
+    console.error("❌ PostgreSQL connection error:", err);
   }
-}
-
-testConnection();
+})();
 
 export default pool;

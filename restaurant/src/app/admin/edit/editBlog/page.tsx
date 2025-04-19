@@ -83,6 +83,14 @@ export default function EditBlog() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Disable the button and change its text
+    const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+    if (submitButton) {
+      submitButton.textContent = "Updating...";
+      submitButton.disabled = true;
+    }
+
     const formData = new FormData();
     formData.append("category", blogData.category);
     formData.append("title", blogData.title);
@@ -126,8 +134,8 @@ export default function EditBlog() {
         image: null,
       });
       setIsEditing(false);
-      if (resData.alert){
-        alert(isEditing? "Blog updated successfully!": "Blog Created Successfully!");
+      if (resData.alert) {
+        alert(isEditing ? "Blog updated successfully!" : "Blog Created Successfully!");
       }
 
     } catch (error) {
@@ -136,6 +144,12 @@ export default function EditBlog() {
         error
       );
       alert(`Error ${isEditing ? "updating" : "creating"} blog!`);
+    } finally {
+      // Re-enable the button and reset its text in either success or error
+      if (submitButton) {
+        submitButton.textContent = isEditing ? "Update Blog" : "Publish Blog";
+        submitButton.disabled = false;
+      }
     }
   };
 

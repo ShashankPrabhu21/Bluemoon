@@ -22,7 +22,10 @@ export async function POST(req: Request) {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *;
     `;
-    const values = [user_id, name, price, image_url, quantity || 1, special_note, item_id, scheduledDate, scheduledTime, serviceType];
+    const isoDate = new Date(scheduledDate).toISOString().split('T')[0]; // "2025-04-18"
+const isoTime = scheduledTime.length === 5 ? `${scheduledTime}:00` : scheduledTime; // Ensure "HH:mm:ss" format
+
+const values = [user_id, name, price, image_url, quantity || 1, special_note, item_id, isoDate, isoTime, serviceType];
 
     const result = await pool.query(insertQuery, values);
 
