@@ -155,28 +155,43 @@ const ViewScheduleMenuContent = () => {
 
     return (
         <div className="min-h-screen bg-white p-6 mt-32">
-            <div className="flex justify-center flex-col items-center relative mb-10">
-                <h1 className="text-5xl font-extrabold text-gray-900 tracking-wide">Scheduled Order</h1>
-                <div className="mt-6 text-center space-y-2 bg-gray-100 p-4 rounded-lg shadow-md">
-                  <p className="text-xl font-bold text-gray-800">Service: <span className="text-blue-600">{service}</span></p>
-                  <p className="text-lg text-gray-700">📅 Date: <span className="font-medium">{date}</span></p>
-                  <p className="text-lg text-gray-700">⏰ Time: <span className="font-medium">{time}</span></p>
-                </div>
-
-                <Link
+            <div className="relative mb-10 px-4 sm:px-8">
+                {/* Cart Button */}
+                <div className="flex justify-center lg:justify-end lg:absolute lg:top-0 lg:right-0 w-full">
+                    <Link
                     href={{
                         pathname: "/scheduledCart",
                         query: {
-                            service: service || "",
-                            date: date || "",
-                            time: time || "",
+                        service: service || "",
+                        date: date || "",
+                        time: time || "",
                         },
                     }}
-                    className="absolute right-0 flex items-center space-x-2 bg-blue-600 text-white px-5 py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
-                >
-                    <FiShoppingCart size={26} />
-                    <span className="text-lg font-semibold">Cart ({cart.length})</span>
-                </Link>
+                    className="mb-4 lg:mb-0 flex items-center space-x-2 bg-blue-600 text-white px-4 sm:px-5 py-3 sm:py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
+                    >
+                    <FiShoppingCart size={22} className="sm:size-[26px]" />
+                    <span className="text-base sm:text-lg font-semibold">Cart ({cart.length})</span>
+                    </Link>
+                </div>
+
+                {/* Heading */}
+                <div className="flex flex-col justify-center items-center">
+                    <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-wide text-center">
+                    Scheduled Order
+                    </h1>
+
+                    <div className="mt-6 text-center space-y-2 bg-gray-100 p-4 rounded-lg shadow-md">
+                    <p className="text-xl font-bold text-gray-800">
+                        Service: <span className="text-blue-600">{service}</span>
+                    </p>
+                    <p className="text-lg text-gray-700">
+                        📅 Date: <span className="font-medium">{date}</span>
+                    </p>
+                    <p className="text-lg text-gray-700">
+                        ⏰ Time: <span className="font-medium">{time}</span>
+                    </p>
+                    </div>
+                </div>
             </div>
 
             {categories.map((category) => {

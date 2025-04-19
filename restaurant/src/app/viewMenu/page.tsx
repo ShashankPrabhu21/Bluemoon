@@ -122,19 +122,27 @@ const OnlineOrderPage = () => {
 
   return (
     <div className="min-h-screen bg-white p-6 mt-32">
-      <div className="flex justify-center items-center relative mb-10">
-      <h1 className="text-6xl font-extrabold text-gray-900 tracking-wide bg-gradient-to-r from-black to-gray-700 text-transparent bg-clip-text drop-shadow-lg">
-        Online Order
-      </h1>
 
-        <Link
-          href="/cart"
-          className="absolute right-0 flex items-center space-x-2 bg-blue-600 text-white px-5 py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
-        >
-          <FiShoppingCart size={26} />
-          <span className="text-lg font-semibold">Cart ({cart.length})</span>
-        </Link>
-      </div>
+  <div className="relative mb-10 px-4 sm:px-8">
+  {/* Cart Button */}
+  <div className="flex justify-center lg:justify-end lg:absolute lg:top-0 lg:right-0 w-full">
+    <Link
+      href="/cart"
+      className="mb-4 lg:mb-0 flex items-center space-x-2 bg-blue-600 text-white px-4 sm:px-5 py-3 sm:py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
+    >
+      <FiShoppingCart size={22} className="sm:size-[26px]" />
+      <span className="text-base sm:text-lg font-semibold">Cart ({cart.length})</span>
+    </Link>
+  </div>
+
+  {/* Heading */}
+  <h1 className="text-5xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-wide bg-gradient-to-r from-black to-gray-700 text-transparent bg-clip-text drop-shadow-lg text-center">
+    Online Order
+  </h1>
+</div>
+
+
+
 
       {/* Service Type Selection */}
       <div className="flex justify-center items-center mb-6">
