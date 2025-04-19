@@ -4,7 +4,9 @@ import pool from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    let { name, email, cart_items, service_type, total_amount, scheduled_date, scheduled_time } = body;
+    const { name, email, cart_items, service_type, total_amount } = body;
+    let { scheduled_date, scheduled_time } = body;
+
 
     console.log("cart_items received:", cart_items);
 
