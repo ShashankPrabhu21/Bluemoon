@@ -96,49 +96,7 @@ const UploadGalleryImages = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      await fetch(`/api/gallery/delete/${id}`, { method: "DELETE" });
-      setUploadedImages((prev) => prev.filter((img) => img.id !== id));
-      alert("Image deleted successfully!");
-    } catch (err) {
-      console.error("Error deleting image:", err);
-      alert("Error deleting image.");
-    }
-  };
-
-  const handleEdit = (image: GalleryImage) => {
-    setEditingImage(image);
-    setCategory(image.category);
-    setTitle(image.title);
-    setAlt(image.alt);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleUpdate = async () => {
-    if (!editingImage) return;
-
-    try {
-      await fetch(`/api/gallery/update/${editingImage.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, title, alt }),
-      });
-      setUploadedImages((prev) =>
-        prev.map((img) =>
-          img.id === editingImage.id ? { ...img, category, title, alt } : img
-        )
-      );
-      setEditingImage(null);
-      setCategory("");
-      setTitle("");
-      setAlt("");
-      alert("Image updated successfully!");
-    } catch (err) {
-      console.error("Error updating image:", err);
-      alert("Error updating image.");
-    }
-  };
+  
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen mt-24">  
@@ -197,12 +155,7 @@ const UploadGalleryImages = () => {
                   </div>
 
                   <div className="flex justify-between gap-4">
-                    <button
-                      onClick={handleUpdate}
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-indigo-500 hover:to-blue-500 px-6 py-2 rounded-xl text-white font-semibold transition-all"
-                    >
-                      Update Image
-                    </button>
+                    
                     <button
                       onClick={() => setEditingImage(null)}
                       className="flex-1 bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-xl text-white font-semibold transition-all"
@@ -302,7 +255,7 @@ const UploadGalleryImages = () => {
         </div>
 
          {/* Uploaded Images */}
-         <div className="mt-12 w-full max-w-4xl"> {/* Added w-full and max-w-4xl */}
+         <div className="mt-12 w-full max-w-4xl mb-5"> {/* Added w-full and max-w-4xl */}
           <h3 className="text-2xl font-semibold mb-6 text-center">
             📂 Uploaded Images
           </h3>
@@ -322,22 +275,9 @@ const UploadGalleryImages = () => {
                   />
                 </div>
 
-                <div className="flex justify-center gap-3 mt-3">
-                  <button
-                    onClick={() => handleEdit(image)}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 rounded shadow transition-all"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(image.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded shadow transition-all"
-                  >
-                    Delete
-                  </button>
-                </div>
+                
 
-                <div className="text-center text-sm text-gray-800 font-semibold px-4 py-2 mt-2 w-full transition-colors duration-200 group-hover:bg-blue-800 group-hover:text-white">
+                <div className="text-center text-sm text-gray-800 font-semibold px-4 py-4 w-full transition-colors duration-200 group-hover:bg-blue-800 group-hover:text-white">
                   {image.title}
                 </div>
               </div>
