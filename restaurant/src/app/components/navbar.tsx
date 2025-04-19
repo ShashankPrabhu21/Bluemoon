@@ -20,17 +20,17 @@ export default function Navbar() {
       setIsVisible(currentScrollY < lastScrollY || currentScrollY === 0);
       setLastScrollY(currentScrollY);
     };
-
+  
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 1440);
+      setIsMobile(window.innerWidth < 1280); 
     };
-
+  
     if (typeof window !== 'undefined') {
       window.addEventListener("scroll", handleScroll);
       window.addEventListener("resize", handleResize);
       handleResize(); // Check on first client render
     }
-
+  
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener("scroll", handleScroll);
@@ -86,17 +86,18 @@ export default function Navbar() {
 
         </div>
 
-        {/* Desktop Navbar (Only visible if screen width > 1440px) */}
+        {/* Desktop Navbar*/}
         {!isMobile && (
           <ul className="flex space-x-6 text-lg font-medium items-center">
+            
             <li className="cursor-pointer hover:text-gray-300"><Link href="/">Home</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/menu">Menu</Link></li>
-            <li className="cursor-pointer hover:text-gray-300"><Link href="/about">About Us</Link></li>
+            <li className="cursor-pointer hover:text-gray-300"><Link href="/about">About</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/delivery">Delivery</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/gallery">Gallery</Link></li>
-            <li className="cursor-pointer hover:text-gray-300"><Link href="/cooking">Cooking Videos</Link></li>
+            <li className="cursor-pointer hover:text-gray-300 whitespace-nowrap"><Link href="/cooking">Cooking Videos</Link></li>
             <li className="cursor-pointer hover:text-gray-300"><Link href="/contact">Contact</Link></li>
-            <li className="cursor-pointer hover:text-gray-300"><Link href="/table">Table Reservation</Link></li>
+            <li className="cursor-pointer hover:text-gray-300"><Link href="/table">Reservation</Link></li>
 
             {/* Extra Links Toggle */}
             {extraLinks && (
@@ -121,7 +122,7 @@ export default function Navbar() {
 
         {/* Mobile Menu Button (Appears at width ≤ 1280px) */}
         {isMobile && (
-          <button onClick={() => setMenuOpen(!menuOpen)} className="xl:hidden">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="block xl:hidden">
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         )}
