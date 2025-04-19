@@ -182,34 +182,36 @@ const OnlineOrderPage = () => {
             </h2>
 
             {filteredItems.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                {filteredItems.map((item) => (
-                  <div key={item.item_id} className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 w-56 h-75 mx-auto transform transition duration-300 hover:scale-105">
-                    <img
-                      src={item.image_url || "/placeholder.jpg"}
-                      alt={item.name}
-                      className="w-full h-40 object-cover"
-                    />
-                    <div className="p-3 text-center">
-                      <h3 className="text-md font-bold text-gray-900 mb-1">{item.name}</h3>
-                      <p className="text-xs text-gray-600 mb-2">{item.description}</p>
-                      <div className="flex justify-between items-center text-sm font-semibold text-gray-800 bg-gray-100 p-2 rounded-md">
-                        <span>${item.price}</span>
-                        <span>Item: {item.quantity}</span>
-                      </div>
-                      <button
-                        onClick={() => setSelectedItem(item)}
-                        className="w-full mt-3 py-2 text-white font-medium rounded-lg bg-blue-500 hover:bg-blue-800 transition"
-                      >
-                        Order Now
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-gray-500 text-sm italic">No items available in this category.</p>
-            )}
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+    {filteredItems.map((item) => (
+      <div key={item.item_id} className="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200 w-full max-w-xs mx-auto transform transition duration-200 hover:scale-105">
+        <img
+          src={item.image_url || "/placeholder.jpg"}
+          alt={item.name}
+          className="w-full h-36 object-cover"
+        />
+        <div className="p-3 text-center">
+          <h3 className="text-sm font-semibold text-gray-900 mb-1">{item.name}</h3>
+          <p className="text-xs text-gray-500 mb-2 line-clamp-2">{item.description}</p>
+          <div className="flex justify-between items-center text-sm font-semibold text-gray-700 bg-gray-100 p-1 rounded-md">
+            <span className="text-blue-600">${item.price}</span>
+            <span className="text-gray-500">Item: {item.quantity}</span>
+          </div>
+          <button
+            onClick={() => setSelectedItem(item)}
+            className="w-full mt-2 py-2 text-white font-semibold rounded-lg bg-blue-500 hover:bg-blue-600 transition"
+          >
+            Order Now
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+) : (
+  <p className="text-center text-gray-500">No items found</p>
+)}
+
+
           </div>
         );
       })}
