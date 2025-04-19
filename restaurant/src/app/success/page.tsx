@@ -116,7 +116,7 @@ export default function SuccessPage() {
   },[scheduledCart]);
 
   useEffect(() => {
-    setDeliveryCharge(serviceType === "delivery" ? 5 : 0);
+    setDeliveryCharge(serviceType === "delivery" ? 0 : 0);
     setFinalTotal(totalAmount + deliveryCharge);
   }, [totalAmount, serviceType]);
 
