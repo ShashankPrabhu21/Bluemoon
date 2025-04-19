@@ -96,16 +96,7 @@ const UploadGalleryImages = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      await fetch(`/api/gallery/delete/${id}`, { method: "DELETE" });
-      setUploadedImages((prev) => prev.filter((img) => img.id !== id));
-      alert("Image deleted successfully!");
-    } catch (err) {
-      console.error("Error deleting image:", err);
-      alert("Error deleting image.");
-    }
-  };
+  
 
   const handleEdit = (image: GalleryImage) => {
     setEditingImage(image);
@@ -329,12 +320,7 @@ const UploadGalleryImages = () => {
                   >
                     Edit
                   </button>
-                  <button
-                    onClick={() => handleDelete(image.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded shadow transition-all"
-                  >
-                    Delete
-                  </button>
+                  
                 </div>
 
                 <div className="text-center text-sm text-gray-800 font-semibold px-4 py-2 mt-2 w-full transition-colors duration-200 group-hover:bg-blue-800 group-hover:text-white">

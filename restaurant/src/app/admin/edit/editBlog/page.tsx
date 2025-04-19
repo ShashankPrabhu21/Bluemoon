@@ -161,7 +161,23 @@ export default function EditBlog() {
     }
   };
 
-  
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await fetch(`/api/blogs/${id}`, {
+        method: "DELETE",
+      });
+      const resData = await res.json();
+      if (res.ok) {
+        setPublishedBlogs(publishedBlogs.filter((blog) => blog.id !== id));
+      }
+      if (resData.alert){
+        alert("Blog Deleted Successfully!");
+      }
+    } catch (err) {
+      console.error("Error deleting blog:", err);
+      alert("Error deleting blog!");
+    }
+  };
 
   return (
     
@@ -321,7 +337,12 @@ export default function EditBlog() {
                   >
                     ✏️ Edit
                   </button>
-                  
+                  <button
+                    onClick={() => handleDelete(blog.id!)}
+                    className="px-3 py-1 rounded-lg text-sm bg-red-100 text-red-700 hover:bg-red-200"
+                  >
+                    🗑️ Delete
+                  </button>
                 </div>
               </div>
             </div>
