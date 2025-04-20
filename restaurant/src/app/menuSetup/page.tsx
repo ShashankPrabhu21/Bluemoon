@@ -204,7 +204,7 @@ const AdminPage = () => {
       {/* Food List */}
       <div className="w-full max-w-screen-xl mx-auto p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {foodItems.map((item, index) => (
+          {foodItems.map((item) => (
             <div
               key={item.item_id}
               className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105"
