@@ -121,10 +121,11 @@ const OnlineOrderPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6 mt-32">
-        <div className="relative mb-10 px-4 sm:px-8">
+    <div className="min-h-screen py-6 bg-[url('/sec1.jpg')] bg-cover bg-center bg-no-repeat relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 to-black opacity-90"></div>
+        <div className="z-10 relative mb-10 px-4 sm:px-8 mt-32">
         {/* Cart Button */}
-        <div className="flex justify-center lg:justify-end lg:absolute lg:top-0 lg:right-0 w-full z-50">
+        <div className="flex justify-center lg:justify-end lg:absolute lg:top-0 lg:right-2 w-full z-50">
           <Link
             href="/cart"
             className="mb-4 lg:mb-0 flex items-center space-x-2 bg-blue-600 text-white px-4 sm:px-5 py-3 sm:py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
@@ -135,21 +136,21 @@ const OnlineOrderPage = () => {
         </div>
 
         {/* Heading */}
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-wide bg-gradient-to-r from-black to-gray-700 text-transparent bg-clip-text drop-shadow-lg text-center">
+        <h1 className="text-4xl sm:text-5xl lg:text-5xl font-extrabold text-white tracking-wide bg-gradient-to-r from-black to-gray-700 text-transparent bg-clip-text drop-shadow-lg text-center">
           Online Order
         </h1>
       </div>
 
       {/* Service Type Selection */}
-      <div className="flex flex-col sm:flex-row justify-center items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-6 text-center">
-        <span className="text-lg sm:text-xl font-semibold text-gray-900">
+      <div className="z-10 flex flex-col sm:flex-row justify-center items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-6 text-center">
+        <span className="text-lg sm:text-xl font-semibold z-10 text-white">
           Select Service Type:
         </span>
         
-        <div className="flex bg-gray-200 p-1 rounded-full shadow-lg border border-gray-300">
+        <div className="flex bg-gray-200 p-1 rounded-full shadow-lg border border-gray-300 z-10">
           <button
             onClick={() => setServiceType("pickup")}
-            className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 ease-in-out
+            className={`px-6 sm:px-8 py-2 sm:py-2.5 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 ease-in-out
               ${serviceType === "pickup"
                 ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
                 : "bg-transparent text-gray-700 hover:text-blue-500"
@@ -160,7 +161,7 @@ const OnlineOrderPage = () => {
           
           <button
             onClick={() => setServiceType("delivery")}
-            className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 ease-in-out
+            className={`px-6 sm:px-8 py-2 sm:py-2.5 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 ease-in-out
               ${serviceType === "delivery"
                 ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
                 : "bg-transparent text-gray-700 hover:text-blue-500"
@@ -175,7 +176,7 @@ const OnlineOrderPage = () => {
       const filteredItems = foodItems.filter((item) => categoryMapping[item.category_id] === category);
       return (
       <div key={category} className="mb-10">
-        <h2 className="mb-6 text-3xl font-bold text-center text-gray-900 py-3 relative uppercase tracking-wide">
+        <h2 className="mb-6 text-3xl font-bold text-center text-white py-3 relative uppercase tracking-wide">
           {category}
           <span className="absolute left-1/2 bottom-0 w-16 h-1 bg-gradient-to-r from-[#3345A7] to-blue-400 transform -translate-x-1/2"></span>
         </h2>
@@ -185,8 +186,8 @@ const OnlineOrderPage = () => {
           {filteredItems.map((item) => (
           <div
           key={item.item_id}
-          className="group bg-blue-50 shadow-sm hover:shadow-md border border-blue-100 rounded-xl overflow-hidden transition duration-300 hover:bg-blue-100 text-sm sm:text-base"
-        >
+          className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
+ >
               <img
                   src={item.image_url || "/placeholder.jpg"}
                   alt={item.name}
@@ -194,16 +195,16 @@ const OnlineOrderPage = () => {
               />
 
         <div className="p-2 sm:p-3 text-center rounded-b-xl">
-        <h3 className="text-sm sm:text-lg font-semibold text-gray-800 tracking-wide truncate">{item.name}</h3>
+        <h3 className="text-sm sm:text-lg font-bold text-blue-900 tracking-wide truncate">{item.name}</h3>
         <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2">{item.description}</p>
         <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-gray-700 bg-gray-100 p-2 rounded-md mb-2 sm:mb-4">
-            <span className="text-blue-600 font-semibold">${item.price}</span>
+            <span className="text-blue-800 font-semibold">${item.price}</span>
             <span className="text-gray-500">Item No: {item.quantity}</span>
         </div>
 
           <button
             onClick={() => setSelectedItem(item)}
-            className="w-full py-2 sm:py-2.5 text-white font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 transition duration-200 shadow-md hover:shadow-lg active:scale-95"
+            className="w-full py-2 sm:py-2.5 text-white font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition duration-200 shadow-md hover:shadow-lg active:scale-95"
             >
             Order Now
           </button>

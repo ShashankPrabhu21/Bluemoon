@@ -17,7 +17,13 @@ interface ScheduledCartItem {
   scheduled_time: string;
   service_type: string;
 }
-
+interface LoggedInUserInfo {
+  phone_number?: string;
+  address?: string;
+  city?: string;
+  postCode?: string;
+  state?: string;
+}
 const ScheduledCheckoutPage = () => {
   const [orderType, setOrderType] = useState<string>("");
   const [scheduledDate, setScheduledDate] = useState<string>("");
@@ -62,6 +68,23 @@ const ScheduledCheckoutPage = () => {
   const [loginSuccess, setLoginSuccess] = useState<boolean>(false);
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState<string | null>(null);
   const [scheduledCartItems, setScheduledCartItems] = useState<ScheduledCartItem[]>([]);
+  const [loggedInUserInfo, setLoggedInUserInfo] = useState<LoggedInUserInfo | null>(null);
+
+  const fetchLoggedInUserInfo = async (email: string) => {
+    try {
+      const response = await fetch(`/api/user?email=${email}`);
+      if (response.ok) {
+        const userData = await response.json();
+        setLoggedInUserInfo(userData);
+      } else {
+        console.error("Failed to fetch user info");
+        setLoggedInUserInfo(null);
+      }
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      setLoggedInUserInfo(null);
+    }
+  };
 
   useEffect(() => {
     const fetchScheduledCartItems = async () => {
@@ -201,8 +224,12 @@ const ScheduledCheckoutPage = () => {
 
       if (response.ok) {
         setSignupSuccess(true);
+        fetchLoggedInUserInfo(signupInfo.email);
       } else {
         const errorData = await response.json();
+        if (response.status === 409 && errorData.error === 'Email ID already exists') {
+          setAuthError(errorData.error); // Display the specific email exists error
+        }
         setAuthError(errorData.error || "Failed to create account.");
       }
     } catch (error) {
@@ -225,6 +252,7 @@ const ScheduledCheckoutPage = () => {
         console.log("Login successful");
         setAuthError(null);
         setLoginSuccess(true);
+        fetchLoggedInUserInfo(emailLoginInfo.email);
       } else {
         const errorData = await response.json();
         if (response.status === 401) {
@@ -269,6 +297,7 @@ const ScheduledCheckoutPage = () => {
         if (response.ok) {
             setGuestLoginSuccess(true);
             setLoginSuccess(true);
+            setLoggedInUserInfo({ phone_number: guestInfo.mobileNumber, ...deliveryInfo });
            
         } else {
             const errorData = await response.json();
@@ -487,6 +516,7 @@ const ScheduledCheckoutPage = () => {
             >
               Sign Up
             </button>
+            {authError && <p className="text-red-500 mt-2">{authError}</p>}
             {signupSuccess && <p className="text-green-500 mt-2">Successfully created!</p>}
           </div>
         ) : authOption === "forgotPassword" ? (
@@ -522,6 +552,37 @@ const ScheduledCheckoutPage = () => {
             )}
           </div>
         ) : null}
+
+{(loginSuccess || guestLoginSuccess) && loggedInUserInfo && (
+  <div className="mt-6 bg-white p-6 rounded-lg shadow-lg">
+    <h2 className="text-xl font-bold mb-2">Contact Information</h2>
+    <p className="text-gray-700 mb-2">
+      <strong>Phone Number:</strong> {loggedInUserInfo.phone_number || ''}
+    </p>
+    {orderType === "DELIVERY" && loggedInUserInfo.address && (
+      <>
+        <p className="text-gray-700 mb-1">
+          <strong>Address:</strong> {loggedInUserInfo.address}
+        </p>
+        {loggedInUserInfo.city && (
+          <p className="text-gray-700 mb-1">
+            <strong>City:</strong> {loggedInUserInfo.city}
+          </p>
+        )}
+        {loggedInUserInfo.state && (
+          <p className="text-gray-700 mb-1">
+            <strong>State:</strong> {loggedInUserInfo.state}
+          </p>
+        )}
+        {loggedInUserInfo.postCode && (
+          <p className="text-gray-700 mb-1">
+            <strong>Post Code:</strong> {loggedInUserInfo.postCode}
+          </p>
+        )}
+      </>
+    )}
+  </div>
+)}
 
         {/* Order Summary */}
         <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-lg mt-6">

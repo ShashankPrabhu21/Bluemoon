@@ -1,10 +1,12 @@
+
+//api/orders/route.ts
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, cart_items, service_type, total_amount } = body;
+    const { name, email, cart_items, service_type, total_amount, phone_number, address, city, postCode, state } = body; // Receive new fields
     let { scheduled_date, scheduled_time } = body;
 
 
@@ -37,8 +39,8 @@ export async function POST(req: Request) {
     const stringifiedCartItems = JSON.stringify(cart_items);
 
     const insertQuery = `
-      INSERT INTO "order" (name, email, cart_items, service_type, total_amount, scheduled_date, scheduled_time)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO "order" (name, email, cart_items, service_type, total_amount, scheduled_date, scheduled_time, phone_number, address, city, "postCode", state)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *;
     `;
 
@@ -50,6 +52,11 @@ export async function POST(req: Request) {
       total_amount,
       scheduled_date || null,
       scheduled_time || null,
+      phone_number, // Add phone number
+      address || null, // Add address
+      city || null,    // Add city
+      postCode || null, // Add postCode
+      state || null,   // Add state
     ];
 
     const result = await pool.query(insertQuery, values);

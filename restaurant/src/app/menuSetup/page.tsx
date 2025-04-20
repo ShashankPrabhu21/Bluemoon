@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 interface FoodItem {
   item_id: number;
@@ -14,7 +14,6 @@ interface FoodItem {
   quantity: number;
 }
 
-// 🔹 Category Mapping for Backend
 const categoryMapping: Record<string, number> = {
   "Breakfast": 1,
   "Main Course": 2,
@@ -34,12 +33,13 @@ const AdminPage = () => {
   const [quantity, setQuantity] = useState<string>("");
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchFoodItems();
   }, []);
 
-  // 🔹 Fetch All Food Items
   const fetchFoodItems = async () => {
     try {
       const res = await fetch("/api/menuitem");
@@ -51,7 +51,6 @@ const AdminPage = () => {
     }
   };
 
-  // 🔹 Handle Image Upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -63,31 +62,18 @@ const AdminPage = () => {
     }
   };
 
-  // 🔹 Submit Food Data (Add/Update)
   const handleFoodSubmit = async () => {
+    setIsSubmitting(true);
     try {
-      
       const category_id = categoryMapping[category] || 1;
       const method = editingId ? "PUT" : "POST";
-      const url = "/api/menuitem"; // ✅ Use same URL for both POST and PUT
-  
-      console.log("Submitting:", {
-        id: editingId, // ✅ Ensure ID is included
-        category_id,
-        name,
-        description,
-        price: parseFloat(price),
-        availability,
-        image_url: image,
-        quantity: parseInt(quantity, 10),
-        spicy_level: spicyLevel,
-      });
-  
+      const url = "/api/menuitem";
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: editingId, // ✅ Ensure ID is sent
+          id: editingId,
           category_id,
           name,
           description,
@@ -98,62 +84,52 @@ const AdminPage = () => {
           spicy_level: spicyLevel,
         }),
       });
-  
+
+      const result = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        if (errorData.error && errorData.error.includes("already exists")) {
-          alert("A food item with this number already exists.");
-        } else {
-          alert(errorData.error || "Failed to save menu item");
-        }
+        alert(result.error || "Failed to save menu item");
         return;
       }
-      if(method === "POST"){
+
+      if (method === "POST") {
         alert("Item added successfully");
-    }
-      
-  
-      console.log("Update successful! Refreshing food list...");
-      await fetchFoodItems(); // ✅ Refresh the menu list after update
+      } else {
+        alert("Item updated successfully");
+      }
+
+      await fetchFoodItems();
       resetForm();
     } catch (error) {
       console.error("Error saving menu item:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  
-  // 🔹 Delete Item
-  const deleteFoodItem = async (item_id: number) => {
-    if (!item_id) {
-      console.error("Invalid item_id:", item_id);
-      return;
-    }
-  
+
+  const deleteFoodItem = async (item_id: number, itemName: string) => {
+    const confirmDelete = confirm(`Are you sure you want to delete "${itemName}"?`);
+    if (!confirmDelete) return;
+
     try {
-      console.log("Deleting item with ID:", item_id); // Debugging
-  
       const res = await fetch("/api/menuitem", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: item_id }), // Ensure correct id is sent
+        body: JSON.stringify({ id: item_id }),
       });
-  
+
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || "Failed to delete menu item");
       }
-  
-      // Remove the deleted item from state
+
       setFoodItems((prev) => prev.filter((item) => item.item_id !== item_id));
     } catch (error) {
       console.error("Error deleting food item:", error);
     }
   };
-  
 
-  // 🔹 Edit Food Item
   const editFoodItem = (item: FoodItem) => {
-    console.log("Editing item:", item); // Debugging
-  
     setCategory(Object.keys(categoryMapping).find((key) => categoryMapping[key] === item.category_id) || "");
     setName(item.name);
     setDescription(item.description);
@@ -161,12 +137,10 @@ const AdminPage = () => {
     setImage(item.image_url);
     setSpicyLevel(item.spicy_level);
     setQuantity(item.quantity.toString());
-    setEditingId(item.item_id); // ✅ Use item_id, not id
+    setEditingId(item.item_id);
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-  
-  
 
-  // 🔹 Reset Form Fields
   const resetForm = () => {
     setCategory("");
     setName("");
@@ -179,8 +153,9 @@ const AdminPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-white p-6">
       <h1 className="text-3xl font-bold text-center mb-2 mt-32">Admin Menu Setup</h1>
+
       <div className="flex justify-center mb-6">
         <button
           onClick={() => (window.location.href = "/adminDashboard")}
@@ -190,8 +165,8 @@ const AdminPage = () => {
         </button>
       </div>
 
-      {/* 🔹 Form */}
-      <div className="bg-white shadow-lg rounded-xl p-6 max-w-lg mx-auto mb-8 border border-gray-200">
+      {/* Form */}
+      <div ref={formRef} className="bg-white shadow-lg rounded-xl p-6 max-w-lg mx-auto mb-8 border border-gray-200">
         <h2 className="text-xl font-semibold text-center text-gray-900 mb-4">
           {editingId !== null ? "Update Food" : "Add Food"}
         </h2>
@@ -211,53 +186,61 @@ const AdminPage = () => {
         <input type="file" className="w-full p-2 border rounded-lg" onChange={handleImageUpload} />
         {image && <img src={image} alt="Preview" className="w-28 h-28 object-cover rounded-lg shadow-md mt-3" />}
 
-        <button className="w-full mt-4 py-2 text-white font-semibold rounded-lg bg-blue-800 hover:bg-blue-900 transition-all duration-300" onClick={handleFoodSubmit}>
-          {editingId !== null ? "Update Food" : "Add Food"}
+        <button
+          className="w-full mt-4 py-2 text-white font-semibold rounded-lg bg-blue-800 hover:bg-blue-900 transition-all duration-300"
+          onClick={handleFoodSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? editingId !== null
+              ? "Updating..."
+              : "Adding..."
+            : editingId !== null
+            ? "Update Food"
+            : "Add Food"}
         </button>
       </div>
 
-     {/* 🔹 Food List */}
-<div className="w-full max-w-screen-xl mx-auto p-6">
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-    {foodItems.map((item, index) => (
-      <div
-        key={item.id ? `food-${item.id}` : `food-index-${index}`}
-        className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105"
-      >
-        <img
-          src={item.image_url || "/placeholder.jpg"}
-          alt={item.name}
-          className="w-full h-52 object-cover rounded-t-2xl"
-        />
-        <div className="p-4 text-center space-y-2">
-          <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
-          <p className="text-gray-500 text-sm">{item.description}</p>
-          <p className="text-xl font-semibold text-blue-800">${item.price}</p>
-          <p className="text-md font-medium text-green-700">
-            Item Number: {item.quantity}
-          </p>
+      {/* Food List */}
+      <div className="w-full max-w-screen-xl mx-auto p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {foodItems.map((item, index) => (
+            <div
+              key={item.item_id}
+              className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105"
+            >
+              <img
+                src={item.image_url || "/placeholder.jpg"}
+                alt={item.name}
+                className="w-full h-52 object-cover rounded-t-2xl"
+              />
+              <div className="p-4 text-center space-y-2">
+                <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
+                <p className="text-gray-500 text-sm">{item.description}</p>
+                <p className="text-xl font-semibold text-blue-800">${item.price}</p>
+                <p className="text-md font-medium text-green-700">
+                  Item Number: {item.quantity}
+                </p>
 
-          <div className="flex justify-center gap-4 mt-4">
-            <button
-              onClick={() => editFoodItem(item)}
-              className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-yellow-600 transition-all"
-            >
-              ✏️ Edit
-            </button>
-            <button
-              onClick={() => deleteFoodItem(item.item_id)}
-              className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-red-600 transition-all"
-            >
-              🗑️ Delete
-            </button>
-          </div>
+                <div className="flex justify-center gap-4 mt-4">
+                  <button
+                    onClick={() => editFoodItem(item)}
+                    className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-yellow-600 transition-all"
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    onClick={() => deleteFoodItem(item.item_id, item.name)}
+                    className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-red-600 transition-all"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-    ))}
-  </div>
-</div>
-
-
     </div>
   );
 };

@@ -14,7 +14,7 @@ export async function POST(req) {
         // Check if email already exists
         const existingUser = await pool.query("SELECT email FROM users_order WHERE email = $1", [email]);
         if (existingUser.rows.length > 0) {
-            return NextResponse.json({ error: "Email address already exists" }, { status: 400 });
+            return NextResponse.json({ error: "Email address already exists" }, { status: 409 }); // Changed status to 409
         }
 
         // Hash password
@@ -23,8 +23,8 @@ export async function POST(req) {
         let insertQuery;
         let values;
 
-        if (serviceType === "delivery" || serviceType === "DELIVERY") 
-            {
+        if (serviceType === "delivery" || serviceType === "DELIVERY")
+        {
             if (!address || !city || !postCode || !state) {
                 return NextResponse.json({ error: "Delivery address is incomplete." }, { status: 400 });
             }

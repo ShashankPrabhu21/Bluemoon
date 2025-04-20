@@ -23,6 +23,14 @@ interface ScheduledCartItem {
   scheduled_time: string;
 }
 
+interface CustomerDetails {
+  phone_number?: string;
+  address?: string;
+  city?: string;
+  postCode?: string;
+  state?: string;
+}
+
 export default function SuccessPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [scheduledCart, setScheduledCart] = useState<ScheduledCartItem[]>([]);
@@ -37,6 +45,7 @@ export default function SuccessPage() {
   const [isScheduledOrder, setIsScheduledOrder] = useState(false);
   const [scheduledDate, setScheduledDate] = useState<string | null>(null);
   const [scheduledTime, setScheduledTime] = useState<string | null>(null);
+  const [customerDetails, setCustomerDetails] = useState<CustomerDetails | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -45,6 +54,23 @@ export default function SuccessPage() {
     setIsScheduledOrder(params.get("scheduled") === "true");
     console.log("Session ID from URL:", sessionIdFromUrl); // Debugging
   }, []);
+
+  const fetchCustomerInfo = async (email: string) => {
+    try {
+      const response = await fetch(`/api/user?email=${email}`);
+      if (response.ok) {
+        const userData = await response.json();
+        setCustomerDetails(userData);
+        console.log("Fetched customer details:", userData); // Debugging
+      } else {
+        console.error("Failed to fetch customer info");
+        setCustomerDetails(null);
+      }
+    } catch (error) {
+      console.error("Error fetching customer info:", error);
+      setCustomerDetails(null);
+    }
+  };
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -93,13 +119,16 @@ export default function SuccessPage() {
         }
         if (sessionId) {
           console.log("Fetching session details for session ID:", sessionId); // Debugging
-          const stripeRes = await fetch(`/api/checkout?session_id=${sessionId}`);
-          console.log("Stripe API response:", stripeRes); // Debugging
-          if (stripeRes.ok) {
-            const stripeData = await stripeRes.json();
-            console.log("Stripe API data:", stripeData); // Debugging
-            setCustomerEmail(stripeData.email);
-            setCardholderName(stripeData.name);
+          if (sessionId && !customerDetails) { // Added a check to prevent redundant calls
+            const stripeRes = await fetch(`/api/checkout?session_id=${sessionId}`);
+            if (stripeRes.ok) {
+              const stripeData = await stripeRes.json();
+              setCustomerEmail(stripeData.email);
+              setCardholderName(stripeData.name);
+              if (stripeData.email) {
+                fetchCustomerInfo(stripeData.email);
+              }
+            }
           }
         }
 
@@ -122,7 +151,7 @@ export default function SuccessPage() {
 
   useEffect(() => {
     const saveOrderToDatabase = async () => {
-      if ((cart.length > 0 || scheduledCart.length > 0) && customerEmail && cardholderName) {
+      if ((cart.length > 0 || scheduledCart.length > 0) && customerEmail && cardholderName && customerDetails) {
         try {
           let cartItemsForDatabase;
           if (isScheduledOrder) {
@@ -147,6 +176,11 @@ export default function SuccessPage() {
             total_amount: finalTotal,
             scheduled_date: scheduledDate,
             scheduled_time: scheduledTime,
+            phone_number: customerDetails.phone_number || null, // Add phone number
+            address: customerDetails.address || null,         // Add address
+            city: customerDetails.city || null,               // Add city
+            postCode: customerDetails.postCode || null,       // Add postCode
+            state: customerDetails.state || null,             // Add state
           };
 
           const saveOrderRes = await fetch("/api/orders", {
@@ -167,7 +201,8 @@ export default function SuccessPage() {
     };
 
     saveOrderToDatabase();
-  }, [cart, scheduledCart, customerEmail, cardholderName, serviceType, finalTotal, isScheduledOrder, scheduledDate, scheduledTime]);
+  }, [cart, scheduledCart, customerEmail, cardholderName, serviceType, finalTotal, isScheduledOrder, scheduledDate, scheduledTime, customerDetails]);
+
 
 
   return (
@@ -189,7 +224,43 @@ export default function SuccessPage() {
             <span className="text-white font-medium w-28">Email:</span>
             <span className="text-gray-200 text-sm truncate">{customerEmail || ""}</span>
           </div>
+
+          
         </div>
+        {customerDetails && (
+  <div className="mb-6 bg-gradient-to-r from-[#1A2E66] to-[#203A8E] px-6 py-4 rounded-lg shadow-lg shadow-blue-500/30 border border-blue-400/50 text-left">
+    <h3 className="text-lg font-semibold text-yellow-200 mb-4">📞 Contact & Delivery Info</h3>
+    <div className="flex items-center gap-3 mb-2">
+      <span className="text-white font-medium w-28">Phone:</span>
+      <span className="text-gray-200 text-sm truncate">{customerDetails.phone_number || "N/A"}</span>
+    </div>
+    {serviceType === "delivery" ||serviceType === "DELIVERY"  && customerDetails.address && (
+      <>
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-white font-medium w-28">Address:</span>
+          <span className="text-gray-200 text-sm truncate">{customerDetails.address}</span>
+        </div>
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-white font-medium w-28">City:</span>
+          <span className="text-gray-200 text-sm truncate">{customerDetails.city}</span>
+        </div>
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-white font-medium w-28">State:</span>
+          <span className="text-gray-200 text-sm truncate">{customerDetails.state}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-white font-medium w-28">Post Code:</span>
+          <span className="text-gray-200 text-sm truncate">{customerDetails.postCode}</span>
+        </div>
+      </>
+    )}
+    {serviceType === "pickup" && !customerDetails.phone_number && (
+              <p className="text-gray-200 text-sm">Phone number not available.</p>
+            )}
+  </div>
+)}
+
+        
 
         <div className="bg-gradient-to-r from-[#1A2E66] to-[#203A8E] px-6 py-4 rounded-lg text-left shadow-lg shadow-blue-500/30 border border-blue-400/50">
           <h3 className="text-lg font-medium text-white mb-2">🛒 Order Summary</h3>
