@@ -98,7 +98,7 @@ const UploadGalleryImages = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await fetch(`/api/gallery/delete/${id}`, { method: "DELETE" });
+      await fetch(`/api/gallery/${id}`, { method: "DELETE" });
       setUploadedImages((prev) => prev.filter((img) => img.id !== id));
       alert("Image deleted successfully!");
     } catch (err) {
@@ -119,7 +119,7 @@ const UploadGalleryImages = () => {
     if (!editingImage) return;
 
     try {
-      await fetch(`/api/gallery/update/${editingImage.id}`, {
+      await fetch(`/api/gallery/${editingImage.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ category, title, alt }),
