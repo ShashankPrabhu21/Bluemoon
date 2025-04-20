@@ -210,9 +210,11 @@ export default function Home() {
                   lingering aftertaste, your dining experience with us will be nothing short of extraordinary.
                 </p>
                 <div className="mt-4 md:mt-6 flex justify-center md:justify-start">
-                  <button className="px-5 py-3 md:px-6 md:py-3 border border-[#3345A7] text-[#3345A7] text-sm md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
-                    Discover More
-                  </button>
+                  <Link href="/menu">
+                    <button className="px-5 py-3 md:px-6 md:py-3 border border-[#3345A7] text-[#3345A7] text-sm md:text-lg font-semibold rounded-lg hover:bg-[#3345A7] hover:text-white transition duration-300">
+                      Discover More
+                    </button>
+                  </Link>
                 </div>
               </div>
             </motion.div>

@@ -5,8 +5,15 @@ module.exports = {
     "./src/app/**/*.{js,ts,jsx,tsx}", // Adjust paths based on your folder structure
   ],
   theme: {
-    extend: {},
-  },
+    extend: {
+      colors: {
+        lightBlue: {
+          400: '#60a5fa',
+          500: '#3b82f6',
+        },
+      },
+    },
+  },  
   plugins: [],
 }
 

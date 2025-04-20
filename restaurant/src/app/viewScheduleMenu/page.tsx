@@ -159,40 +159,40 @@ const ViewScheduleMenuContent = () => {
                 {/* Cart Button */}
                 <div className="flex justify-center lg:justify-end lg:absolute lg:top-0 lg:right-0 w-full">
                     <Link
-                    href={{
-                        pathname: "/scheduledCart",
-                        query: {
-                        service: service || "",
-                        date: date || "",
-                        time: time || "",
-                        },
-                    }}
-                    className="mb-4 lg:mb-0 flex items-center space-x-2 bg-blue-600 text-white px-4 sm:px-5 py-3 sm:py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
+                        href={{
+                            pathname: "/scheduledCart",
+                            query: {
+                                service: service || "",
+                                date: date || "",
+                                time: time || "",
+                            },
+                        }}
+                        className="mb-4 lg:mb-0 flex items-center space-x-2 bg-blue-600 text-white px-4 sm:px-5 py-3 sm:py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
                     >
-                    <FiShoppingCart size={22} className="sm:size-[26px]" />
-                    <span className="text-base sm:text-lg font-semibold">Cart ({cart.length})</span>
+                        <FiShoppingCart size={22} className="sm:size-[26px]" />
+                        <span className="text-base sm:text-lg font-semibold">Cart ({cart.length})</span>
                     </Link>
                 </div>
 
                 {/* Heading */}
                 <div className="flex flex-col justify-center items-center">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-wide text-center">
-                    Scheduled Order
+                        Scheduled Order
                     </h1>
 
                     <div className="mt-6 text-center space-y-2 bg-gray-100 p-4 rounded-lg shadow-md">
-                    <p className="text-xl font-bold text-gray-800">
-                        Service: <span className="text-blue-600">{service}</span>
-                    </p>
-                    <p className="text-lg text-gray-700">
-                        📅 Date: <span className="font-medium">{date}</span>
-                    </p>
-                    <p className="text-lg text-gray-700">
-                        ⏰ Time: <span className="font-medium">{time}</span>
-                    </p>
+                        <p className="text-xl font-bold text-gray-800">
+                            Service: <span className="text-blue-600">{service}</span>
+                        </p>
+                        <p className="text-lg text-gray-700">
+                            📅 Date: <span className="font-medium">{date}</span>
+                        </p>
+                        <p className="text-lg text-gray-700">
+                            ⏰ Time: <span className="font-medium">{time}</span>
+                        </p>
                     </div>
                 </div>
-                </div>
+            </div>
 
             {categories.map((category) => {
                 const filteredItems = foodItems.filter((item) => categoryMapping[item.category_id] === category);
@@ -204,56 +204,52 @@ const ViewScheduleMenuContent = () => {
                         </h2>
 
                         {filteredItems.length > 0 ? (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 px-2 sm:px-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
                                 {filteredItems.map((item) => (
-                                <div
+                                    <div
                                     key={item.item_id}
-                                    className="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-200 w-full max-w-[170px] mx-auto transform transition duration-200 hover:scale-105"
-                                >
-                                    <img
-                                    src={item.image_url || "/placeholder.jpg"}
-                                    alt={item.name}
-                                    className="w-full h-32 object-cover"
-                                    />
-
-                                    <div className="p-2 text-center">
-                                    <h3 className="text-xs font-semibold text-gray-900 truncate">{item.name}</h3>
-                                    <p className="text-[10px] text-gray-500 my-1 line-clamp-2">{item.description}</p>
-
-                                    <div className="mt-1 bg-gray-100 rounded p-1 flex justify-between items-center text-[11px] font-medium text-gray-700">
-                                        <span className="text-blue-600 font-semibold">${item.price}</span>
-                                        <span>Qty: {item.quantity}</span>
+                                    className="group bg-blue-50 shadow-sm hover:shadow-md border border-blue-100 rounded-xl overflow-hidden transition duration-300 hover:bg-blue-100 text-sm sm:text-base"
+                                  >
+                                        <img
+                                            src={item.image_url || "/placeholder.jpg"}
+                                            alt={item.name}
+                                            className="w-full h-32 sm:h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-110"
+                                        />
+                                        <div className="p-2 sm:p-3 text-center  rounded-b-xl">
+                                        <h3 className="text-sm sm:text-lg font-semibold text-gray-800 tracking-wide truncate">{item.name}</h3>
+                                        <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2">{item.description}</p>
+                                            <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-gray-700 bg-gray-100 p-2 rounded-md mb-2 sm:mb-4">
+                                                <span className="text-blue-600 font-semibold">${item.price}</span>
+                                                <span className="text-gray-500">Item No: {item.quantity}</span>
+                                            </div>
+                                            <button
+                                                onClick={() => setSelectedItem(item)}
+                                                className="w-full py-2 sm:py-2.5 text-white font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 transition duration-200 transform active:scale-95"
+                                            >
+                                                Order Now
+                                            </button>
+                                        </div>
                                     </div>
-
-                                    <button
-                                        onClick={() => setSelectedItem(item)}
-                                        className="w-full mt-2 py-1.5 bg-blue-500 text-white text-xs font-semibold rounded hover:bg-blue-600 transition"
-                                    >
-                                        Order
-                                    </button>
-                                    </div>
-                                </div>
                                 ))}
                             </div>
-                            ) : (
+                        ) : (
                             <p className="text-center text-gray-500 text-sm italic">No items found</p>
-                            )}
-
+                        )}
                     </div>
                 );
             })}
-  
-        {selectedItem && (
-          <ScheduleOrderModal
-            item={selectedItem}
-            onClose={() => setSelectedItem(null)}
-            onAddToCart={addToCart}
-            scheduledDate={date || ""}
-            scheduledTime={time || ""}
-            serviceType={service || ""}
-          />
-        )}
-      </div>
+
+            {selectedItem && (
+                <ScheduleOrderModal
+                    item={selectedItem}
+                    onClose={() => setSelectedItem(null)}
+                    onAddToCart={addToCart}
+                    scheduledDate={date || ""}
+                    scheduledTime={time || ""}
+                    serviceType={service || ""}
+                />
+            )}
+        </div>
     );
 };
 

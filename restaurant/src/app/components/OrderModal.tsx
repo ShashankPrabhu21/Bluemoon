@@ -31,79 +31,70 @@ const OrderModal: React.FC<OrderModalProps> = ({
   const [specialNote, setSpecialNote] = useState("");
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-2">
-      <div className="bg-white w-full max-w-5xl h-[90%] md:h-[80%] lg:h-[80%] rounded-lg shadow-lg flex flex-col md:flex-row overflow-hidden relative">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 px-4 md:px-6">
+      <div className="bg-gradient-to-r from-blue-100 to-blue-200 w-full max-w-4xl md:max-w-5xl h-[90%] md:h-[80%] rounded-xl shadow-xl flex flex-col md:flex-row overflow-hidden relative transition-all duration-300">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 bg-gray-200 hover:bg-gray-300 text-gray-800 p-2 rounded-full transition z-10"
+          className="absolute top-4 right-4 bg-white hover:bg-gray-100 text-gray-800 p-2 rounded-full transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
-          <IoMdClose size={22} />
+          <IoMdClose size={24} />
         </button>
 
         {/* Image Section */}
-        <div className="w-full md:w-1/2 max-h-[50vh] md:max-h-full overflow-hidden">
-          <div className="w-full h-full">
+        <div className="w-full md:w-1/2 max-h-[40vh] md:max-h-full overflow-hidden rounded-lg shadow-md">
+          <div className="w-full h-full relative">
             <img
               src={item.image_url || "/placeholder.jpg"}
               alt={item.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover rounded-lg transform hover:scale-105 transition-transform duration-300 ease-in-out"
             />
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="w-full md:w-1/2 p-4 md:p-6 flex flex-col justify-between overflow-auto max-h-[50vh] md:max-h-[90vh]">
-          <div>
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-              {item.name}
-            </h2>
-            <p className="text-gray-600 text-sm md:text-base mt-1">
-              {item.description}
-            </p>
+        <div className="w-full md:w-1/2 p-6 flex flex-col justify-between overflow-auto">
+          <div className="text-gray-900">
+            <h2 className="text-3xl font-extrabold text-blue-700">{item.name}</h2>
+            <p className="text-gray-700 mt-2 text-lg leading-relaxed">{item.description}</p>
 
-            <div className="mt-3">
-              <span className="text-sm font-semibold text-gray-700">
-                Service Type:
-              </span>{" "}
-              <span className="text-blue-600 font-bold uppercase text-sm">
-                {serviceType}
-              </span>
+            <div className="mt-4">
+              <span className="text-lg font-medium text-gray-800">Service:</span>
+              <span className="ml-1 font-semibold text-blue-600 uppercase text-sm">{serviceType}</span>
             </div>
 
-            <div className="mt-3">
-              <label className="text-sm font-semibold text-gray-700">
+            <div className="mt-4">
+              <label htmlFor="specialNote" className="block text-lg font-medium text-gray-800">
                 Special Instructions
               </label>
               <textarea
-                placeholder="Leave a note"
-                className="w-full mt-1 p-2 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-400 text-sm"
-                rows={3}
+                id="specialNote"
+                placeholder="Leave a note for your order"
+                className="w-full mt-2 p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-400 text-sm transition-all duration-200 ease-in-out"
+                rows={4}
                 value={specialNote}
                 onChange={(e) => setSpecialNote(e.target.value)}
               ></textarea>
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mt-4">
-              <div className="flex items-center space-x-2">
+          <div className="mt-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                  className="bg-gray-300 text-gray-900 px-3 py-1 rounded-md text-lg font-bold"
+                  className="bg-gray-200 text-gray-900 px-4 py-2 rounded-full transition duration-200 hover:bg-gray-300 text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-gray-400"
                 >
                   -
                 </button>
-                <span className="text-lg font-semibold">{quantity}</span>
+                <span className="text-xl font-bold text-gray-900">{quantity}</span>
                 <button
                   onClick={() => setQuantity((prev) => prev + 1)}
-                  className="bg-green-500 text-white px-3 py-1 rounded-md text-lg font-bold"
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 text-xl font-semibold"
                 >
                   +
                 </button>
               </div>
-              <span className="text-lg font-bold text-gray-800">
-                ${(item.price * quantity).toFixed(2)}
-              </span>
+              <span className="text-xl font-bold text-gray-900">${(item.price * quantity).toFixed(2)}</span>
             </div>
 
             <button
@@ -111,7 +102,7 @@ const OrderModal: React.FC<OrderModalProps> = ({
                 onAddToCart(item, quantity, specialNote);
                 onClose();
               }}
-              className="w-full mt-4 py-2 bg-blue-600 text-white font-semibold rounded-lg text-base hover:bg-blue-500 transition"
+              className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg text-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-300"
             >
               Add to Cart
             </button>

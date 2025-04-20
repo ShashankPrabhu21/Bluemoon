@@ -122,94 +122,98 @@ const OnlineOrderPage = () => {
 
   return (
     <div className="min-h-screen bg-white p-6 mt-32">
-
-  <div className="relative mb-10 px-4 sm:px-8">
-  {/* Cart Button */}
-  <div className="flex justify-center lg:justify-end lg:absolute lg:top-0 lg:right-0 w-full">
-    <Link
-      href="/cart"
-      className="mb-4 lg:mb-0 flex items-center space-x-2 bg-blue-600 text-white px-4 sm:px-5 py-3 sm:py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
-    >
-      <FiShoppingCart size={22} className="sm:size-[26px]" />
-      <span className="text-base sm:text-lg font-semibold">Cart ({cart.length})</span>
-    </Link>
-  </div>
-
-  {/* Heading */}
-  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-wide bg-gradient-to-r from-black to-gray-700 text-transparent bg-clip-text drop-shadow-lg text-center">
-    Online Order
-  </h1>
-</div>
-
-
-
-
-      {/* Service Type Selection */}
-      <div className="flex justify-center items-center mb-6">
-          <span className="mr-4 text-xl font-semibold text-gray-900">Select Service Type:</span>
-          <div className="flex bg-gray-200 p-1 rounded-full shadow-lg border border-gray-300">
-            <button
-              onClick={() => setServiceType("pickup")}
-              className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out 
-                ${serviceType === "pickup"
-                  ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
-                  : "bg-transparent text-gray-700 hover:text-blue-500"
-                }`}
-            >
-              Pickup
-            </button>
-            <button
-              onClick={() => setServiceType("delivery")}
-              className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out 
-                ${serviceType === "delivery"
-                  ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
-                  : "bg-transparent text-gray-700 hover:text-blue-500"
-                }`}
-            >
-              Delivery
-            </button>
-          </div>
+        <div className="relative mb-10 px-4 sm:px-8">
+        {/* Cart Button */}
+        <div className="flex justify-center lg:justify-end lg:absolute lg:top-0 lg:right-0 w-full z-50">
+          <Link
+            href="/cart"
+            className="mb-4 lg:mb-0 flex items-center space-x-2 bg-blue-600 text-white px-4 sm:px-5 py-3 sm:py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
+          >
+            <FiShoppingCart size={22} className="sm:size-[26px]" />
+            <span className="text-base sm:text-lg font-semibold">Cart ({cart.length})</span>
+          </Link>
         </div>
 
+        {/* Heading */}
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-wide bg-gradient-to-r from-black to-gray-700 text-transparent bg-clip-text drop-shadow-lg text-center">
+          Online Order
+        </h1>
+      </div>
 
-      {categories.map((category) => {
-        const filteredItems = foodItems.filter((item) => categoryMapping[item.category_id] === category);
-        return (
-          <div key={category} className="mb-10">
-            <h2 className="mb-6 text-3xl font-bold text-center text-gray-900 py-3 relative uppercase tracking-wide">
-              {category}
-              <span className="absolute left-1/2 bottom-0 w-16 h-1 bg-gradient-to-r from-[#3345A7] to-blue-400 transform -translate-x-1/2"></span>
-            </h2>
+      {/* Service Type Selection */}
+      <div className="flex flex-col sm:flex-row justify-center items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-6 text-center">
+        <span className="text-lg sm:text-xl font-semibold text-gray-900">
+          Select Service Type:
+        </span>
+        
+        <div className="flex bg-gray-200 p-1 rounded-full shadow-lg border border-gray-300">
+          <button
+            onClick={() => setServiceType("pickup")}
+            className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 ease-in-out
+              ${serviceType === "pickup"
+                ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
+                : "bg-transparent text-gray-700 hover:text-blue-500"
+              }`}
+          >
+            Pickup
+          </button>
+          
+          <button
+            onClick={() => setServiceType("delivery")}
+            className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 ease-in-out
+              ${serviceType === "delivery"
+                ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
+                : "bg-transparent text-gray-700 hover:text-blue-500"
+              }`}
+          >
+            Delivery
+          </button>
+        </div>
+      </div>
 
-            {filteredItems.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                  {filteredItems.map((item) => (
-                    <div key={item.item_id} className="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200 w-full max-w-xs mx-auto transform transition duration-200 hover:scale-105">
-                      <img
-                        src={item.image_url || "/placeholder.jpg"}
-                        alt={item.name}
-                        className="w-full h-36 object-cover"
-                      />
-                      <div className="p-3 text-center">
-                        <h3 className="text-sm font-semibold text-gray-900 mb-1">{item.name}</h3>
-                        <p className="text-xs text-gray-500 mb-2 line-clamp-2">{item.description}</p>
-                        <div className="flex justify-between items-center text-sm font-semibold text-gray-700 bg-gray-100 p-1 rounded-md">
-                          <span className="text-blue-600">${item.price}</span>
-                          <span className="text-gray-500">Item: {item.quantity}</span>
-                        </div>
-                        <button
-                          onClick={() => setSelectedItem(item)}
-                          className="w-full mt-2 py-2 text-white font-semibold rounded-lg bg-blue-500 hover:bg-blue-600 transition"
-                        >
-                          Order Now
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-gray-500">No items found</p>
-              )}
+    {categories.map((category) => {
+      const filteredItems = foodItems.filter((item) => categoryMapping[item.category_id] === category);
+      return (
+      <div key={category} className="mb-10">
+        <h2 className="mb-6 text-3xl font-bold text-center text-gray-900 py-3 relative uppercase tracking-wide">
+          {category}
+          <span className="absolute left-1/2 bottom-0 w-16 h-1 bg-gradient-to-r from-[#3345A7] to-blue-400 transform -translate-x-1/2"></span>
+        </h2>
+
+      {filteredItems.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
+          {filteredItems.map((item) => (
+          <div
+          key={item.item_id}
+          className="group bg-blue-50 shadow-sm hover:shadow-md border border-blue-100 rounded-xl overflow-hidden transition duration-300 hover:bg-blue-100 text-sm sm:text-base"
+        >
+              <img
+                  src={item.image_url || "/placeholder.jpg"}
+                  alt={item.name}
+                  className="w-full h-32 sm:h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-110"
+              />
+
+        <div className="p-2 sm:p-3 text-center rounded-b-xl">
+        <h3 className="text-sm sm:text-lg font-semibold text-gray-800 tracking-wide truncate">{item.name}</h3>
+        <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2">{item.description}</p>
+        <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-gray-700 bg-gray-100 p-2 rounded-md mb-2 sm:mb-4">
+            <span className="text-blue-600 font-semibold">${item.price}</span>
+            <span className="text-gray-500">Item No: {item.quantity}</span>
+        </div>
+
+          <button
+            onClick={() => setSelectedItem(item)}
+            className="w-full py-2 sm:py-2.5 text-white font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 transition duration-200 shadow-md hover:shadow-lg active:scale-95"
+            >
+            Order Now
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+) : (
+  <p className="text-center text-gray-500">No items found</p>
+)}
           </div>
         );
       })}
