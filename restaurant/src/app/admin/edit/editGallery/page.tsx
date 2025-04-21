@@ -141,11 +141,11 @@ const UploadGalleryImages = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen mt-24">
+    <div className="flex flex-col md:flex-row min-h-screen mt-24 bg-gradient-to-br from-gray-800 to-black">
       <EditUserSidebar />
       <div className="flex-1 flex flex-col items-center mt-12"> {/* Changed to flex-col and items-center */}
-        <div className="bg-white rounded-3xl shadow-lg p-6 mb-8 max-w-xl w-full"> {/* Adjusted max-w */}
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-center text-blue-800 drop-shadow-sm mb-10">
+        <div className="backdrop-blur-md bg-[#2c2f45]/70 border border-gray-600 rounded-3xl shadow-lg p-6 mb-8 max-w-xl w-full"> {/* Adjusted max-w */}
+          <h1 className="text-4xl sm:text-4xl font-bold text-center text-blue-700 drop-shadow-sm mb-10">
             <span role="img" aria-label="camera">📸</span> Upload Gallery Image
           </h1>
           <div className="flex justify-center">
@@ -214,7 +214,7 @@ const UploadGalleryImages = () => {
               ) : (
                 <>
                   <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-800">
+                    <label className="block mb-2 text-sm font-medium text-blue-400">
                       Select Image
                     </label>
                     <input
@@ -239,7 +239,7 @@ const UploadGalleryImages = () => {
                   )}
 
                   <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-800">
+                    <label className="block mb-2 text-sm font-medium text-blue-400">
                       Category
                     </label>
                     <select
@@ -257,7 +257,7 @@ const UploadGalleryImages = () => {
                   </div>
 
                   <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-800">
+                    <label className="block mb-2 text-sm font-medium text-blue-400">
                       Title
                     </label>
                     <input
@@ -270,7 +270,7 @@ const UploadGalleryImages = () => {
                   </div>
 
                   <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-800">
+                    <label className="block mb-2 text-sm font-medium text-blue-400">
                       Alt Text
                     </label>
                     <input
@@ -285,7 +285,7 @@ const UploadGalleryImages = () => {
                   <button
                     onClick={handleUpload}
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-blue-500 hover:to-purple-500 px-6 py-3 rounded-xl text-white font-bold tracking-wide shadow-lg transition-all"
+                    className="w-full  bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-xl text-white font-bold tracking-wide shadow-lg transition-all"
                   >
                     {loading ? "Uploading..." : "Upload"}
                   </button>
@@ -303,7 +303,7 @@ const UploadGalleryImages = () => {
 
         {/* Uploaded Images */}
         <div className="mt-12 w-full max-w-4xl"> {/* Added w-full and max-w-4xl */}
-          <h3 className="text-2xl font-semibold mb-6 text-center">
+          <h3 className="text-3xl font-semibold mb-6 text-center text-blue-700">
             📂 Uploaded Images
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

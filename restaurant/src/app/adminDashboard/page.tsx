@@ -103,8 +103,8 @@ export default function AdminDashboard() {
               <button className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/edit/editBlog")}>
                 🍳 BLOGS
               </button>
-              <button className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🍽️ COOKING VIDEOS
+              <button className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/edit/editCookingVideo")}>
+                🍽️ COOKING VIDEO
               </button>
               <button className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => router.push("/admin/edit/editGallery")}>
                 🖼️ GALLERY

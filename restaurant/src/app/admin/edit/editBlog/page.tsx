@@ -181,174 +181,174 @@ export default function EditBlog() {
 
   return (
     
-    <div className="flex flex-col md:flex-row min-h-screen mt-24">   
-    <EditUserSidebar />  
-    {/* Blog Content */}
-    <div className="flex-grow p-6 sm:p-12">
-    
-      <div className="max-w-3xl mx-auto backdrop-blur-xl bg-white/80 border border-gray-200 rounded-3xl shadow-xl p-10 space-y-8">
-        <h1 className="text-4xl font-extrabold text-center text-blue-800 drop-shadow-sm">
-          {isEditing ? "✏️ Edit Blog" : "✍️ Create a New Blog"}
-        </h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-black flex md:flex-row flex-col mt-24">
+     
+        <EditUserSidebar />
+  
+      {/* Blog Content */}
+      <div className="flex-grow p-6 sm:p-12">
+      <div className="max-w-3xl mx-auto backdrop-blur-md bg-[#2c2f45]/70 border border-gray-600 rounded-3xl shadow-xl p-10 space-y-8 text-white">
+      <h1 className="text-4xl font-extrabold text-center text-blue-700 drop-shadow-sm">
+            {isEditing ? "✏️ Edit Blog" : "✍️ Create a New Blog"}
+          </h1>
 
-        <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
-          {/* Category */}
-          <div>
-            <label className="block text-md font-semibold text-gray-700">
-              📂 Category
-            </label>
-            <input
-              type="text"
-              value={blogData.category}
-              onChange={(e) => handleInputChange(e, "category")}
-              placeholder="e.g. Travel, Food, Technology"
-              className="mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-              required
-            />
-          </div>
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 ">
+            {/* Category */}
+            <div>
+              <label className="block text-md font-semibold text-blue-400">
+                📂 Category
+              </label>
+              <input
+                type="text"
+                value={blogData.category}
+                onChange={(e) => handleInputChange(e, "category")}
+                placeholder="e.g. Travel, Food, Technology"
+                className="mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                required
+              />
+            </div>
 
-          {/* Title */}
-          <div>
-            <label className="block text-md font-semibold text-gray-700">
-              📝 Title
-            </label>
-            <input
-              type="text"
-              value={blogData.title}
-              onChange={(e) => handleInputChange(e, "title")}
-              placeholder="Enter the main title"
-              className="mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus
-                ::contentReference[oaicite:8]{index=8}  focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-              required
-            />
-          </div>
+            {/* Title */}
+            <div>
+              <label className="block text-md font-semibold text-blue-400">
+                📝 Title
+              </label>
+              <input
+                type="text"
+                value={blogData.title}
+                onChange={(e) => handleInputChange(e, "title")}
+                placeholder="Enter the main title"
+                className="mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                required
+              />
+            </div>
 
-          {/* Subtitle */}
-          <div>
-            <label className="block text-md font-semibold text-gray-700">
-              📑 Subtitle
-            </label>
-            <input
-              type="text"
-              value={blogData.subtitle}
-              onChange={(e) => handleInputChange(e, "subtitle")}
-              placeholder="Enter a short subtitle"
-              className="mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-              required
-            />
-          </div>
+            {/* Subtitle */}
+            <div>
+              <label className="block text-md font-semibold text-blue-400">
+                📑 Subtitle
+              </label>
+              <input
+                type="text"
+                value={blogData.subtitle}
+                onChange={(e) => handleInputChange(e, "subtitle")}
+                placeholder="Enter a short subtitle"
+                className="mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                required
+              />
+            </div>
 
-          {/* Image Upload */}
-          <div>
-            <label className="block text-md font-semibold text-gray-700">
-              🖼️ Upload Image
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
-          </div>
+            {/* Image Upload */}
+            <div>
+              <label className="block text-md font-semibold text-blue-400">
+                🖼️ Upload Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
 
-          {/* Blog Content Sections */}
-          <div className="space-y-4">
-            <h3 className="text-md font-semibold text-gray-700">📃 Blog Content</h3>
-            {blogData.content.map((section, index) => (
-              <div key={index} className="p-4 bg-gray-50 rounded-xl space-y-2">
-                <input
-                  type="text"
-                  placeholder="Section Heading"
-                  value={section.heading}
-                  onChange={(e) =>
-                    handleSectionChange(e, index, "heading")
-                  }
-                  className="w-full border border-gray-300 rounded-xl px-4 py-2"
-                  required
-                />
-                <textarea
-                  placeholder="Section Text"
-                  value={section.text}
-                  onChange={(e) =>
-                    handleSectionChange(e, index, "text")
-                  }
-                  className="w-full border border-gray-300 rounded-xl px-4 py-2"
-                  rows={4}
-                  required
-                ></textarea>
-                {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => removeSection(index)}
-                    className="text-red-600 hover:underline text-sm"
-                  >
-                    Remove Section
-                  </button>
-                )}
-              </div>
-            ))}
+            {/* Blog Content Sections */}
+            <div className="space-y-4">
+              <h3 className="text-md font-semibold text-blue-400">📃 Blog Content</h3>
+              {blogData.content.map((section, index) => (
+                <div key={index} className="p-4 bg-gray-50 rounded-xl space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Section Heading"
+                    value={section.heading}
+                    onChange={(e) =>
+                      handleSectionChange(e, index, "heading")
+                    }
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2"
+                    required
+                  />
+                  <textarea
+                    placeholder="Section Text"
+                    value={section.text}
+                    onChange={(e) =>
+                      handleSectionChange(e, index, "text")
+                    }
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2"
+                    rows={4}
+                    required
+                  ></textarea>
+                  {index > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSection(index)}
+                      className="text-red-600 hover:underline text-sm"
+                    >
+                      Remove Section
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addSection}
+                className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium"
+              >
+                ➕ Add Section
+              </button>
+            </div>
+
+            {/* Submit Button */}
             <button
-              type="button"
-              onClick={addSection}
-              className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium"
+              type="submit"
+              className="bg-blue-700 text-white w-full py-3 rounded-2xl font-semibold hover:bg-blue-800 transition"
             >
-              ➕ Add Section
+              {isEditing ? "Update Blog" : "Publish Blog"}
             </button>
-          </div>
+          </form>
+        </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="bg-blue-700 text-white w-full py-3 rounded-2xl font-semibold hover:bg-blue-800 transition"
-          >
-            {isEditing ? "Update Blog" : "Publish Blog"}
-          </button>
-        </form>
-      </div>
+        {/* Published Blogs Section */}
+        <div className="max-w-5xl mx-auto mt-12 ">
+          <h2 className="text-3xl font-bold mb-6 text-blue-700 text-center">📚 Published Blogs</h2>
+          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+            {publishedBlogs.map((blog) => (
+              <div
+                key={blog.id}
+                className="bg-white border border-gray-200 rounded-2xl shadow-md overflow-hidden"
+              >
+                {/* Show thumbnail if available */}
+                {blog.image && typeof blog.image === "string" && (
+                  <img
+                    src={`data:image/*;base64,${blog.image}`}
+                    alt="Blog"
+                    className="rounded-xl w-full h-48 object-cover mb-4"
+                  />
+                )}
+                <div className="p-4 space-y-1">
+                  <p className="text-sm text-blue-600">{blog.category}</p>
+                  <h3 className="font-semibold text-lg">{blog.title}</h3>
+                  <p className="text-gray-500 text-sm line-clamp-2">
+                    {blog.subtitle}
+                  </p>
 
-      {/* Published Blogs Section */}
-      <div className="max-w-5xl mx-auto mt-12 ">
-        <h2 className="text-3xl font-bold mb-6 text-blue-900">📚 Published Blogs</h2>
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-          {publishedBlogs.map((blog) => (
-            <div
-              key={blog.id}
-              className="bg-white border border-gray-200 rounded-2xl shadow-md overflow-hidden"
-            >
-              {/* Show thumbnail if available */}
-              {blog.image && typeof blog.image === "string" && (
-                 <img
-                 src={`data:image/*;base64,${blog.image}`}
-                 alt="Blog"
-                 className="rounded-xl w-full h-48 object-cover mb-4"
-               />
-              )}
-              <div className="p-4 space-y-1">
-                <p className="text-sm text-blue-600">{blog.category}</p>
-                <h3 className="font-semibold text-lg">{blog.title}</h3>
-                <p className="text-gray-500 text-sm line-clamp-2">
-                  {blog.subtitle}
-                </p>
-
-                <div className="flex gap-2 mt-3">
-                  <button
-                    onClick={() => handleEdit(blog)}
-                    className="px-3 py-1 rounded-lg text-sm bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(blog.id!)}
-                    className="px-3 py-1 rounded-lg text-sm bg-red-100 text-red-700 hover:bg-red-200"
-                  >
-                    🗑️ Delete
-                  </button>
+                  <div className="flex gap-2 mt-3">
+                    <button
+                      onClick={() => handleEdit(blog)}
+                      className="px-3 py-1 rounded-lg text-sm bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(blog.id!)}
+                      className="px-3 py-1 rounded-lg text-sm bg-red-100 text-red-700 hover:bg-red-200"
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
