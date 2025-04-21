@@ -203,7 +203,7 @@ export default function EditBlog() {
                 value={blogData.category}
                 onChange={(e) => handleInputChange(e, "category")}
                 placeholder="e.g. Travel, Food, Technology"
-                className="mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                className="mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition text-black"
                 required
               />
             </div>
@@ -218,7 +218,7 @@ export default function EditBlog() {
                 value={blogData.title}
                 onChange={(e) => handleInputChange(e, "title")}
                 placeholder="Enter the main title"
-                className="mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                className="text-black mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                 required
               />
             </div>
@@ -233,7 +233,7 @@ export default function EditBlog() {
                 value={blogData.subtitle}
                 onChange={(e) => handleInputChange(e, "subtitle")}
                 placeholder="Enter a short subtitle"
-                className="mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                className="text-black mt-2 block w-full border border-gray-300 rounded-2xl shadow-inner px-5 py-3 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                 required
               />
             </div>
@@ -247,7 +247,7 @@ export default function EditBlog() {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                className="text-black mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               />
             </div>
 
@@ -263,7 +263,7 @@ export default function EditBlog() {
                     onChange={(e) =>
                       handleSectionChange(e, index, "heading")
                     }
-                    className="w-full border border-gray-300 rounded-xl px-4 py-2"
+                    className="text-black w-full border border-gray-300 rounded-xl px-4 py-2"
                     required
                   />
                   <textarea
@@ -272,7 +272,7 @@ export default function EditBlog() {
                     onChange={(e) =>
                       handleSectionChange(e, index, "text")
                     }
-                    className="w-full border border-gray-300 rounded-xl px-4 py-2"
+                    className="text-black w-full border border-gray-300 rounded-xl px-4 py-2"
                     rows={4}
                     required
                   ></textarea>
