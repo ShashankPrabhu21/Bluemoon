@@ -113,7 +113,7 @@ export default function CookingVideosPage() {
         )}
 
         {/* 🧱 Video Grid */}
-        <div className="max-w-5xl w-full mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="max-w-5xl w-full mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-2">
           {filteredVideos.map((video, index) => (
             <div
               key={index}
