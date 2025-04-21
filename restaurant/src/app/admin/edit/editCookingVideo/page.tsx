@@ -120,9 +120,14 @@ export default function CookingVideoEdit() {
       setVideoFile(null);
       setVideoUrl(finalVideoUrl); // <---- UPDATE THIS LINE
       setEditingVideoId(null); // Reset editing mode
-    } catch (err: any) {
-      setUploadStatus("❌ Failed: " + err.message);
-    }
+    } catch (err: unknown) {
+        // Type guard to check if error is an instance of Error
+        if (err instanceof Error) {
+          setUploadStatus("❌ Failed: " + err.message);
+        } else {
+          setUploadStatus("❌ Failed: An unknown error occurred.");
+        }
+      }
   };
   
   const handleDelete = async (id: number) => {
