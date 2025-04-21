@@ -142,9 +142,14 @@ export default function CookingVideoEdit() {
   
       // Refresh video list
       setVideoUrl(prev => prev + "?refresh=" + Date.now());
-    } catch (err: any) {
-      alert("Failed to delete video: " + err.message);
-    }
+    } catch (err: unknown) {
+        // Type guard to check if error is an instance of Error
+        if (err instanceof Error) {
+          alert("Failed to delete video: " + err.message);
+        } else {
+          alert("Failed to delete video: An unknown error occurred.");
+        }
+      }
   };
 
   const [editingVideoId, setEditingVideoId] = useState<number | null>(null);
@@ -162,6 +167,7 @@ export default function CookingVideoEdit() {
     // Scroll to top of the page smoothly
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   const handleUpdateVideo = async () => {
     if (!editingVideoId) return;
   
@@ -185,9 +191,15 @@ export default function CookingVideoEdit() {
       setVideoFile(null);
       setVideoUrl(""); // reset preview
       setVideoUrl(prev => prev + "?refresh=" + Date.now()); // refresh list
-    } catch (err: any) {
+    } catch (err: unknown) {
+    // Type guard to check if error is an instance of Error
+    if (err instanceof Error) {
       console.error(err);
       setUploadStatus(`❌ Update failed: ${err.message}`);
+    } else {
+      console.error(err);
+      setUploadStatus("❌ Update failed: An unknown error occurred.");
+    }
     }
   };
     
