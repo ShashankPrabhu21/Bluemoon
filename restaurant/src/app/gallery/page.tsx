@@ -12,51 +12,52 @@ const categories = [
   { id: "drinks", name: "Drinks" },
 ];
 
-interface GalleryImage {
+interface GalleryItem {
   id: number;
-  src: string;
-  alt: string;
+  type: "image" | "video" | "youtube";
+  src: string; // For image base64, video base64, or YouTube URL
+  alt?: string; // For images
   category: string;
   title: string;
 }
 
 const Gallery = () => {
-  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentImage, setCurrentImage] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    const fetchImages = async () => {
+    const fetchGalleryItems = async () => {
       try {
         const res = await fetch("/api/gallery/get");
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
         const data = await res.json();
-        if (data && data.images) {
-          setGalleryImages(data.images);
+        if (data && data.items) { // Use 'items' to match your backend response
+          setGalleryItems(data.items);
         } else {
-          setGalleryImages([]);
+          setGalleryItems([]);
         }
       } catch (error) {
-        console.error("Failed to load gallery images", error);
-        setGalleryImages([]);
+        console.error("Failed to load gallery items", error);
+        setGalleryItems([]);
       }
     };
-    fetchImages();
+    fetchGalleryItems();
   }, []);
 
-  const filteredImages =
+  const filteredItems =
     activeCategory === "all"
-      ? galleryImages
-      : galleryImages.filter((img) => img.category === activeCategory);
+      ? galleryItems
+      : galleryItems.filter((item) => item.category === activeCategory);
 
   const openLightbox = (index: number) => {
-    const globalIndex = galleryImages.findIndex(
-      (img) => img.src === filteredImages[index].src
+    const globalIndex = galleryItems.findIndex(
+      (item) => item.src === filteredItems[index].src && item.type === filteredItems[index].type
     );
-    setCurrentImage(globalIndex);
+    setCurrentImageIndex(globalIndex);
     setLightboxOpen(true);
     document.body.style.overflow = "hidden";
   };
@@ -67,11 +68,11 @@ const Gallery = () => {
   };
 
   const goToPrevious = () =>
-    setCurrentImage((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+    setCurrentImageIndex((prev) => (prev === 0 ? galleryItems.length - 1 : prev - 1));
 
   const goToNext = () =>
-    setCurrentImage((prev) =>
-      prev === galleryImages.length - 1 ? 0 : prev + 1
+    setCurrentImageIndex((prev) =>
+      prev === galleryItems.length - 1 ? 0 : prev + 1
     );
 
   useEffect(() => {
@@ -85,16 +86,15 @@ const Gallery = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [lightboxOpen]);
 
-  // Function to group images into rows of 4
-  const groupImagesIntoRows = (images: GalleryImage[]) => {
+  const groupItemsIntoRows = (items: GalleryItem[]) => {
     const rows = [];
-    for (let i = 0; i < images.length; i += 4) {
-      rows.push(images.slice(i, i + 4));
+    for (let i = 0; i < items.length; i += 4) {
+      rows.push(items.slice(i, i + 4));
     }
     return rows;
   };
 
-  const imageRows = groupImagesIntoRows(filteredImages);
+  const itemRows = groupItemsIntoRows(filteredItems);
 
   return (
     <main className="relative w-full text-white">
@@ -145,9 +145,9 @@ const Gallery = () => {
         ></div>
       )}
 
-      {/* Image Grid */}
+      {/* Item Grid */}
       <div className="w-full">
-        {imageRows.map((row, rowIndex) => (
+        {itemRows.map((row, rowIndex) => (
           <React.Fragment key={rowIndex}>
             <div
               className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-cover bg-center"
@@ -158,30 +158,49 @@ const Gallery = () => {
                     : "linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url('/sec4.jpg')",
               }}
             >
-              {row.map((image, index) => (
+              {row.map((item, index) => (
                 <div
-                  key={image.id}
+                  key={item.id}
                   className="relative group cursor-pointer"
                   onClick={() => openLightbox(rowIndex * 4 + index)}
                 >
-                  <div className="w-full h-[300px] relative">
-                    <Image
-                      src={`data:image/*;base64,${image.src}`}
-                      alt={image.alt}
-                      fill
-                      className="rounded-lg shadow-md transition-opacity group-hover:opacity-80 object-cover"
-                    />
+                  <div className="w-full h-[300px] relative overflow-hidden rounded-lg shadow-md transition-opacity group-hover:opacity-80">
+                    {item.type === "image" && (
+                      <Image
+                        src={`data:image/*;base64,${item.src}`}
+                        alt={item.alt || item.title}
+                        fill
+                        className="object-cover"
+                      />
+                    )}
+                    {item.type === "video" && (
+  <div className="w-full h-[300px] relative overflow-hidden rounded-lg shadow-md transition-opacity group-hover:opacity-80">
+    <video
+      src={`data:video/mp4;base64,${item.src}`} // Try a specific MIME type
+      controls
+      className="object-cover w-full h-full"
+    />
+  </div>
+)}
+                    {item.type === "youtube" && (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${new URL(item.src).searchParams.get("v")}`}
+                        title={item.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        className="w-full h-full"
+                      ></iframe>
+                    )}
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-center text-white p-2 opacity-0 group-hover:opacity-100 transition-all">
-                    {image.title}
+                    {item.title}
                   </div>
                 </div>
               ))}
             </div>
-            {/* Add the fixed background between each row with reduced height */}
-            {rowIndex < imageRows.length - 1 && (
+            {rowIndex < itemRows.length - 1 && (
               <div
-                className="w-full h-[200px] bg-cover bg-center" // reduced height to 200px
+                className="w-full h-[200px] bg-cover bg-center"
                 style={{
                   backgroundImage:
                     "linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url('/sec2.jpg')",
@@ -191,10 +210,9 @@ const Gallery = () => {
             )}
           </React.Fragment>
         ))}
-        {/* Removed the extra h-40 div */}
       </div>
 
-      {lightboxOpen && galleryImages[currentImage] && (
+      {lightboxOpen && galleryItems[currentImageIndex] && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
           <button
             className="absolute top-5 right-5 text-white"
@@ -205,13 +223,34 @@ const Gallery = () => {
           <button className="absolute left-5 text-white" onClick={goToPrevious}>
             <ChevronLeft size={48} />
           </button>
-          <Image
-            src={`data:image/*;base64,${galleryImages[currentImage].src}`}
-            alt={galleryImages[currentImage].alt}
-            width={800}
-            height={600}
-            className="rounded-lg shadow-lg object-contain max-h-[600px]"
-          />
+          <div className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-lg bg-black flex items-center justify-center">
+            {galleryItems[currentImageIndex].type === "image" && (
+              <Image
+                src={`data:image/*;base64,${galleryItems[currentImageIndex].src}`}
+                alt={galleryItems[currentImageIndex].alt || galleryItems[currentImageIndex].title}
+                width={1200} // Adjust as needed
+                height={800} // Adjust as needed
+                className="object-contain"
+                priority // Add priority for the initially visible image
+              />
+            )}
+            {galleryItems[currentImageIndex].type === "video" && (
+              <video
+                src={`data:video/*;base64,${galleryItems[currentImageIndex].src}`}
+                controls
+                className="object-contain w-full h-full"
+              />
+            )}
+            {galleryItems[currentImageIndex].type === "youtube" && (
+              <iframe
+                src={`https://www.youtube.com/embed/${new URL(galleryItems[currentImageIndex].src).searchParams.get("v")}?autoplay=1&mute=1`}
+                title={galleryItems[currentImageIndex].title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="w-full h-full"
+              ></iframe>
+            )}
+          </div>
           <button className="absolute right-5 text-white" onClick={goToNext}>
             <ChevronRight size={48} />
           </button>

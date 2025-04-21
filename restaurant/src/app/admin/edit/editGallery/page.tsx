@@ -9,44 +9,55 @@ const categories = [
   { id: "dishes", name: "Signature Dishes" },
   { id: "events", name: "Events" },
   { id: "drinks", name: "Drinks" },
+  { id: "videos", name: "Videos" }, // Added Videos category
 ];
 
-interface GalleryImage {
+interface GalleryItem {
   id: number;
-  src: string;
-  alt: string;
+  type: "image" | "video" | "youtube";
+  src: string; // For image file path or YouTube URL
+  alt?: string; // For images
   category: string;
   title: string;
 }
 
 const UploadGalleryImages = () => {
+  const [mediaType, setMediaType] = useState<"image" | "video" | "youtube">("image");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [alt, setAlt] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
-  const [uploadedImages, setUploadedImages] = useState<GalleryImage[]>([]);
-  const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
+  const [uploadedItems, setUploadedItems] = useState<GalleryItem[]>([]);
+  const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
 
   useEffect(() => {
-    const fetchUploadedImages = async () => {
+    const fetchUploadedItems = async () => {
       try {
-        const res = await fetch("/api/gallery/get");
+        const res = await fetch("/api/gallery/get"); // Assuming this endpoint will now return all types
         if (!res.ok) {
-          throw new Error("Failed to fetch uploaded images");
+          throw new Error("Failed to fetch uploaded items");
         }
         const data = await res.json();
-        setUploadedImages(data.images);
+        setUploadedItems(data.items); // Assuming the response is { items: [...] }
       } catch (err) {
-        console.error("Error fetching uploaded images:", err);
+        console.error("Error fetching uploaded items:", err);
       }
     };
-    fetchUploadedImages();
+    fetchUploadedItems();
   }, [successMsg]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMediaTypeChange = (type: "image" | "video" | "youtube") => {
+    setMediaType(type);
+    setFile(null);
+    setPreview(null);
+    setYoutubeUrl("");
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (selected) {
       setFile(selected);
@@ -55,16 +66,33 @@ const UploadGalleryImages = () => {
   };
 
   const handleUpload = async () => {
-    if (!file || !category || !title || !alt) {
-      alert("Please fill all fields and select an image.");
+    if (!category || !title) {
+      alert("Please fill category and title.");
       return;
     }
 
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("type", mediaType); // <--- Add this line
     formData.append("category", category);
     formData.append("title", title);
-    formData.append("alt", alt);
+
+    if (mediaType === "image" && file && alt) {
+      formData.append("image", file);
+      formData.append("alt", alt);
+    } else if (mediaType === "video" && file) {
+      formData.append("video", file);
+    } else if (mediaType === "youtube" && youtubeUrl) {
+      formData.append("url", youtubeUrl);
+    } else if (mediaType === "image" && !file) {
+      alert("Please select an image.");
+      return;
+    } else if (mediaType === "video" && !file) {
+      alert("Please select a video file.");
+      return;
+    } else if (mediaType === "youtube" && !youtubeUrl) {
+      alert("Please provide a YouTube URL.");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -79,15 +107,16 @@ const UploadGalleryImages = () => {
         throw new Error(resData.error || "Upload failed");
       }
 
-      setSuccessMsg("Image uploaded successfully!");
+      setSuccessMsg("Item uploaded successfully!");
       setFile(null);
       setPreview(null);
+      setYoutubeUrl("");
       setCategory("");
       setTitle("");
       setAlt("");
     } catch (err) {
       if (err instanceof Error) {
-        alert(`Error uploading image: ${err.message}`);
+        alert(`Error uploading item: ${err.message}`);
       } else {
         alert("An unknown error occurred during upload.");
       }
@@ -99,61 +128,77 @@ const UploadGalleryImages = () => {
   const handleDelete = async (id: number) => {
     try {
       await fetch(`/api/gallery/${id}`, { method: "DELETE" });
-      setUploadedImages((prev) => prev.filter((img) => img.id !== id));
-      alert("Image deleted successfully!");
+      setUploadedItems((prev) => prev.filter((item) => item.id !== id));
+      alert("Item deleted successfully!");
     } catch (err) {
-      console.error("Error deleting image:", err);
-      alert("Error deleting image.");
+      console.error("Error deleting item:", err);
+      alert("Error deleting item.");
     }
   };
 
-  const handleEdit = (image: GalleryImage) => {
-    setEditingImage(image);
-    setCategory(image.category);
-    setTitle(image.title);
-    setAlt(image.alt);
+  const handleEdit = (item: GalleryItem) => {
+    setEditingItem(item);
+    setMediaType(item.type);
+    setCategory(item.category);
+    setTitle(item.title);
+    setAlt(item.alt || "");
+    setYoutubeUrl(item.type === "youtube" ? item.src : "");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleUpdate = async () => {
-    if (!editingImage) return;
+    if (!editingItem) return;
+
+    const updateData: { category: string; title: string; alt?: string; src?: string; type: "image" | "video" | "youtube" } = {
+      category,
+      title,
+      type: editingItem.type,
+    };
+
+    if (editingItem.type === "image") {
+      updateData.alt = alt;
+    } else if (editingItem.type === "youtube") {
+      updateData.src = youtubeUrl;
+    }
 
     try {
-      await fetch(`/api/gallery/${editingImage.id}`, {
+      await fetch(`/api/gallery/${editingItem.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, title, alt }),
+        body: JSON.stringify(updateData),
       });
-      setUploadedImages((prev) =>
-        prev.map((img) =>
-          img.id === editingImage.id ? { ...img, category, title, alt } : img
+      setUploadedItems((prev) =>
+        prev.map((item) =>
+          item.id === editingItem.id ? { ...item, category, title, alt, src: editingItem.type === "youtube" ? youtubeUrl : item.src } : item
         )
       );
-      setEditingImage(null);
+      setEditingItem(null);
+      setMediaType("image");
       setCategory("");
       setTitle("");
       setAlt("");
-      alert("Image updated successfully!");
+      setYoutubeUrl("");
+      alert("Item updated successfully!");
     } catch (err) {
-      console.error("Error updating image:", err);
-      alert("Error updating image.");
+      console.error("Error updating item:", err);
+      alert("Error updating item.");
     }
   };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen mt-24 bg-gradient-to-br from-gray-800 to-black">
       <EditUserSidebar />
-      <div className="flex-1 flex flex-col items-center mt-12"> {/* Changed to flex-col and items-center */}
-        <div className="backdrop-blur-md bg-[#2c2f45]/70 border border-gray-600 rounded-3xl shadow-lg p-6 mb-8 max-w-xl w-full"> {/* Adjusted max-w */}
+      <div className="flex-1 flex flex-col items-center mt-12">
+        <div className="backdrop-blur-md bg-[#2c2f45]/70 border border-gray-600 rounded-3xl shadow-lg p-6 mb-8 max-w-xl w-full">
           <h1 className="text-4xl sm:text-4xl font-bold text-center text-blue-700 drop-shadow-sm mb-10">
-            <span role="img" aria-label="camera">📸</span> Upload Gallery Image
+            <span role="img" aria-label="camera">📸</span> Upload Gallery Item
           </h1>
           <div className="flex justify-center">
             <div className="space-y-6 w-full">
-              {editingImage ? (
+              {editingItem ? (
                 <>
                   <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-800">
+                    <label className="block mb-2 text-sm font-medium text-blue-400">
                       Category
                     </label>
                     <select
@@ -171,7 +216,7 @@ const UploadGalleryImages = () => {
                   </div>
 
                   <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-800">
+                    <label className="block mb-2 text-sm font-medium text-blue-400">
                       Title
                     </label>
                     <input
@@ -179,32 +224,49 @@ const UploadGalleryImages = () => {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g. Cozy Dining Area"
+                      placeholder="e.g. Cozy Dining Area or Event Highlight"
                     />
                   </div>
 
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-800">
-                      Alt Text
-                    </label>
-                    <input
-                      type="text"
-                      value={alt}
-                      onChange={(e) => setAlt(e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g. Restaurant interior view"
-                    />
-                  </div>
+                  {editingItem.type === "image" && (
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-blue-400">
+                        Alt Text
+                      </label>
+                      <input
+                        type="text"
+                        value={alt}
+                        onChange={(e) => setAlt(e.target.value)}
+                        className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. Restaurant interior view"
+                      />
+                    </div>
+                  )}
+
+                  {editingItem.type === "youtube" && (
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-gray-800">
+                        YouTube URL
+                      </label>
+                      <input
+                        type="url"
+                        value={youtubeUrl}
+                        onChange={(e) => setYoutubeUrl(e.target.value)}
+                        className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. https://www.youtube.com/watch?v=XXXXXXXXXXX"
+                      />
+                    </div>
+                  )}
 
                   <div className="flex justify-between gap-4">
                     <button
                       onClick={handleUpdate}
                       className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-indigo-500 hover:to-blue-500 px-6 py-2 rounded-xl text-white font-semibold transition-all"
                     >
-                      Update Image
+                      Update Item
                     </button>
                     <button
-                      onClick={() => setEditingImage(null)}
+                      onClick={() => setEditingItem(null)}
                       className="flex-1 bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-xl text-white font-semibold transition-all"
                     >
                       Cancel
@@ -215,25 +277,90 @@ const UploadGalleryImages = () => {
                 <>
                   <div>
                     <label className="block mb-2 text-sm font-medium text-blue-400">
-                      Select Image
+                      Media Type
                     </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="text-gray-800"
-                    />
+                    <select
+                      value={mediaType}
+                      onChange={(e) => handleMediaTypeChange(e.target.value as "image" | "video" | "youtube")}
+                      className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="image">Image</option>
+                      <option value="video">Video</option>
+                      <option value="youtube">YouTube URL</option>
+                    </select>
                   </div>
 
-                  {preview && (
+                  {mediaType === "image" && (
+                    <>
+                      <div>
+                        <label className="block mb-2 text-sm font-medium text-blue-400">
+                          Select Image
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="text-gray-800"
+                        />
+                      </div>
+                      {preview && (
+                        <div>
+                          <p className="mb-2 text-sm text-gray-800">Preview</p>
+                          <Image
+                            src={preview}
+                            alt="Image Preview"
+                            width={500}
+                            height={300}
+                            className="rounded-xl border border-gray-600 shadow-lg"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <label className="block mb-2 text-sm font-medium text-blue-400">
+                          Alt Text
+                        </label>
+                        <input
+                          type="text"
+                          value={alt}
+                          onChange={(e) => setAlt(e.target.value)}
+                          className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="e.g. Restaurant interior view"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {mediaType === "video" && (
                     <div>
-                      <p className="mb-2 text-sm text-gray-800">Preview</p>
-                      <Image
-                        src={preview}
-                        alt="Preview"
-                        width={500}
-                        height={300}
-                        className="rounded-xl border border-gray-600 shadow-lg"
+                      <label className="block mb-2 text-sm font-medium text-blue-400">
+                        Select Video
+                      </label>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={handleFileChange}
+                        className="text-gray-800"
+                      />
+                      {preview && (
+                        <div>
+                          <p className="mb-2 text-sm text-gray-800">Preview</p>
+                          <video src={preview} controls className="rounded-xl border border-gray-600 shadow-lg w-full max-w-md"></video>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {mediaType === "youtube" && (
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-blue-400">
+                        YouTube URL
+                      </label>
+                      <input
+                        type="url"
+                        value={youtubeUrl}
+                        onChange={(e) => setYoutubeUrl(e.target.value)}
+                        className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. https://www.youtube.com/watch?v=XXXXXXXXXXX"
                       />
                     </div>
                   )}
@@ -265,27 +392,14 @@ const UploadGalleryImages = () => {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g. Cozy Dining Area"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-blue-400">
-                      Alt Text
-                    </label>
-                    <input
-                      type="text"
-                      value={alt}
-                      onChange={(e) => setAlt(e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g. Restaurant interior view"
+                      placeholder="e.g. Cozy Dining Area or Event Highlight"
                     />
                   </div>
 
                   <button
                     onClick={handleUpload}
                     disabled={loading}
-                    className="w-full  bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-xl text-white font-bold tracking-wide shadow-lg transition-all"
+                    className="w-full bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-xl text-white font-bold tracking-wide shadow-lg transition-all"
                   >
                     {loading ? "Uploading..." : "Upload"}
                   </button>
@@ -301,36 +415,60 @@ const UploadGalleryImages = () => {
           </div>
         </div>
 
-        {/* Uploaded Images */}
-        <div className="mt-12 w-full max-w-4xl"> {/* Added w-full and max-w-4xl */}
+        {/* Uploaded Items */}
+        <div className="mt-12 w-full max-w-4xl">
           <h3 className="text-3xl font-semibold mb-6 text-center text-blue-700">
-            📂 Uploaded Images
+            📂 Uploaded Items
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-            {uploadedImages.map((image) => (
+          {uploadedItems.map((item) => (
               <div
-                key={image.id}
+                key={item.id}
                 className="rounded-lg overflow-hidden shadow-lg flex flex-col hover:shadow-2xl transition-shadow duration-300 group"
               >
-                <div className="w-full h-[250px] relative">
-                  <Image
-                    src={`data:image/*;base64,${image.src}`}
-                    alt={image.alt}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                {item.type === "image" && (
+                  <div className="w-full h-[250px] relative">
+                    <Image
+                      src={`data:image/*;base64,${item.src}`}
+                      alt={item.alt || ""}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+
+{item.type === "video" && (
+  <div className="w-full h-[300px] relative overflow-hidden rounded-lg shadow-md transition-opacity group-hover:opacity-80">
+    <video
+      src={`data:video/mp4;base64,${item.src}`} // Try a specific MIME type
+      controls
+      className="object-cover w-full h-full"
+    />
+  </div>
+)}
+
+                {item.type === "youtube" && (
+                  <div className="w-full h-[250px]">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${new URL(item.src).searchParams.get("v")}`}
+                      title={item.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="w-full h-full"
+                    ></iframe>
+                  </div>
+                )}
 
                 <div className="flex justify-center gap-3 mt-3">
                   <button
-                    onClick={() => handleEdit(image)}
+                    onClick={() => handleEdit(item)}
                     className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 rounded shadow transition-all"
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(image.id)}
+                    onClick={() => handleDelete(item.id)}
                     className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded shadow transition-all"
                   >
                     Delete
@@ -338,7 +476,7 @@ const UploadGalleryImages = () => {
                 </div>
 
                 <div className="text-center text-sm text-gray-800 font-semibold px-4 py-2 mt-2 w-full transition-colors duration-200 group-hover:bg-blue-800 group-hover:text-white">
-                  {image.title}
+                  {item.title}
                 </div>
               </div>
             ))}

@@ -25,7 +25,7 @@ export default function Home() {
   // Hero Section Transition
   const slides = [
     {
-      image: "/chef.png",
+      image: "/chef3.png",
       title: "A New Chapter in Indian",
       highlight: "Cuisine",
       subtitle: "Fresh, Bold, Indian",
