@@ -14,8 +14,8 @@ export async function POST(req: NextRequest) {
     }
 
     await db.query(
-      `INSERT INTO cooking_videos (title, video_url, thumbnail_url, description, category, uploaded_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())`,
+      `INSERT INTO cooking_videos (title, video_url, thumbnail_url, description, category, uploaded_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`,
       [title, video_url, thumbnail_url, description, category]
     );
 

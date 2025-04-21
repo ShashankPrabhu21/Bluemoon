@@ -94,14 +94,14 @@ export default function CookingVideosPage() {
         {selectedVideo && (
           <div className="max-w-3xl w-full bg-white p-4 rounded-lg shadow-md border border-gray-300 text-black">
             <div className="w-full flex justify-center">
-  <ReactPlayer
-    url={selectedVideo.video_url}
-    controls
-    width="640px"
-    height="360px"
-    className="rounded-lg"
-  />
-</div>
+            <ReactPlayer
+              url={selectedVideo.video_url}
+              controls
+              width="640px"
+              height="360px"
+              className="rounded-lg"
+            />
+          </div>
 
             <h3 className="mt-3 text-md font-semibold text-gray-700 text-center">
               {selectedVideo.title}
