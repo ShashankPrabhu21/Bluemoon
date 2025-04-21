@@ -203,9 +203,6 @@ export default function CookingVideoEdit() {
     }
   };
     
-  
-  
-
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-br from-gray-800 to-black text-white mt-24">
       <EditUserSidebar />
