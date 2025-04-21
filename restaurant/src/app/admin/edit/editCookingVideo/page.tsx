@@ -28,23 +28,31 @@ export default function CookingVideoEdit() {
 
   useEffect(() => {
     const fetchVideos = async () => {
-      setIsFetching(true);
-      setFetchError(null);
-      try {
-        const res = await fetch("/api/getvideo");
-        if (!res.ok) {
-          throw new Error(`Failed to fetch videos: ${res.status}`);
+        setIsFetching(true);
+        setFetchError(null);
+        try {
+          const res = await fetch("/api/getvideo");
+          if (!res.ok) {
+            // Handle HTTP errors
+            const errorText = await res.text(); // Read error message from response
+            throw new Error(`HTTP error! Status: ${res.status} - ${errorText}`);
+          }
+          const data = await res.json();
+          setUploadedVideos(data);
+        } catch (error) {
+          console.error("Error fetching videos:", error);
+          // Ensure error is of type Error
+          if (error instanceof Error) {
+            setFetchError(error.message);
+          } else {
+            setFetchError("An unknown error occurred");
+          }
+          setUploadedVideos([]);
+        } finally {
+          setIsFetching(false);
         }
-        const data = await res.json();
-        setUploadedVideos(data);
-      } catch (error: any) {
-        console.error("Error fetching videos:", error);
-        setFetchError(error.message || "Failed to fetch videos");
-        setUploadedVideos([]);
-      } finally {
-        setIsFetching(false);
-      }
-    };
+      };
+      
 
     fetchVideos();
   }, [videoUrl]); // Re-fetch videos when a new video is uploaded (videoUrl changes)
