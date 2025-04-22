@@ -34,12 +34,12 @@ export default function Home() {
       position: "bottom-10 left-7 text-center",
     },
     {
-      image: "/sec2.jpg",
+      image: "/sec11.jpg",
       title: "Kerala's Spice",
       highlight: "Reimagined",
       subtitle: "Fresh catches, bold flavors, a modern twist.",
       description: "A new chapter in coastal culinary artistry.",
-      position: "bottom-20 right-5 transform -translate-x-1/2 text-center text-black",
+      position: "bottom-20 right-5 transform -translate-x-1/2 text-center text-white",
     },
     {
       image: "/chef.png",
@@ -58,17 +58,12 @@ export default function Home() {
     
     return () => clearInterval(interval);
   }, []);
-
-
-
-  
-
   
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-white/95">
 
       {/* Hero Section Image */}
-      <section className="relative h-[95vh] flex items-center justify-center text-white z-30  " id="hero-section" >
+      <section className="relative h-[100vh] flex items-center justify-center text-white z-30  " id="hero-section" >
       <div className="absolute inset-0" >
         {slides.map((slide, index) => (
           <motion.div
