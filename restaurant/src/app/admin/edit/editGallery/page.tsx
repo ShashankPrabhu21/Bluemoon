@@ -438,15 +438,15 @@ const UploadGalleryImages = () => {
                   </div>
                 )}
 
-{item.type === "video" && (
-  <div className="w-full h-[300px] relative overflow-hidden rounded-lg shadow-md transition-opacity group-hover:opacity-80">
-    <video
-      src={`data:video/mp4;base64,${item.src}`} // Try a specific MIME type
-      controls
-      className="object-cover w-full h-full"
-    />
-  </div>
-)}
+                {item.type === "video" && (
+                  <div className="w-full h-[300px] relative overflow-hidden rounded-lg shadow-md transition-opacity group-hover:opacity-80">
+                    <video
+                      src={`data:video/mp4;base64,${item.src}`} // Try a specific MIME type
+                      controls
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                )}
 
                 {item.type === "youtube" && (
                   <div className="w-full h-[250px]">
