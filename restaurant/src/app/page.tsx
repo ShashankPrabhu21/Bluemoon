@@ -24,15 +24,7 @@ export default function Home() {
 
   // Hero Section Transition
   const slides = [
-    {
-      image: "/chef.png",
-      title: "A New Chapter in Indian",
-      highlight: "Cuisine",
-      subtitle: "Fresh, Bold, Indian",
-      description:
-        "A new chapter in Kerala cuisine, blending tradition with modern culinary innovation.",
-      position: "bottom-10 left-1/2 transform -translate-x-1/2 text-center",
-    },
+    
     {
       image: "/1.jpg",
       title: "Experience the Essence of",
@@ -48,6 +40,15 @@ export default function Home() {
       subtitle: "Fresh catches, bold flavors, a modern twist.",
       description: "A new chapter in coastal culinary artistry.",
       position: "bottom-20 right-5 transform -translate-x-1/2 text-center text-black",
+    },
+    {
+      image: "/chef.png",
+      title: "A New Chapter in Indian",
+      highlight: "Cuisine",
+      subtitle: "Fresh, Bold, Indian",
+      description:
+        "A new chapter in Kerala cuisine, blending tradition with modern culinary innovation.",
+      position: "bottom-10 left-1/2 transform -translate-x-1/2 text-center",
     },
   ];  
   useEffect(() => {
