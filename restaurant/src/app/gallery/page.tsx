@@ -129,7 +129,7 @@ const Gallery = () => {
           {categories.map((category) => (
             <button
               key={category.id}
-              className={`px-3 py-1 md:px-4 md:py-2 rounded-lg transition-all text-xs md:text-sm whitespace-nowrap ${
+              className={`px-3 py-2 md:px-4 md:py-2 rounded-lg transition-all text-xs md:text-sm whitespace-nowrap ${
                 activeCategory === category.id
                   ? "bg-blue-500"
                   : "bg-gray-700 hover:bg-gray-600"
