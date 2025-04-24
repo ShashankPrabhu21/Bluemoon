@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import GeistMono from "@next/font/local";
+import { Inter } from "next/font/google"; // Geist_Mono is NOT available
 import "./globals.css";
 
 import Footer from "./components/footer";
@@ -9,24 +8,6 @@ import Navbar from "./components/navbar";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  display: "swap",
-});
-
-const geistMono = GeistMono({ // Configure GeistMono
-  src: [
-    {
-      path: './fonts/GeistMono-Regular.woff2', // Adjust paths based on your file structure
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: './fonts/GeistMono-Bold.woff2',
-      weight: '700',
-      style: 'normal',
-    },
-    // Add other weights and styles as needed
-  ],
-  variable: "--font-geist-mono",
   display: "swap",
 });
 
@@ -41,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable}`}> {/* Apply both font variables */}
-      <body className={`antialiased bg-gray-50 text-gray-900 font-geist-mono`}> {/* Use the Geist Mono class */}
+    <html lang="en">
+      <body className={`${inter.variable} antialiased bg-gray-50 text-gray-900`}>
         <Navbar />
         <main>{children}</main>
         <Footer />
