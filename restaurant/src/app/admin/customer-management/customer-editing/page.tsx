@@ -99,7 +99,7 @@ export default function CustomerList() {
   );
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen"> {/* Adjusted flex direction here */}
+    <div className="flex flex-col md:flex-row min-h-screen"> 
       <CustomerUserSidebar />
       <div className="flex-1 p-4">
         <div className="flex flex-col items-center mt-5">
