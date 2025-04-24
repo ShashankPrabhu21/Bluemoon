@@ -7,7 +7,7 @@ const pool = new Pool({
   },
 });
 
-// Optional test connection (use only once if you want to verify)
+
 (async () => {
   try {
     const client = await pool.connect();
