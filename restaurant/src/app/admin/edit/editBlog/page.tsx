@@ -306,7 +306,7 @@ export default function EditBlog() {
           </form>
         </div>
 
-        {/* Published Blogs Section */}
+        {/* Published Blogs Sections*/}
         <div className="max-w-5xl mx-auto mt-12 ">
           <h2 className="text-3xl font-bold mb-6 text-blue-700 text-center">📚 Published Blogs</h2>
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
