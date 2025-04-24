@@ -26,23 +26,32 @@ const Gallery = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     const fetchGalleryItems = async () => {
+      setLoading(true); // Set loading to true before fetching
       try {
         const res = await fetch("/api/gallery/get");
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
         const data = await res.json();
-        if (data && data.items) { // Use 'items' to match your backend response
-          setGalleryItems(data.items);
+        if (data && data.items) {
+          // Simulate a delay, remove this in production
+          setTimeout(() => {
+            setGalleryItems(data.items);
+            setLoading(false); // Set loading to false after data is loaded
+          }, 500);
+
         } else {
           setGalleryItems([]);
+          setLoading(false);
         }
       } catch (error) {
         console.error("Failed to load gallery items", error);
         setGalleryItems([]);
+        setLoading(false); // Set loading to false on error as well
       }
     };
     fetchGalleryItems();
@@ -116,11 +125,11 @@ const Gallery = () => {
         </div>
 
         {/* Category Filter */}
-        <div className="flex justify-center gap-4 py-4">
+        <div className="flex justify-center gap-2 md:gap-4 py-4 overflow-x-auto">
           {categories.map((category) => (
             <button
               key={category.id}
-              className={`px-4 py-2 rounded-lg transition-all ${
+              className={`px-3 py-1 md:px-4 md:py-2 rounded-lg transition-all text-xs md:text-sm whitespace-nowrap ${
                 activeCategory === category.id
                   ? "bg-blue-500"
                   : "bg-gray-700 hover:bg-gray-600"
@@ -147,69 +156,75 @@ const Gallery = () => {
 
       {/* Item Grid */}
       <div className="w-full">
-        {itemRows.map((row, rowIndex) => (
-          <React.Fragment key={rowIndex}>
-            <div
-              className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-cover bg-center"
-              style={{
-                backgroundImage:
-                  rowIndex % 2 === 0
-                    ? "linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url('/sec11.jpg')"
-                    : "linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url('/sec4.jpg')",
-              }}
-            >
-              {row.map((item, index) => (
-                <div
-                  key={item.id}
-                  className="relative group cursor-pointer"
-                  onClick={() => openLightbox(rowIndex * 4 + index)}
-                >
-                  <div className="w-full h-[300px] relative overflow-hidden rounded-lg shadow-md transition-opacity group-hover:opacity-80">
-                    {item.type === "image" && (
-                      <Image
-                        src={`data:image/*;base64,${item.src}`}
-                        alt={item.alt || item.title}
-                        fill
-                        className="object-cover"
-                      />
-                    )}
-                    {item.type === "video" && (
-  <div className="w-full h-[300px] relative overflow-hidden rounded-lg shadow-md transition-opacity group-hover:opacity-80">
-    <video
-      src={`data:video/mp4;base64,${item.src}`} // Try a specific MIME type
-      controls
-      className="object-cover w-full h-full"
-    />
-  </div>
-)}
-                    {item.type === "youtube" && (
-                      <iframe
-                        src={`https://www.youtube.com/embed/${new URL(item.src).searchParams.get("v")}`}
-                        title={item.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        className="w-full h-full"
-                      ></iframe>
-                    )}
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-center text-white p-2 opacity-0 group-hover:opacity-100 transition-all">
-                    {item.title}
-                  </div>
-                </div>
-              ))}
-            </div>
-            {rowIndex < itemRows.length - 1 && (
+        {loading ? (
+          <div className="text-center py-8">Loading...</div> // Show loading message
+        ) : (
+          itemRows.map((row, rowIndex) => (
+            <React.Fragment key={rowIndex}>
               <div
-                className="w-full h-[200px] bg-cover bg-center"
+                className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-cover bg-center"
                 style={{
                   backgroundImage:
-                    "linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url('/sec2.jpg')",
-                  backgroundAttachment: "fixed",
+                    rowIndex % 2 === 0
+                      ? "linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url('/sec11.jpg')"
+                      : "linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url('/sec4.jpg')",
                 }}
-              ></div>
-            )}
-          </React.Fragment>
-        ))}
+              >
+                {row.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="relative group cursor-pointer"
+                    onClick={() => openLightbox(rowIndex * 4 + index)}
+                  >
+                    <div className="w-full h-[300px] relative overflow-hidden rounded-lg shadow-md transition-opacity group-hover:opacity-80">
+                      {item.type === "image" && (
+                        <Image
+                          src={`data:image/*;base64,${item.src}`}
+                          alt={item.alt || item.title}
+                          fill
+                          className="object-cover"
+                          priority={rowIndex < 1 && index < 4}
+                        />
+                      )}
+                      {item.type === "video" && (
+                        <div className="w-full h-[300px] relative overflow-hidden rounded-lg shadow-md transition-opacity group-hover:opacity-80">
+
+                          <video
+                            src={`data:video/mp4;base64,${item.src}`} //added video/mp4
+                            controls
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                      )}
+                      {item.type === "youtube" && (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${new URL(item.src).searchParams.get("v")}`}
+                          title={item.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          className="w-full h-full"
+                        ></iframe>
+                      )}
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-center text-white p-2 opacity-0 group-hover:opacity-100 transition-all">
+                      {item.title}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {rowIndex < itemRows.length - 1 && (
+                <div
+                  className="w-full h-[200px] bg-cover bg-center"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url('/sec2.jpg')",
+                    backgroundAttachment: "fixed",
+                  }}
+                ></div>
+              )}
+            </React.Fragment>
+          ))
+        )}
       </div>
 
       {lightboxOpen && galleryItems[currentImageIndex] && (
@@ -228,10 +243,11 @@ const Gallery = () => {
               <Image
                 src={`data:image/*;base64,${galleryItems[currentImageIndex].src}`}
                 alt={galleryItems[currentImageIndex].alt || galleryItems[currentImageIndex].title}
-                width={1200} // Adjust as needed
-                height={800} // Adjust as needed
+                width={1200}
+                height={800}
                 className="object-contain"
                 priority // Add priority for the initially visible image
+
               />
             )}
             {galleryItems[currentImageIndex].type === "video" && (
@@ -261,3 +277,4 @@ const Gallery = () => {
 };
 
 export default Gallery;
+
