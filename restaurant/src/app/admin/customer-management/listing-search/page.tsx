@@ -8,7 +8,7 @@ type Customer = {
   email: string;
   phone: number;
   join_date: string;
-  role?: string; // Add role field
+  role?: string;
 };
 
 export default function CustomerList() {
