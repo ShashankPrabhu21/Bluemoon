@@ -227,9 +227,9 @@ const OffersCarousel = () => {
             <p className="text-yellow-300 font-bold text-2xl">Discounted Price: ${offers[nextIndex].discounted_price}</p>
             {/* 🗓️ Display Date Range for Next Slide */}
             <p className="text-gray-400 text-sm mt-1">
-              🗓️ {new Date(offers[nextIndex].start_date).toLocaleDateString()} -{" "}
-              {new Date(offers[nextIndex].end_date).toLocaleDateString()}
-            </p>
+  🗓️ {new Date(offers[nextIndex].start_date).toLocaleDateString('en-GB')} -{" "}
+  {new Date(offers[nextIndex].end_date).toLocaleDateString('en-GB')}
+</p>
           </div>
         </motion.div>
       </AnimatePresence>

@@ -305,9 +305,9 @@ export default function OfferSetup() {
                   ✅ Discounted Price: <span className="text-xl">${Number(offer.discounted_price).toFixed(2)}</span>
                 </p>
                 {/* 🗓️ Display Start and End Dates */}
-                <p className="text-gray-600 text-sm mt-1">
-                  🗓️ {new Date(offer.start_date).toLocaleDateString()} - {new Date(offer.end_date).toLocaleDateString()}
-                </p>
+              <p className="text-gray-600 text-sm mt-1">
+                🗓️ {new Date(offer.start_date).toLocaleDateString()} - {new Date(offer.end_date).toLocaleDateString()}
+              </p>
               </div>
 
               {/* 🔹 Selected Items Grid */}
