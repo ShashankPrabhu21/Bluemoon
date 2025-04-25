@@ -1,3 +1,4 @@
+//api/offers/[id]/route.js
 import { NextResponse } from "next/server";
 import pool from "@/lib/db"; // Ensure this points to your PostgreSQL connection
 

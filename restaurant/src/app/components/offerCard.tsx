@@ -16,6 +16,8 @@ interface Offer {
   discounted_price: number | string | null;
   selected_items: string;
   offer_type: string;
+  start_date: string;
+  end_date: string;
 }
 
 const OffersCarousel = () => {
@@ -121,26 +123,31 @@ const OffersCarousel = () => {
           <div className="mt-4 text-center text-xl font-semibold">
             <p className="text-gray-400 line-through">Actual Price: ${offers[prevIndex].total_price}</p>
             <p className="text-yellow-300 font-bold text-2xl">Discounted Price: ${offers[prevIndex].discounted_price}</p>
+            {/* 🗓️ Display Date Range for Previous Slide */}
+            <p className="text-gray-400 text-sm mt-1">
+              🗓️ {new Date(offers[prevIndex].start_date).toLocaleDateString()} -{" "}
+              {new Date(offers[prevIndex].end_date).toLocaleDateString()}
+            </p>
           </div>
         </motion.div>
 
 
-{/* Center Slide */}
+        {/* Center Slide */}
         <motion.div
           key={currentIndex}
-          className="relative w-[90%] max-w-[700px] md:max-w-[600px] sm:max-w-[450px] 
-                    min-h-[360px] lg:min-h-[500px] h-auto  
-                    bg-[#131722] text-white rounded-2xl p-6 sm:p-10 shadow-xl border border-gray-700 
-                    flex flex-col items-center justify-between
-                    mt-2 sm:mt-0 lg:mt-6 mb-2 sm:mb-0 lg:mb-6"
+          className="relative w-[90%] max-w-[700px] md:max-w-[600px] sm:max-w-[450px]
+                           min-h-[360px] lg:min-h-[500px] h-auto
+                           bg-[#131722] text-white rounded-2xl p-6 sm:p-10 shadow-xl border border-gray-700
+                           flex flex-col items-center justify-between
+                           mt-2 sm:mt-0 lg:mt-6 mb-2 sm:mb-0 lg:mb-6"
           initial={{ x: "100vw" }}
           animate={{ x: "0vw" }}
           exit={{ x: "-25vw" }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
           {/* Offer Header */}
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold bg-gradient-to-r from-yellow-500 to-orange-500 text-white 
-                      px-6 py-3 sm:px-7 sm:py-4 rounded-lg flex items-center gap-3 w-full text-center justify-center shadow-lg">
+          <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold bg-gradient-to-r from-yellow-500 to-orange-500 text-white
+                              px-6 py-3 sm:px-7 sm:py-4 rounded-lg flex items-center gap-3 w-full text-center justify-center shadow-lg">
             <MdLocalOffer className="text-white text-xl sm:text-2xl lg:text-3xl" />
             {offers[currentIndex].offer_type} Offer
           </h2>
@@ -175,11 +182,16 @@ const OffersCarousel = () => {
             <p className="text-yellow-300 font-bold text-2xl sm:text-3xl lg:text-3xl">
               Discounted Price: ${offers[currentIndex].discounted_price}
             </p>
+            {/* 🗓️ Display Date Range for Center Slide */}
+            <p className="text-gray-400 text-sm mt-1">
+              🗓️ {new Date(offers[currentIndex].start_date).toLocaleDateString()} -{" "}
+              {new Date(offers[currentIndex].end_date).toLocaleDateString()}
+            </p>
           </div>
         </motion.div>
 
 
-{/* Next Slide */}
+        {/* Next Slide */}
         <motion.div
           key={nextIndex}
           className="absolute right-[15%] w-[400px] h-[400px] flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-white shadow-2xl rounded-xl p-6 opacity-70 border border-gray-700 hidden xl:flex"
@@ -213,6 +225,11 @@ const OffersCarousel = () => {
           <div className="mt-4 text-center text-xl font-semibold">
             <p className="text-gray-400 line-through">Actual Price: ${offers[nextIndex].total_price}</p>
             <p className="text-yellow-300 font-bold text-2xl">Discounted Price: ${offers[nextIndex].discounted_price}</p>
+            {/* 🗓️ Display Date Range for Next Slide */}
+            <p className="text-gray-400 text-sm mt-1">
+              🗓️ {new Date(offers[nextIndex].start_date).toLocaleDateString()} -{" "}
+              {new Date(offers[nextIndex].end_date).toLocaleDateString()}
+            </p>
           </div>
         </motion.div>
       </AnimatePresence>
