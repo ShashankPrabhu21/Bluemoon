@@ -296,7 +296,7 @@ export default function OfferSetup() {
                 ⭐ {offer.offer_type} Offer
               </div>
 
-              {/* 🔹 Price Section */}
+              {/*  Price Section */}
               <div className="text-center my-3">
                 <p className="text-red-500 line-through text-sm font-medium">
                   💲 Total Price: <span className="font-semibold">${Number(offer.total_price).toFixed(2)}</span>
