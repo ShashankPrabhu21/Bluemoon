@@ -1,4 +1,4 @@
-
+//app/componenets/ResevartionForm.tsx
 "use client";
 
 import { useState } from "react";
@@ -64,6 +64,17 @@ export default function ReservationForm() {
 
     setLoading(false);
   };
+  const generateTimeOptions = () => {
+    const times = [];
+    const periods = ["AM", "PM"];
+    for (let hour = 1; hour <= 12; hour++) {
+      for (let i = 0; i < periods.length; i++) {
+        const time = `${hour}:00 ${periods[i]}`;
+        times.push(<option key={time} value={time}>{time}</option>);
+      }
+    }
+    return times;
+  };
   
   return (
     <div className="bg-gray-100 p-8 rounded-xl shadow-2xl w-full max-w-xl">
@@ -104,20 +115,32 @@ export default function ReservationForm() {
             {[...Array(10)].map((_, i) => (
               <option key={i} value={i + 1}>{i + 1}</option>
             ))}
-            <option value="10+">10+</option>
+            
           </select>
         </div>
 
         <div className="flex space-x-4">
-          <input
-            type="time" name="fromTime" required
-            className="w-1/2 p-3 border rounded-lg text-lg" value={formData.fromTime} onChange={handleChange}
-          />
-          <input
-            type="time" name="toTime" required
-            className="w-1/2 p-3 border rounded-lg text-lg" value={formData.toTime} onChange={handleChange}
-          />
+          <select
+            name="fromTime" required
+            value={formData.fromTime}
+            onChange={handleChange}
+            className="w-1/2 p-3 border rounded-lg text-lg text-gray-500"
+          >
+            <option value="" disabled>From</option>
+            {generateTimeOptions()}
+          </select>
+
+          <select
+            name="toTime" required
+            value={formData.toTime}
+            onChange={handleChange}
+            className="w-1/2 p-3 border rounded-lg text-lg text-gray-500"
+          >
+            <option value="" disabled>To</option>
+            {generateTimeOptions()}
+          </select>
         </div>
+
 
         <div>
           <select

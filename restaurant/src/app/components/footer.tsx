@@ -46,7 +46,7 @@ export default function Footer() {
             </p>
             <p className="flex justify-center md:justify-start items-center gap-2">
               <Mail size={16} />
-              <a href="mailto:bluemoonrest@gmail.com" className="hover:text-gray-200">bluemoonrest@gmail.com</a>
+              <a href="mailto:contact@bluemoonrestaurants.com" className="hover:text-gray-200">contact@bluemoonrestaurants.com              </a>
             </p>
 
             {/* Social Media Links */}

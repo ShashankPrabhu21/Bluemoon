@@ -131,7 +131,7 @@ const ContactUs = () => {
         <p className="text-yellow-600 flex items-center justify-center gap-3 text-3xl font-bold mb-2">
           📞 0422 306 777
         </p>
-        <p className="text-yellow-600 text-xl text-center font-semibold mb-6">📧 bluemoon.res@gmail.com</p>
+        <p className="text-yellow-600 text-xl text-center font-semibold mb-6">📧 contact@bluemoonrestaurants.com </p>
         <div className="mt-4 text-center">
           <h4 className="text-2xl font-bold text-blue-900">Location</h4>
           <p className="text-yellow-600 text-lg font-medium">Bluemoon Restaurant<br />4 Station Street, Wentworthville</p>

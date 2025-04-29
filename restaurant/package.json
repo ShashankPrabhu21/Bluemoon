@@ -29,6 +29,7 @@
     "mongodb": "^6.14.2",
     "mongoose": "^8.12.1",
     "next": "^15.1.7",
+    "nodemailer": "^6.10.1",
     "pg": "^8.14.1",
     "react": "^19.0.0",
     "react-datepicker": "^8.2.1",

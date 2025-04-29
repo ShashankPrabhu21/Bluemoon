@@ -1,5 +1,7 @@
+// /api/reservation/route.js
 import { NextResponse } from "next/server";
-import db from "@/lib/db"; // Update the path if your db file is in a different directory
+import db from "@/lib/db";
+import nodemailer from "nodemailer"; // 👉 Import Nodemailer
 
 export async function POST(req) {
   try {
@@ -15,7 +17,7 @@ export async function POST(req) {
       return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
     }
 
-    // Step 1: Check for conflicting reservation on same table, date & overlapping time
+    // Step 1: Check for conflicting reservation
     const conflictQuery = `
       SELECT 1 FROM reservations
       WHERE table_number = $1
@@ -29,7 +31,7 @@ export async function POST(req) {
       console.warn("⚠️ Table already reserved for this slot:", tableNumber);
       return NextResponse.json({ success: false, message: "Table not available for the selected time." }, { status: 409 });
     }
-
+    
     // Step 2: Insert reservation
     const insertQuery = `
       INSERT INTO reservations
@@ -41,6 +43,38 @@ export async function POST(req) {
 
     await db.query(insertQuery, insertValues);
     console.log("✅ Reservation inserted successfully.");
+
+    // Step 3: Send email to reservations@bluemoonrestaurants.com
+    const transporter = nodemailer.createTransport({
+      host: "smtp.hostinger.com", // The address of the post office
+      port: 465, // The specific line/channel at the post office
+      secure: true, // A way to make sure the communication is private
+      auth: {
+        user: process.env.SMTP_USER, // Your username at the post office
+        pass: process.env.SMTP_PASS, // Your password at the post office
+      },
+    });
+
+
+    const mailOptions = {
+      from: `"${name} (${email})" <${process.env.SMTP_USER}>`,
+      to: "reservations@bluemoonrestaurants.com", // your restaurant reservation email
+      subject: `New Table Reservation from ${name}`,
+      html: `
+        <h3>New Reservation Request</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>From:</strong> ${fromTime}</p>
+        <p><strong>To:</strong> ${toTime}</p>
+        <p><strong>Guests:</strong> ${guests}</p>
+        <p><strong>Table Number:</strong> ${tableNumber}</p>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent successfully.");
 
     return NextResponse.json({ success: true, message: "Reservation successful" }, { status: 200 });
 
