@@ -181,7 +181,7 @@ const AdminPage = () => {
         <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Food Name" value={name} onChange={(e) => setName(e.target.value)} />
         <input className="w-full mb-3 p-2 border rounded-lg" type="number" placeholder="Price ($)" value={price} onChange={(e) => setPrice(e.target.value)} />
         <textarea className="w-full mb-3 p-2 border rounded-lg" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
-        <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Spicy Level - mild/low/high" value={spicyLevel} onChange={(e) => setSpicyLevel(e.target.value)} />
+        <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Spicy Level - mild/medium/high" value={spicyLevel} onChange={(e) => setSpicyLevel(e.target.value)} />
         <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Item Number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
         <input type="file" className="w-full p-2 border rounded-lg" onChange={handleImageUpload} />
         {image && <img src={image} alt="Preview" className="w-28 h-28 object-cover rounded-lg shadow-md mt-3" />}
