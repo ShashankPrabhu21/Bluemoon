@@ -98,15 +98,13 @@ const MenuPage = () => {
 
             {/* 🍽️ Food Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {menuItems
-                .filter(
-                  (item) => categoryMapping[item.category_id] === selectedCategory
-                )
-                .map((item, index) => (
-                  <div
-                    key={item.id || `menu-item-${index}`}
-                    className="shadow-xl rounded-xl overflow-hidden w-80 mx-auto transform transition duration-300 hover:scale-[1.04] hover:shadow-2xl bg-white/30 backdrop-blur-md hover:bg-white/40"
-                  >
+  {menuItems
+    .filter((item) => categoryMapping[item.category_id] === selectedCategory)
+    .map((item, index) => (
+      <div
+        key={item.id || `menu-item-${index}`}
+        className="shadow-xl rounded-xl overflow-hidden transform transition duration-300 hover:scale-[1.04] hover:shadow-2xl bg-white/30 backdrop-blur-md hover:bg-white/40"
+      >
                     {/* 📸 Food Image */}
                     <img
                       src={item.image_url || "/placeholder.jpg"}
@@ -181,11 +179,11 @@ const MenuPage = () => {
 
         {/* 🍽️ Food Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {groupedMenuItems[category]?.map((item, index) => (
-            <div
-              key={item.id || `all-menu-item-${index}`}
-              className="w-80 mx-auto rounded-3xl overflow-hidden backdrop-blur-md bg-white/30 shadow-xl hover:shadow-2xl hover:scale-[1.05] transform transition duration-300"
-            >
+  {groupedMenuItems[category]?.map((item, index) => (
+    <div
+      key={item.id || `all-menu-item-${index}`}
+      className="rounded-3xl overflow-hidden backdrop-blur-md bg-white/30 shadow-xl hover:shadow-2xl hover:scale-[1.05] transform transition duration-300"
+    >
               {/* 📸 Food Image */}
               <img
                 src={item.image_url || "/placeholder.jpg"}
