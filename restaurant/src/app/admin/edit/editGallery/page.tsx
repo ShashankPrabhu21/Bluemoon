@@ -31,24 +31,7 @@ const UploadGalleryImages = () => {
     const [alt, setAlt] = useState("");
     const [loading, setLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState("");
-    const [uploadedItems, setUploadedItems] = useState<GalleryItem[]>([]);
     const [uploadingToCloudinary, setUploadingToCloudinary] = useState(false); // Track Cloudinary upload
-
-    useEffect(() => {
-        const fetchUploadedItems = async () => {
-            try {
-                const res = await fetch("/api/gallery/get");
-                if (!res.ok) {
-                    throw new Error("Failed to fetch uploaded items");
-                }
-                const data = await res.json();
-                setUploadedItems(data.items);
-            } catch (err) {
-                console.error("Error fetching uploaded items:", err);
-            }
-        };
-        fetchUploadedItems();
-    }, [successMsg]);
 
     const handleMediaTypeChange = (type: "image" | "video" | "youtube") => {
         setMediaType(type);
