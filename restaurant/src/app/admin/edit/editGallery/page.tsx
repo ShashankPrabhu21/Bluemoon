@@ -340,57 +340,6 @@ const UploadGalleryImages = () => {
                     </div>
                 </div>
 
-                {/* Uploaded Items */}
-                <div className="mt-12 w-full max-w-4xl">
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {uploadedItems.map((item) => (
-                            <div
-                                key={item.id}
-                                className="rounded-lg overflow-hidden shadow-lg flex flex-col hover:shadow-2xl transition-shadow duration-300 group"
-                            >
-                                {item.type === "image" && (
-                                    <div className="w-full h-[250px] relative">
-                                        <Image
-                                            src={item.src || "/placeholder.jpg"} // Use Cloudinary URL
-                                            alt={item.alt || ""}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                    </div>
-                                )}
-
-                                {item.type === "video" && (
-                                    <div className="w-full h-[300px] relative overflow-hidden rounded-lg shadow-md transition-opacity group-hover:opacity-80">
-                                        <video
-                                            src={item.src || "/placeholder_video.mp4"} // Use Cloudinary URL
-                                            controls
-                                            className="object-cover w-full h-full"
-                                        />
-                                    </div>
-                                )}
-
-                                {item.type === "youtube" && (
-                                    <div className="w-full h-[250px]">
-                                        <iframe
-                                            src={`https://www.youtube.com/embed/${new URL(item.src).searchParams.get("v")}`}
-                                            title={item.title}
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                            allowFullScreen
-                                            className="w-full h-full"
-                                        ></iframe>
-                                    </div>
-                                )}
-
-                                
-
-                                <div className="text-center text-sm text-gray-800 font-semibold px-4 py-2 mt-2 w-full transition-colors duration-200 group-hover:bg-blue-800 group-hover:text-white">
-                                    {item.title}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
             </div>
         </div>
     );
