@@ -190,16 +190,7 @@ const UploadGalleryImages = () => {
     };
     
     
-    const handleDelete = async (id: number) => {
-        try {
-            await fetch(`/api/gallery/${id}`, { method: "DELETE" });
-            setUploadedItems((prev) => prev.filter((item) => item.id !== id));
-            alert("Item deleted successfully!");
-        } catch (err) {
-            console.error("Error deleting item:", err);
-            alert("Error deleting item.");
-        }
-    };
+    
 
     return (
         <div className="flex flex-col md:flex-row min-h-screen mt-24 bg-gradient-to-br from-gray-800 to-black">
@@ -393,14 +384,7 @@ const UploadGalleryImages = () => {
                                     </div>
                                 )}
 
-                                <div className="flex justify-center gap-3 mt-3">
-                                    <button
-                                        onClick={() => handleDelete(item.id)}
-                                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded shadow transition-all"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
+                                
 
                                 <div className="text-center text-sm text-gray-800 font-semibold px-4 py-2 mt-2 w-full transition-colors duration-200 group-hover:bg-blue-800 group-hover:text-white">
                                     {item.title}
