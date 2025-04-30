@@ -1,72 +1,88 @@
-// gallery/[id]/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
+import pool from '@/lib/db';
+import { v2 as cloudinary } from 'cloudinary';
 
-// PUT: Edit gallery item by ID
-export async function PUT(req: NextRequest) {
-  try {
-    const id = req.nextUrl.pathname.split("/").pop(); // Extract ID from the URL
+// 1. Configure Cloudinary (using environment variables)
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-    const formData = await req.formData();
-    const type = formData.get("type") as string;
-    const category = formData.get("category") as string;
-    const title = formData.get("title") as string;
-    const alt = formData.get("alt") as string | null;
-    const url = formData.get("url") as string | null;
-    const imageFile = formData.get("image") as File | null;
-    const videoFile = formData.get("video") as File | null;
-
-    if (!id || !type || !category || !title) {
-      return NextResponse.json({ message: "Missing required fields", alert: false }, { status: 400 });
-    }
-
-    let src: string | null = null;
-
-    if (type === "image" && imageFile) {
-      const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      src = buffer.toString("base64");
-    } else if (type === "video" && videoFile) {
-      const bytes = await videoFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      src = buffer.toString("base64");
-      // Consider storing video files in a dedicated storage and saving the URL instead for scalability
-    } else if (type === "youtube" && url) {
-      src = url;
-    } else if (type === "image" && formData.has("src")) {
-      src = formData.get("src") as string; // For updating existing images without re-uploading
-    }
-
-    if (!src && (type === "image" || type === "video" || type === "youtube") && !formData.has("src")) {
-      return NextResponse.json({ message: "Missing media source", alert: false }, { status: 400 });
-    }
-
-    await pool.query(
-      `UPDATE gallery SET type = $1, category = $2, title = $3, alt = $4, src = $5 WHERE id = $6`,
-      [type, category, title, alt, src, id]
-    );
-
-    return NextResponse.json({ message: "Gallery item updated successfully", alert: true });
-  } catch (error) {
-    console.error("PUT error:", error);
-    return NextResponse.json({ message: "Failed to update item", alert: false }, { status: 500 });
-  }
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    console.error("Cloudinary credentials are not set in environment variables!");
+    //  Don't throw here, because the API might be used for other things.  Handle it in the DELETE function.
 }
 
-// DELETE: Delete gallery item by ID
-export async function DELETE(req: NextRequest) {
-  try {
-    const id = req.nextUrl.pathname.split("/").pop(); // Extract ID
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+    try {
+        const id = params.id;
 
-    if (!id) {
-      return NextResponse.json({ message: "Invalid ID", alert: false }, { status: 400 });
+        // 2. Validate the ID
+        if (!id || isNaN(Number(id))) {
+            return NextResponse.json({ message: "Invalid ID. ID must be a number.", alert: false }, { status: 400 });
+        }
+
+        // 3. Get the item's details from the database (to get the Cloudinary URL)
+        const dbResult = await pool.query("SELECT src FROM gallery WHERE id = $1", [id]);
+
+        if (dbResult.rows.length === 0) {
+            return NextResponse.json({ message: "Item not found in database.", alert: false }, { status: 404 });
+        }
+
+        const src = dbResult.rows[0].src;
+        let publicId: string | undefined;
+        let resourceType: string = 'image'; // Default to 'image'
+
+        // 4. Extract the Public ID and Resource Type from the Cloudinary URL
+        try {
+            const urlParts = src.split('/');
+            const filename = urlParts[urlParts.length - 1];
+            const filenameParts = filename.split('.');
+            publicId = filenameParts[0];
+
+            if (urlParts.includes('video')) {
+                resourceType = 'video';
+            }
+
+            if (!publicId) {
+                return NextResponse.json({ message: "Could not extract public ID from URL.", alert: false }, { status: 500 });
+            }
+        } catch (error) {
+            console.error("Error extracting public ID:", error);
+            return NextResponse.json({ message: "Error extracting public ID from URL.", alert: false }, { status: 500 });
+        }
+
+        // 5. Delete the asset from Cloudinary
+        if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+            try {
+                const destroyResult = await cloudinary.uploader.destroy(publicId, {
+                    resource_type: resourceType, // Use the determined resource type
+                });
+
+                if (destroyResult.result !== 'ok') {
+                    console.error("Cloudinary deletion failed:", destroyResult);
+                    return NextResponse.json({ message: "Failed to delete from Cloudinary.  Database entry will remain.", alert: false }, { status: 500 }); //don't delete from db
+                }
+            } catch (cloudinaryError: any) {
+                console.error("Cloudinary error:", cloudinaryError);
+                return NextResponse.json({ message: "Cloudinary error: " + cloudinaryError.message, alert: false }, { status: 500 });
+            }
+        } else {
+             console.warn("Cloudinary credentials not set, skipping Cloudinary deletion.");
+        }
+
+
+        // 6. Delete the record from the database
+        const deleteDbResult = await pool.query("DELETE FROM gallery WHERE id = $1", [id]);
+         if (deleteDbResult.rowCount === 0) {
+            return NextResponse.json({ message: "Item not found in database.", alert: false }, { status: 404 });
+        }
+
+        return NextResponse.json({ message: "Item deleted successfully", alert: true }, { status: 200 });
+
+    } catch (error: any) {
+        console.error("DELETE error:", error);
+        return NextResponse.json({ message: "Failed to delete item: " + error.message, alert: false }, { status: 500 });
     }
-
-    await pool.query("DELETE FROM gallery WHERE id = $1", [id]);
-
-    return NextResponse.json({ message: "Item deleted successfully", alert: true });
-  } catch (error) {
-    console.error("DELETE error:", error);
-    return NextResponse.json({ message: "Failed to delete item", alert: false }, { status: 500 });
-  }
 }

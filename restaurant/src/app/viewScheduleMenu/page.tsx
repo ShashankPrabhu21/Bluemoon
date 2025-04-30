@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useRef } from "react";
 import { FiShoppingCart } from "react-icons/fi";
 import ScheduleOrderModal from "../components/ScheduleOrderModal";
 import { useSearchParams } from 'next/navigation';
 import Link from "next/link";
+import { motion } from 'framer-motion';
 
 interface FoodItem {
   item_id: number;
@@ -40,6 +41,85 @@ const categoryMapping: Record<number, string> = {
 };
 
 const categories = Object.values(categoryMapping);
+
+// 🖼️ Lazy-loaded Image Component
+const LazyLoadedImage: React.FC<{ src: string; alt: string; className?: string; onLoad?: () => void }> = ({ src, alt, className, onLoad }) => {
+    const [loaded, setLoaded] = useState(false);
+    const ref = useRef<HTMLImageElement>(null);
+
+    useEffect(() => {
+        let observer: IntersectionObserver;
+
+        const loadImage = () => {
+            if (ref.current) {
+                setLoaded(true);
+                if (onLoad) {
+                    onLoad();
+                }
+                if (observer) {
+                    observer.disconnect();
+                }
+            }
+        };
+
+        if (ref.current) {
+            if ('IntersectionObserver' in window) {
+                observer = new IntersectionObserver(
+                    (entries) => {
+                        if (entries[0].isIntersecting) {
+                            loadImage();
+                        }
+                    },
+                    {
+                        rootMargin: '100px', // Load 100px before the element appears
+                    }
+                );
+
+                observer.observe(ref.current);
+            } else {
+                // Fallback for browsers that don't support IntersectionObserver
+                loadImage();
+            }
+        }
+
+        return () => {
+            if (observer) {
+                observer.disconnect();
+            }
+        };
+    }, [onLoad]);
+
+    return (
+        <React.Fragment>
+            {!loaded && (
+                <div
+                    ref={ref}
+                    className={`${className} bg-gray-300 animate-pulse`} // Show a placeholder
+                    style={{
+                        backgroundImage: 'url(/placeholder.jpg)', // Use a very small placeholder
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                    }}
+                >
+                </div>
+            )}
+            {loaded && (
+                <motion.img
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    ref={ref}
+                    src={src}
+                    alt={alt}
+                    className={className}
+                    style={{
+                        display: 'block', // Ensure the image behaves like a block element
+                    }}
+                />
+            )}
+        </React.Fragment>
+    );
+};
 
 const ViewScheduleMenuPage = () => {
   return (
@@ -225,7 +305,7 @@ const ViewScheduleMenuContent = () => {
                     key={item.item_id}
                     className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
                   >
-                    <img
+                    <LazyLoadedImage
                       src={item.image_url || "/placeholder.jpg"}
                       alt={item.name}
                       className="w-full h-32 sm:h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-110"

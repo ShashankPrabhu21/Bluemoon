@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface FoodItem {
   id: number;
@@ -28,6 +29,85 @@ const categoryMapping: Record<number, string> = {
   3: "Desserts",
   4: "Snacks",
   5: "Drinks",
+};
+
+// 🖼️ Lazy-loaded Image Component
+const LazyLoadedImage: React.FC<{ src: string; alt: string; className?: string; onLoad?: () => void }> = ({ src, alt, className, onLoad }) => {
+  const [loaded, setLoaded] = useState(false);
+  const ref = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    let observer: IntersectionObserver;
+
+    const loadImage = () => {
+      if (ref.current) {
+        setLoaded(true);
+        if (onLoad) {
+          onLoad();
+        }
+        if (observer) {
+          observer.disconnect();
+        }
+      }
+    };
+
+    if (ref.current) {
+      if ('IntersectionObserver' in window) {
+        observer = new IntersectionObserver(
+          (entries) => {
+            if (entries[0].isIntersecting) {
+              loadImage();
+            }
+          },
+          {
+            rootMargin: '100px', // Load 100px before the element appears
+          }
+        );
+
+        observer.observe(ref.current);
+      } else {
+        // Fallback for browsers that don't support IntersectionObserver
+        loadImage();
+      }
+    }
+
+    return () => {
+      if (observer) {
+        observer.disconnect();
+      }
+    };
+  }, [onLoad]);
+
+  return (
+    <React.Fragment>
+      {!loaded && (
+        <div
+          ref={ref}
+          className={`${className} bg-gray-300 animate-pulse`} // Show a placeholder
+          style={{
+            backgroundImage: 'url(/placeholder.jpg)', // Use a very small placeholder
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+        </div>
+      )}
+      {loaded && (
+        <motion.img
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          ref={ref}
+          src={src}
+          alt={alt}
+          className={className}
+          style={{
+            display: 'block', // Ensure the image behaves like a block element
+          }}
+        />
+      )}
+    </React.Fragment>
+  );
 };
 
 const MenuPage = () => {
@@ -124,7 +204,7 @@ const MenuPage = () => {
                     className="shadow-xl rounded-xl overflow-hidden transform transition duration-300 hover:scale-[1.04] hover:shadow-2xl bg-white/30 backdrop-blur-md hover:bg-white/40"
                   >
                     {/* 📸 Food Image */}
-                    <img
+                    <LazyLoadedImage
                       src={item.image_url || "/placeholder.jpg"}
                       alt={item.name}
                       className="w-full h-52 object-cover rounded-t-xl"
@@ -203,7 +283,7 @@ const MenuPage = () => {
                       className="rounded-3xl overflow-hidden backdrop-blur-md bg-white/30 shadow-xl hover:shadow-2xl hover:scale-[1.05] transform transition duration-300"
                     >
                       {/* 📸 Food Image */}
-                      <img
+                      <LazyLoadedImage
                         src={item.image_url || "/placeholder.jpg"}
                         alt={item.name}
                         className="w-full h-52 object-cover rounded-t-3xl"
@@ -256,7 +336,7 @@ const MenuPage = () => {
                 className="relative group w-80 h-96 rounded-3xl overflow-hidden cursor-pointer transition-transform duration-300 hover:scale-105"
               >
                 <div className="absolute inset-0 z-0">
-                  <img
+                  <LazyLoadedImage
                     src={categoryImages[label] || "/placeholder.jpg"}
                     alt={label}
                     className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-500"
