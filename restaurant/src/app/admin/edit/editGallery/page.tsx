@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import EditUserSidebar from "@/app/components/editSidebar";
 
@@ -12,14 +12,6 @@ const categories = [
     { id: "videos", name: "Videos" }, // Added Videos category
 ];
 
-interface GalleryItem {
-    id: number;
-    type: "image" | "video" | "youtube";
-    src: string; // Cloudinary URL for image/video, or YouTube URL
-    alt?: string; // For images
-    category: string;
-    title: string;
-}
 
 const UploadGalleryImages = () => {
     const [mediaType, setMediaType] = useState<"image" | "video" | "youtube">("image");
