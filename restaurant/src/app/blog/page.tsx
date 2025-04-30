@@ -1,4 +1,3 @@
-// blog.tsx
 "use client";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -22,6 +21,7 @@ export default function Blog() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [blogContent, setBlogContent] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true); // Added loading state
 
   const categories = [
     "All",
@@ -35,6 +35,7 @@ export default function Blog() {
 
   useEffect(() => {
     const fetchBlogs = async () => {
+      setLoading(true); // Set loading to true when fetching starts
       try {
         const response = await fetch("/api/blogs");
         if (!response.ok) {
@@ -44,6 +45,9 @@ export default function Blog() {
         setBlogContent(data);
       } catch (error) {
         console.error("Error fetching blogs:", error);
+        // Optionally set an error state here
+      } finally {
+        setLoading(false); // Set loading to false when fetching completes
       }
     };
 
@@ -95,11 +99,13 @@ export default function Blog() {
             className="p-2 rounded-full text-black w-full md:w-1/2 border border-gray-300 outline-none"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            disabled={loading} // Disable search input while loading
           />
           <select
             className="p-2 rounded-full text-blue-800 bg-white border border-gray-300 outline-none cursor-pointer"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
+            disabled={loading} // Disable category select while loading
           >
             {categories.map((cat) => (
               <option key={cat} value={cat}>
@@ -109,7 +115,12 @@ export default function Blog() {
           </select>
         </div>
 
-        {filteredContent.length > 0 ? (
+        {loading ? (
+          <div className="flex justify-center items-center mt-6">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white-500"></div>
+            <span className="ml-3 text-white font-semibold">Loading blogs...</span>
+          </div>
+        ) : filteredContent.length > 0 ? (
           filteredContent.map((blog, index) => (
             <motion.div
               key={index}

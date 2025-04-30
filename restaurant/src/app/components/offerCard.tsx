@@ -63,7 +63,13 @@ const OffersCarousel = () => {
     }
   }, [offers, isHovered]);
 
-  if (loading) return <p>Loading offers...</p>;
+  if (loading)
+    return (
+      <div className="w-full h-[500px] flex justify-center items-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-yellow-500"></div>
+        <span className="ml-3 text-gray-700 font-semibold">Loading offers...</span>
+      </div>
+    );
   if (offers.length === 0) return <p>No offers available.</p>;
 
   const prevIndex = (currentIndex - 1 + totalSlides) % totalSlides;
@@ -88,7 +94,6 @@ const OffersCarousel = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <AnimatePresence>
-
         {/* Previous Slide */}
         <motion.div
           key={prevIndex}
@@ -130,7 +135,6 @@ const OffersCarousel = () => {
             </p>
           </div>
         </motion.div>
-
 
         {/* Center Slide */}
         <motion.div
@@ -184,12 +188,11 @@ const OffersCarousel = () => {
             </p>
             {/* 🗓️ Display Date Range for Center Slide */}
             <p className="text-gray-400 text-sm mt-1">
-              🗓️ {new Date(offers[currentIndex].start_date).toLocaleDateString()} -{" "}
-              {new Date(offers[currentIndex].end_date).toLocaleDateString()}
+              🗓️ {new Date(offers[currentIndex].start_date).toLocaleDateString('en-GB')} -{" "}
+              {new Date(offers[currentIndex].end_date).toLocaleDateString('en-GB')}
             </p>
           </div>
         </motion.div>
-
 
         {/* Next Slide */}
         <motion.div
@@ -227,9 +230,9 @@ const OffersCarousel = () => {
             <p className="text-yellow-300 font-bold text-2xl">Discounted Price: ${offers[nextIndex].discounted_price}</p>
             {/* 🗓️ Display Date Range for Next Slide */}
             <p className="text-gray-400 text-sm mt-1">
-  🗓️ {new Date(offers[nextIndex].start_date).toLocaleDateString('en-GB')} -{" "}
-  {new Date(offers[nextIndex].end_date).toLocaleDateString('en-GB')}
-</p>
+              🗓️ {new Date(offers[nextIndex].start_date).toLocaleDateString('en-GB')} -{" "}
+              {new Date(offers[nextIndex].end_date).toLocaleDateString('en-GB')}
+            </p>
           </div>
         </motion.div>
       </AnimatePresence>

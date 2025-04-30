@@ -16,9 +16,11 @@ export default function Reviews() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1); // 1 for next, -1 for previous
   const [isHovered, setIsHovered] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReviews = async () => {
+      setLoading(true);
       try {
         const response = await fetch("/api/reviews");
         if (response.ok) {
@@ -29,6 +31,8 @@ export default function Reviews() {
         }
       } catch (error) {
         console.error("Error fetching reviews:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -42,27 +46,38 @@ export default function Reviews() {
       }, 2000);
       return () => clearInterval(interval);
     }
-  }, [reviews, currentIndex,isHovered]);
+  }, [reviews, currentIndex, isHovered]);
 
   const nextSlide = () => {
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % reviews.length);
   };
 
-
   const prevIndex = (currentIndex - 1 + reviews.length) % reviews.length;
   const nextIndex = (currentIndex + 1) % reviews.length;
 
+  if (loading)
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-6 bg-white">
+        <h2 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold  text-[#2A4D80] text-center mb-8">
+          ⭐ CUSTOMER REVIEWS ⭐
+        </h2>
+        <div className="w-full h-[300px] flex justify-center items-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2A4D80]"></div>
+          <span className="ml-3 text-gray-700 font-semibold">Loading reviews...</span>
+        </div>
+      </div>
+    );
+
   return (
-    <div 
+    <div
       className="flex flex-col items-center justify-center py-16 px-6 bg-white"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-    <h2 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold  text-[#2A4D80] text-center">
-  ⭐ CUSTOMER REVIEWS ⭐
-</h2>
-
+      <h2 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold  text-[#2A4D80] text-center mb-8">
+        ⭐ CUSTOMER REVIEWS ⭐
+      </h2>
 
       {reviews.length > 0 ? (
         <div className="relative w-full mx-auto overflow-hidden h-[500px] flex items-center justify-center">
@@ -101,55 +116,52 @@ export default function Reviews() {
               </p>
             </motion.div>
 
-
-  {/* Center Review */}
+            {/* Center Review */}
             <motion.div
-                key={currentIndex}
-                className="absolute w-[90%] max-w-[650px] h-auto sm:h-[400px] lg:h-[450px] flex flex-col items-center justify-center 
-                          bg-gradient-to-br from-blue-100 to-blue-200 text-gray-900 shadow-2xl rounded-2xl 
-                          p-5 sm:p-8 border border-gray-300"
-                initial={{ x: "100vw" }}
-                animate={{ x: "0vw" }}
-                exit={{ x: direction > 0 ? "-25vw" : "25vw" }}
-                transition={{ duration: 1, ease: "easeOut" }}
-              >
-                {/* Profile Image */}
-                <img
-                  src={
-                    reviews[currentIndex].gender?.toLowerCase() === "male"
-                      ? "/male.png"
-                      : "/female.png"
-                  }
-                  alt="Gender Icon"
-                  className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-cover mb-3 sm:mb-4 rounded-full shadow-md border-2 border-gray-300"
-                />
+              key={currentIndex}
+              className="absolute w-[90%] max-w-[650px] h-auto sm:h-[400px] lg:h-[450px] flex flex-col items-center justify-center
+                        bg-gradient-to-br from-blue-100 to-blue-200 text-gray-900 shadow-2xl rounded-2xl
+                        p-5 sm:p-8 border border-gray-300"
+              initial={{ x: "100vw" }}
+              animate={{ x: "0vw" }}
+              exit={{ x: direction > 0 ? "-25vw" : "25vw" }}
+              transition={{ duration: 1, ease: "easeOut" }}
+            >
+              {/* Profile Image */}
+              <img
+                src={
+                  reviews[currentIndex].gender?.toLowerCase() === "male"
+                    ? "/male.png"
+                    : "/female.png"
+                }
+                alt="Gender Icon"
+                className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-cover mb-3 sm:mb-4 rounded-full shadow-md border-2 border-gray-300"
+              />
 
-                {/* Name */}
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold">{reviews[currentIndex].name}</h3>
+              {/* Name */}
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold">{reviews[currentIndex].name}</h3>
 
-                {/* Star Ratings */}
-                <div className="flex gap-1 mt-2">
-                  {Array.from({ length: reviews[currentIndex].rating }).map((_, index) => (
-                    <span key={index} className="text-yellow-400 text-lg sm:text-xl lg:text-3xl">⭐</span>
-                  ))}
-                </div>
+              {/* Star Ratings */}
+              <div className="flex gap-1 mt-2">
+                {Array.from({ length: reviews[currentIndex].rating }).map((_, index) => (
+                  <span key={index} className="text-yellow-400 text-lg sm:text-xl lg:text-3xl">⭐</span>
+                ))}
+              </div>
 
-                {/* Experience Text */}
-                <p className="italic text-gray-700 mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg text-center leading-relaxed max-w-[90%] sm:max-w-[500px]">
-                  “{reviews[currentIndex].experience}”
-                </p>
+              {/* Experience Text */}
+              <p className="italic text-gray-700 mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg text-center leading-relaxed max-w-[90%] sm:max-w-[500px]">
+                “{reviews[currentIndex].experience}”
+              </p>
 
-                {/* Date */}
-                <p className="text-xs sm:text-sm text-gray-500 mt-4 sm:mt-6">
-                  {new Date(reviews[currentIndex].created_at).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-              </motion.div>
-
-
+              {/* Date */}
+              <p className="text-xs sm:text-sm text-gray-500 mt-4 sm:mt-6">
+                {new Date(reviews[currentIndex].created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            </motion.div>
 
             {/* Next Review */}
             <motion.div

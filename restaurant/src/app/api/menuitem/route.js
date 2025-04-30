@@ -1,3 +1,4 @@
+//api/menuitem/route.js
 import { NextResponse } from "next/server";
 import pool from "@/lib/db"; // Ensure your database connection is correct
 import db from "@/lib/db";
