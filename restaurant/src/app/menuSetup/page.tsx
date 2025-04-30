@@ -325,7 +325,7 @@ const AdminPage = () => {
                 )}
                 {!hasMore && (
                     <div className="text-center text-gray-500 py-4">
-                        That's all folks!
+                        That`&apos;`s all folks!
                     </div>
                 )}
             </div>
