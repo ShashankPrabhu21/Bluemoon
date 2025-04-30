@@ -342,9 +342,7 @@ const UploadGalleryImages = () => {
 
                 {/* Uploaded Items */}
                 <div className="mt-12 w-full max-w-4xl">
-                    <h3 className="text-3xl font-semibold mb-6 text-center text-blue-700">
-                        📂 Uploaded Items
-                    </h3>
+                    
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {uploadedItems.map((item) => (
                             <div
