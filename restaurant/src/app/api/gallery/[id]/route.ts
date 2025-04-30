@@ -64,10 +64,16 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
                     console.error("Cloudinary deletion failed:", destroyResult);
                     return NextResponse.json({ message: "Failed to delete from Cloudinary.  Database entry will remain.", alert: false }, { status: 500 }); //don't delete from db
                 }
-            } catch (cloudinaryError: any) {
-                console.error("Cloudinary error:", cloudinaryError);
-                return NextResponse.json({ message: "Cloudinary error: " + cloudinaryError.message, alert: false }, { status: 500 });
+            } catch (cloudinaryError: unknown) {
+                if (cloudinaryError instanceof Error) {
+                    console.error("Cloudinary error:", cloudinaryError);
+                    return NextResponse.json({ message: "Cloudinary error: " + cloudinaryError.message, alert: false }, { status: 500 });
+                } else {
+                    console.error("Unknown Cloudinary error:", cloudinaryError);
+                    return NextResponse.json({ message: "Unknown Cloudinary error occurred.", alert: false }, { status: 500 });
+                }
             }
+            
         } else {
              console.warn("Cloudinary credentials not set, skipping Cloudinary deletion.");
         }
@@ -81,8 +87,14 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
         return NextResponse.json({ message: "Item deleted successfully", alert: true }, { status: 200 });
 
-    } catch (error: any) {
-        console.error("DELETE error:", error);
-        return NextResponse.json({ message: "Failed to delete item: " + error.message, alert: false }, { status: 500 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("DELETE error:", error);
+            return NextResponse.json({ message: "Failed to delete item: " + error.message, alert: false }, { status: 500 });
+        } else {
+            console.error("Unknown DELETE error:", error);
+            return NextResponse.json({ message: "An unknown error occurred during deletion.", alert: false }, { status: 500 });
+        }
     }
+    
 }

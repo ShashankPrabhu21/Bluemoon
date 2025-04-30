@@ -98,11 +98,17 @@ const UploadGalleryImages = () => {
 
             const data = await response.json();
             return data.secure_url;
-        } catch (error: any) {
-            console.error(`Error uploading ${resourceType} to Cloudinary:`, error);
-            alert(`Failed to upload ${resourceType}: ${error.message}`);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error(`Error uploading ${resourceType} to Cloudinary:`, error);
+                alert(`Failed to upload ${resourceType}: ${error.message}`);
+            } else {
+                console.error(`Unknown error uploading ${resourceType} to Cloudinary:`, error);
+                alert(`Failed to upload ${resourceType}: Unknown error`);
+            }
             return null;
-        } finally {
+        }
+         finally {
             setUploadingToCloudinary(false);
         }
     };

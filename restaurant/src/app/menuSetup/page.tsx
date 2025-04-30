@@ -56,9 +56,14 @@ const AdminPage = () => {
                 setHasMore(false);
             }
             setFoodItems(prevItems => [...prevItems, ...data]);
-        } catch (err: any) {
-            setError(err.message || 'Failed to fetch menu items');
-        } finally {
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message || 'Failed to fetch menu items');
+            } else {
+                setError('Failed to fetch menu items');
+            }
+        }
+         finally {
             setLoading(false);
         }
     }, []);
@@ -122,10 +127,16 @@ const AdminPage = () => {
             }
 
             resetForm();
-        } catch (error: any) {
-            setError(error.message || "An error occurred");
-            console.error("Error saving menu item:", error);
-        } finally {
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message || "An error occurred");
+                console.error("Error saving menu item:", error);
+            } else {
+                setError("An unknown error occurred");
+                console.error("Unknown error saving menu item:", error);
+            }
+        }
+        finally {
             setIsSubmitting(false);
         }
     };
@@ -147,10 +158,16 @@ const AdminPage = () => {
             }
 
             setFoodItems((prev) => prev.filter((item) => item.item_id !== item_id));
-        } catch (error: any) {
-            setError(error.message);
-            console.error("Error deleting food item:", error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+                console.error("Error deleting food item:", error);
+            } else {
+                setError("An unknown error occurred");
+                console.error("Unknown error deleting food item:", error);
+            }
         }
+        
     };
 
     const editFoodItem = (item: FoodItem) => {
