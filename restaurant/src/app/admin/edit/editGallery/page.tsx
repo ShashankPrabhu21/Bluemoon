@@ -36,9 +36,14 @@ export default function EditGalleryPage() {
         } else {
           setError('Failed to fetch videos.');
         }
-      } catch (err: any) {
-        setError(err.message || 'An error occurred.');
-      } finally {
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message || 'An error occurred.');
+        } else {
+          setError('An unexpected error occurred.');
+        }
+      }
+       finally {
         setLoading(false);
       }
     };
@@ -72,10 +77,15 @@ export default function EditGalleryPage() {
       } else {
         setMessage('Failed to add video. Try again.');
       }
-    } catch (err: any) {
-      console.error(err);
-      setMessage('Error adding video.');
-    }
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error(err);
+          setMessage('Error adding video.');
+        } else {
+          console.error('Unknown error');
+          setMessage('Error adding video.');
+        }
+      }
   };
 
   const handleDeleteVideo = async (videoId: number) => {
@@ -87,10 +97,15 @@ export default function EditGalleryPage() {
       } else {
         setMessage('Failed to delete video.');
       }
-    } catch (err: any) {
-      console.error(err);
-      setMessage('Error deleting video.');
-    }
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error(err);
+          setMessage('Error deleting video.');
+        } else {
+          console.error('Unknown error');
+          setMessage('Error deleting video.');
+        }
+      }
   };
 
   return (
