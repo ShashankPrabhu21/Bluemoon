@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdLocalOffer } from "react-icons/md";
 
@@ -19,85 +19,6 @@ interface Offer {
   start_date: string;
   end_date: string;
 }
-
-// 🖼️ Lazy-loaded Image Component
-const LazyLoadedImage: React.FC<{ src: string; alt: string; className?: string; onLoad?: () => void }> = ({ src, alt, className, onLoad }) => {
-  const [loaded, setLoaded] = useState(false);
-  const ref = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    let observer: IntersectionObserver;
-
-    const loadImage = () => {
-      if (ref.current) {
-        setLoaded(true);
-        if (onLoad) {
-          onLoad();
-        }
-        if (observer) {
-          observer.disconnect();
-        }
-      }
-    };
-
-    if (ref.current) {
-      if ('IntersectionObserver' in window) {
-        observer = new IntersectionObserver(
-          (entries) => {
-            if (entries[0].isIntersecting) {
-              loadImage();
-            }
-          },
-          {
-            rootMargin: '100px', // Load 100px before the element appears
-          }
-        );
-
-        observer.observe(ref.current);
-      } else {
-        // Fallback for browsers that don't support IntersectionObserver
-        loadImage();
-      }
-    }
-
-    return () => {
-      if (observer) {
-        observer.disconnect();
-      }
-    };
-  }, [onLoad]);
-
-  return (
-    <React.Fragment>
-      {!loaded && (
-        <div
-          ref={ref}
-          className={`${className} bg-gray-300 animate-pulse`} // Show a placeholder
-          style={{
-            backgroundImage: 'url(/placeholder.jpg)', // Use a very small placeholder
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-        </div>
-      )}
-      {loaded && (
-        <motion.img
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          ref={ref}
-          src={src}
-          alt={alt}
-          className={className}
-          style={{
-            display: 'block', // Ensure the image behaves like a block element
-          }}
-        />
-      )}
-    </React.Fragment>
-  );
-};
 
 const OffersCarousel = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -168,7 +89,7 @@ const OffersCarousel = () => {
 
   return (
     <div
-      className="relative w-full h-[500px] flex items-center justify-center bg-gradient-to-br from-white to-white overflow-hidden"
+      className="relative w-full h-[520px] flex items-center justify-center bg-gradient-to-br from-white to-white overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -190,7 +111,7 @@ const OffersCarousel = () => {
             {getSelectedItems(offers[prevIndex]).map((item) => (
               <div key={item.item_id} className="text-center">
                 <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-yellow-500">
-                  <LazyLoadedImage
+                  <img
                     src={item.image_url}
                     alt={item.name}
                     className="w-full h-full object-cover"
@@ -207,7 +128,7 @@ const OffersCarousel = () => {
           <div className="mt-4 text-center text-xl font-semibold">
             <p className="text-gray-400 line-through">Actual Price: ${offers[prevIndex].total_price}</p>
             <p className="text-yellow-300 font-bold text-2xl">Discounted Price: ${offers[prevIndex].discounted_price}</p>
-             {/* 🗓️ Display Date Range for Previous Slide */}
+            {/* 🗓️ Display Date Range for Previous Slide */}
             <p className="text-gray-400 text-sm mt-1">
               🗓️ {new Date(offers[prevIndex].start_date).toLocaleDateString()} -{" "}
               {new Date(offers[prevIndex].end_date).toLocaleDateString()}
@@ -219,10 +140,10 @@ const OffersCarousel = () => {
         <motion.div
           key={currentIndex}
           className="relative w-[90%] max-w-[700px] md:max-w-[600px] sm:max-w-[450px]
-                        min-h-[360px] lg:min-h-[500px] h-auto
-                        bg-[#131722] text-white rounded-2xl p-6 sm:p-10 shadow-xl border border-gray-700
-                        flex flex-col items-center justify-between
-                        mt-2 sm:mt-0 lg:mt-6 mb-2 sm:mb-0 lg:mb-6"
+                           min-h-[360px] lg:min-h-[500px] h-auto
+                           bg-[#131722] text-white rounded-2xl p-6 sm:p-10 shadow-xl border border-gray-700
+                           flex flex-col items-center justify-between
+                           mt-2 sm:mt-0 lg:mt-6 mb-2 sm:mb-0 lg:mb-6"
           initial={{ x: "100vw" }}
           animate={{ x: "0vw" }}
           exit={{ x: "-25vw" }}
@@ -230,7 +151,7 @@ const OffersCarousel = () => {
         >
           {/* Offer Header */}
           <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold bg-gradient-to-r from-yellow-500 to-orange-500 text-white
-                        px-6 py-3 sm:px-7 sm:py-4 rounded-lg flex items-center gap-3 w-full text-center justify-center shadow-lg">
+                              px-6 py-3 sm:px-7 sm:py-4 rounded-lg flex items-center gap-3 w-full text-center justify-center shadow-lg">
             <MdLocalOffer className="text-white text-xl sm:text-2xl lg:text-3xl" />
             {offers[currentIndex].offer_type} Offer
           </h2>
@@ -241,7 +162,7 @@ const OffersCarousel = () => {
               <div key={item.item_id} className="text-center flex flex-col items-center w-[90px] sm:w-[120px] lg:w-[140px]">
                 {/* Image Container */}
                 <div className="relative w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 max-w-[80px] max-h-[80px] sm:max-w-none sm:max-h-none rounded-full overflow-hidden border-2 border-gray-500 shadow-md">
-                  <LazyLoadedImage
+                  <img
                     src={item.image_url}
                     alt={item.name}
                     className="w-full h-full object-cover"
@@ -252,7 +173,7 @@ const OffersCarousel = () => {
                   {item.name}
                 </p>
                 {/* Item Number */}
-                <div className="mt-3  text-xs sm:text-sm lg:text-base font-medium text-gray-300 border border-gray-500 px-3 py-1 rounded-md">
+                <div className="mt-3  text-xs sm:text-sm lg:text-base font-medium text-gray-300 border border-gray-500 px-3 py-1 rounded-md">
                   Item No: {item.quantity}
                 </div>
               </div>
@@ -265,7 +186,7 @@ const OffersCarousel = () => {
             <p className="text-yellow-300 font-bold text-2xl sm:text-3xl lg:text-3xl">
               Discounted Price: ${offers[currentIndex].discounted_price}
             </p>
-             {/* 🗓️ Display Date Range for Center Slide */}
+            {/* 🗓️ Display Date Range for Center Slide */}
             <p className="text-gray-400 text-sm mt-1">
               🗓️ {new Date(offers[currentIndex].start_date).toLocaleDateString('en-GB')} -{" "}
               {new Date(offers[currentIndex].end_date).toLocaleDateString('en-GB')}
@@ -290,7 +211,7 @@ const OffersCarousel = () => {
             {getSelectedItems(offers[nextIndex]).map((item) => (
               <div key={item.item_id} className="text-center">
                 <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-yellow-500">
-                  <LazyLoadedImage
+                  <img
                     src={item.image_url}
                     alt={item.name}
                     className="w-full h-full object-cover"
@@ -307,7 +228,7 @@ const OffersCarousel = () => {
           <div className="mt-4 text-center text-xl font-semibold">
             <p className="text-gray-400 line-through">Actual Price: ${offers[nextIndex].total_price}</p>
             <p className="text-yellow-300 font-bold text-2xl">Discounted Price: ${offers[nextIndex].discounted_price}</p>
-             {/* 🗓️ Display Date Range for Next Slide */}
+            {/* 🗓️ Display Date Range for Next Slide */}
             <p className="text-gray-400 text-sm mt-1">
               🗓️ {new Date(offers[nextIndex].start_date).toLocaleDateString('en-GB')} -{" "}
               {new Date(offers[nextIndex].end_date).toLocaleDateString('en-GB')}
@@ -320,4 +241,3 @@ const OffersCarousel = () => {
 };
 
 export default OffersCarousel;
-
