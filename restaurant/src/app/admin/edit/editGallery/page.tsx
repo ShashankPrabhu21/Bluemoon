@@ -1,323 +1,201 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 import EditUserSidebar from "@/app/components/editSidebar";
 
-const categories = [
-    { id: "interior", name: "Interior" },
-    { id: "dishes", name: "Signature Dishes" },
-    { id: "events", name: "Events" },
-    { id: "drinks", name: "Drinks" },
-    { id: "videos", name: "Videos" }, // Added Videos category
-];
+interface GalleryItem {
+  id: number;
+  src: string;
+  alt: string;
+  title: string;
+  category: string;
+  type: 'image' | 'video';
+  created_at: string;
+}
 
+export default function EditGalleryPage() {
+  const [url, setUrl] = useState('');
+  const [title, setTitle] = useState('');
+  const [alt, setAlt] = useState('');
+  const [message, setMessage] = useState('');
+  const [videos, setVideos] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-const UploadGalleryImages = () => {
-    const [mediaType, setMediaType] = useState<"image" | "video" | "youtube">("image");
-    const [file, setFile] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
-    const [youtubeUrl, setYoutubeUrl] = useState("");
-    const [category, setCategory] = useState("");
-    const [title, setTitle] = useState("");
-    const [alt, setAlt] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [successMsg, setSuccessMsg] = useState("");
-    const [uploadingToCloudinary, setUploadingToCloudinary] = useState(false); // Track Cloudinary upload
-
-    const handleMediaTypeChange = (type: "image" | "video" | "youtube") => {
-        setMediaType(type);
-        setFile(null);
-        setPreview(null);
-        setYoutubeUrl("");
-    };
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selected = e.target.files?.[0];
-        if (selected) {
-            setFile(selected);
-            setPreview(URL.createObjectURL(selected));
-        }
-    };
-
-    const uploadToCloudinary = async (file: File, resourceType: "image" | "video") => {
-        setUploadingToCloudinary(true);
-        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET; // You might want separate presets for video
-
-        if (!cloudName || !uploadPreset) {
-            alert("Cloudinary configuration is missing.");
-            setUploadingToCloudinary(false);
-            return null;
-        }
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", uploadPreset);
-       
-
-        try {
-          const response = await fetch(
-            `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
-          
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData?.error?.message || `Cloudinary ${resourceType} upload failed`);
-            }
-
-            const data = await response.json();
-            return data.secure_url;
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.error(`Error uploading ${resourceType} to Cloudinary:`, error);
-                alert(`Failed to upload ${resourceType}: ${error.message}`);
-            } else {
-                console.error(`Unknown error uploading ${resourceType} to Cloudinary:`, error);
-                alert(`Failed to upload ${resourceType}: Unknown error`);
-            }
-            return null;
-        }
-         finally {
-            setUploadingToCloudinary(false);
-        }
-    };
-
-    const handleUpload = async () => {
-      if (!category || !title) {
-        alert("Please fill category and title.");
-        return;
-      }
-    
+  useEffect(() => {
+    const fetchVideos = async () => {
       setLoading(true);
-      const formData = new FormData();
-      formData.append("type", mediaType);
-      formData.append("category", category);
-      formData.append("title", title);
-      if (alt) {
-        formData.append("alt", alt);
-      }
-    
+      setError(null);
       try {
-        if (mediaType === "image" && file) {
-          const imageUrl = await uploadToCloudinary(file, "image");
-          if (imageUrl) {
-            formData.append("image", file);
-            formData.append("src", imageUrl);
-          } else {
-            throw new Error("Image upload to Cloudinary failed.");
-          }
-        } else if (mediaType === "video" && file) {
-          // ✅ Add the video size check here
-          if (file.size > 100 * 1024 * 1024) {
-            alert("Video must be less than 100MB");
-            setLoading(false);
-            return;
-          }
-    
-          const videoUrl = await uploadToCloudinary(file, "video");
-          if (videoUrl) {
-            formData.append("video", file);
-            formData.append("src", videoUrl);
-          } else {
-            throw new Error("Video upload to Cloudinary failed.");
-          }
-        } else if (mediaType === "youtube" && youtubeUrl) {
-          formData.append("url", youtubeUrl);
+        const response = await axios.get('/api/gallery/events');
+        if (response.status === 200) {
+          setVideos(response.data);
         } else {
-          alert(`Please provide a ${mediaType}.`);
-          setLoading(false);
-          return;
+          setError('Failed to fetch videos.');
         }
-    
-        const res = await fetch("/api/gallery/upload", {
-          method: "POST",
-          body: formData,
-        });
-    
-        const resData = await res.json();
-    
-        if (!res.ok) {
-          throw new Error(resData.error || "Upload failed");
-        }
-    
-        setSuccessMsg("Item uploaded successfully!");
-        setFile(null);
-        setPreview(null);
-        setYoutubeUrl("");
-        setCategory("");
-        setTitle("");
-        setAlt("");
-      } catch (err) {
-        if (err instanceof Error) {
-          alert(`Error uploading item: ${err.message}`);
-        } else {
-          alert("An unknown error occurred during upload.");
-        }
+      } catch (err: any) {
+        setError(err.message || 'An error occurred.');
       } finally {
         setLoading(false);
       }
     };
-    
-    
-    
+    fetchVideos();
+  }, []);
 
-    return (
-        <div className="flex flex-col md:flex-row min-h-screen mt-24 bg-gradient-to-br from-gray-800 to-black">
-            <EditUserSidebar />
-            <div className="flex-1 flex flex-col items-center mt-12">
-                <div className="backdrop-blur-md bg-[#2c2f45]/70 border border-gray-600 rounded-3xl shadow-lg p-6 mb-8 max-w-xl w-full">
-                    <h1 className="text-4xl sm:text-4xl font-bold text-center text-blue-700 drop-shadow-sm mb-10">
-                        <span role="img" aria-label="camera">📸</span> Upload Gallery Item
-                    </h1>
-                    <div className="flex justify-center">
-                        <div className="space-y-6 w-full">
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-blue-400">
-                                    Media Type
-                                </label>
-                                <select
-                                    value={mediaType}
-                                    onChange={(e) => handleMediaTypeChange(e.target.value as "image" | "video" | "youtube")}
-                                    className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="image">Image</option>
-                                    <option value="video">Video</option>
-                                    <option value="youtube">YouTube URL</option>
-                                </select>
-                            </div>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-                            {mediaType === "image" && (
-                                <>
-                                    <div>
-                                        <label className="block mb-2 text-sm font-medium text-blue-400">
-                                            Select Image
-                                        </label>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleFileChange}
-                                            className="text-gray-800"
-                                        />
-                                    </div>
-                                    {preview && (
-                                        <div>
-                                            <p className="mb-2 text-sm text-gray-800">Preview</p>
-                                            <Image
-                                                src={preview}
-                                                alt="Image Preview"
-                                                width={500}
-                                                height={300}
-                                                className="rounded-xl border border-gray-600 shadow-lg"
-                                            />
-                                        </div>
-                                    )}
-                                    <div>
-                                        <label className="block mb-2 text-sm font-medium text-blue-400">
-                                            Alt Text
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={alt}
-                                            onChange={(e) => setAlt(e.target.value)}
-                                            className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="e.g. Restaurant interior view"
-                                        />
-                                    </div>
-                                </>
-                            )}
+    if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+      setMessage('Please enter a valid YouTube URL');
+      return;
+    }
 
-                            {mediaType === "video" && (
-                                <div>
-                                    <label className="block mb-2 text-sm font-medium text-blue-400">
-                                        Select Video
-                                    </label>
-                                    <input
-                                        type="file"
-                                        accept="video/*"
-                                        onChange={handleFileChange}
-                                        className="text-gray-800"
-                                    />
-                                    {preview && (
-                                        <div>
-                                            <p className="mb-2 text-sm text-gray-800">Preview</p>
-                                            <video src={preview} controls className="rounded-xl border border-gray-600 shadow-lg w-full max-w-md"></video>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+    try {
+      const res = await axios.post('/api/gallery/add', {
+        src: url,
+        alt,
+        title,
+        category: 'event',
+        type: 'video',
+      });
 
-                            {mediaType === "youtube" && (
-                                <div>
-                                    <label className="block mb-2 text-sm font-medium text-blue-400">
-                                        YouTube URL
-                                    </label>
-                                    <input
-                                        type="url"
-                                        value={youtubeUrl}
-                                        onChange={(e) => setYoutubeUrl(e.target.value)}
-                                        className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                                    />
-                                </div>
-                            )}
+      if (res.status === 200) {
+        setMessage('YouTube video added successfully!');
+        setUrl('');
+        setTitle('');
+        setAlt('');
+        const newVideo = res.data.data;
+        setVideos(prevVideos => [newVideo, ...prevVideos]);
+      } else {
+        setMessage('Failed to add video. Try again.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setMessage('Error adding video.');
+    }
+  };
 
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-blue-400">
-                                    Category
-                                </label>
-                                <select
-                                    value={category}
-                                    onChange={(e) => setCategory(e.target.value)}
-                                    className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="">-- Select Category --</option>
-                                    {categories.map((cat) => (
-                                        <option key={cat.id} value={cat.id}>
-                                            {cat.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+  const handleDeleteVideo = async (videoId: number) => {
+    try {
+      const res = await axios.delete(`/api/gallery/delete/${videoId}`);
+      if (res.status === 200) {
+        setMessage('Video deleted successfully!');
+        setVideos(prevVideos => prevVideos.filter(video => video.id !== videoId));
+      } else {
+        setMessage('Failed to delete video.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setMessage('Error deleting video.');
+    }
+  };
 
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-blue-400">
-                                    Title
-                                </label>
-                                <input
-                                    type="text"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    className="w-full px-4 py-2 rounded-lg text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="e.g. Cozy Dining Area or Event Highlight"
-                                />
-                            </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-black flex md:flex-row flex-col p-6 mt-32 space-y-8">
+      <EditUserSidebar />
+      <div className="flex-grow ">
+      <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-center text-blue-600">
+  Add and Manage Event Videos
+</h1>
 
-                            <button
-                                onClick={handleUpload}
-                                disabled={loading || uploadingToCloudinary}
-                                className="w-full bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-xl text-white font-bold tracking-wide shadow-lg transition-all"
-                            >
-                                {loading ? "Uploading..." : uploadingToCloudinary ? "Uploading to Cloudinary..." : "Upload"}
-                            </button>
 
-                            {successMsg && (
-                                <p className="text-green-400 font-semibold text-center mt-4">
-                                    {successMsg}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
+        {/* Add Video Form */}
+        <div className="bg-white text-black rounded-xl p-8 shadow-xl max-w-3xl mx-auto ">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="url" className="text-blue-700 text-lg font-medium">YouTube URL</label>
+              <input
+                id="url"
+                type="text"
+                placeholder="Enter YouTube URL"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                required
+                className="w-full border p-3 rounded-lg bg-gray-100  text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
-        </div>
-    );
-};
 
-export default UploadGalleryImages;
+            <div>
+              <label htmlFor="title" className="text-blue-700 text-lg font-medium">Title</label>
+              <input
+                id="title"
+                type="text"
+                placeholder="Enter Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                className="w-full border p-3 rounded-lg bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="alt" className="text-blue-700 text-lg font-medium">Alt Text</label>
+              <input
+                id="alt"
+                type="text"
+                placeholder="Enter Alt Text"
+                value={alt}
+                onChange={(e) => setAlt(e.target.value)}
+                required
+                className="w-full border p-3 rounded-lg bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+            >
+              Add Video
+            </Button>
+          </form>
+          {message && <p className="mt-4 text-sm text-center text-white">{message}</p>}
+        </div>
+
+        {/* Display Videos */}
+<div className="bg-white text-black rounded-xl p-8 shadow-xl max-w-4xl mx-auto mt-5">
+  <h2 className="text-2xl font-semibold mb-6 text-blue-600 text-center">Uploaded Videos</h2>
+  {loading ? (
+    <p className="text-gray-400 text-center">Loading videos...</p>
+  ) : error ? (
+    <p className="text-red-400 text-center">{error}</p>
+  ) : videos.length === 0 ? (
+    <p className="text-gray-400 text-center">No videos uploaded yet.</p>
+  ) : (
+    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {videos.map((video) => (
+        <div
+          key={video.id}
+          className="flex flex-col items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-300 shadow-md hover:shadow-lg transition-shadow duration-300"
+        >
+          <div className="w-full">
+            <p className="font-medium text-blue-600 text-lg mb-2">{video.title}</p>
+            <p className="text-gray-500 text-sm mb-2">
+              Uploaded: {new Date(video.created_at).toLocaleString()}
+            </p>
+            {video.src.startsWith('http') ? (
+              <p className="text-blue-400 text-sm truncate">{video.src}</p>
+            ) : (
+              <p className="text-green-400 text-sm truncate">Local Video: {video.src}</p>
+            )}
+          </div>
+          <Button
+            variant="destructive"
+            size="icon"
+            onClick={() => handleDeleteVideo(video.id)}
+            className="bg-red-600 text-white p-2 rounded-full mt-4 hover:bg-red-700 transition"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+      </div>
+    </div>
+  );
+}
