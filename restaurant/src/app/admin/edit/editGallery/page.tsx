@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+
 import EditUserSidebar from "@/app/components/editSidebar";
 
 interface GalleryItem {
@@ -21,9 +21,9 @@ export default function EditGalleryPage() {
   const [title, setTitle] = useState('');
   const [alt, setAlt] = useState('');
   const [message, setMessage] = useState('');
-  const [videos, setVideos] = useState<GalleryItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setVideos] = useState<GalleryItem[]>([]);
+  const [, setLoading] = useState(false);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -88,26 +88,7 @@ export default function EditGalleryPage() {
       }
   };
 
-  const handleDeleteVideo = async (videoId: number) => {
-    try {
-      const res = await axios.delete(`/api/gallery/delete/${videoId}`);
-      if (res.status === 200) {
-        setMessage('Video deleted successfully!');
-        setVideos(prevVideos => prevVideos.filter(video => video.id !== videoId));
-      } else {
-        setMessage('Failed to delete video.');
-      }
-    } catch (err: unknown) {
-        if (err instanceof Error) {
-          console.error(err);
-          setMessage('Error deleting video.');
-        } else {
-          console.error('Unknown error');
-          setMessage('Error deleting video.');
-        }
-      }
-  };
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 to-black flex md:flex-row flex-col p-6 mt-32 space-y-8">
       <EditUserSidebar />
@@ -169,46 +150,7 @@ export default function EditGalleryPage() {
           {message && <p className="mt-4 text-sm text-center text-white">{message}</p>}
         </div>
 
-        {/* Display Videos */}
-<div className="bg-white text-black rounded-xl p-8 shadow-xl max-w-4xl mx-auto mt-5">
-  <h2 className="text-2xl font-semibold mb-6 text-blue-600 text-center">Uploaded Videos</h2>
-  {loading ? (
-    <p className="text-gray-400 text-center">Loading videos...</p>
-  ) : error ? (
-    <p className="text-red-400 text-center">{error}</p>
-  ) : videos.length === 0 ? (
-    <p className="text-gray-400 text-center">No videos uploaded yet.</p>
-  ) : (
-    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {videos.map((video) => (
-        <div
-          key={video.id}
-          className="flex flex-col items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-300 shadow-md hover:shadow-lg transition-shadow duration-300"
-        >
-          <div className="w-full">
-            <p className="font-medium text-blue-600 text-lg mb-2">{video.title}</p>
-            <p className="text-gray-500 text-sm mb-2">
-              Uploaded: {new Date(video.created_at).toLocaleString()}
-            </p>
-            {video.src.startsWith('http') ? (
-              <p className="text-blue-400 text-sm truncate">{video.src}</p>
-            ) : (
-              <p className="text-green-400 text-sm truncate">Local Video: {video.src}</p>
-            )}
-          </div>
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={() => handleDeleteVideo(video.id)}
-            className="bg-red-600 text-white p-2 rounded-full mt-4 hover:bg-red-700 transition"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+        
 
       </div>
     </div>
