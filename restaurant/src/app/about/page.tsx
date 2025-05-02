@@ -8,7 +8,7 @@ export default function About() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#f8f9fa] to-[#eef1f6] relative text-[#3345A7]">
             
-            {/* Background Image added*/}
+            {/* Background Image*/}
             <div className="absolute inset-0 bg-black bg-opacity-30">
                 <Image 
                     src="/base.jpg" // Replace with your uploaded image
