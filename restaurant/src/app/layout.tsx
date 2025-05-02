@@ -1,9 +1,9 @@
-import { Inter } from "next/font/google";
+
+import { Inter } from "next/font/google"; 
 import "./globals.css";
 
 import Footer from "./components/footer";
 import Navbar from "./components/navbar";
-import ClientLayout from "./components/clientLayout";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -11,12 +11,12 @@ const inter = Inter({
   display: "swap",
 });
 
-// Metadata MUST be exported here (in the server component)
+// app/layout.tsx
 export const metadata = {
   title: "Bluemoon Restaurant",
   description: "Fine dining at its best.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.ico", // You will update this file below
   },
   keywords: [
     "Bluemoon",
@@ -40,6 +40,7 @@ export const metadata = {
   creator: "Bluemoon Restaurant",
 };
 
+
 export default function RootLayout({
   children,
 }: {
@@ -47,13 +48,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/LOGO.jpg" type="image/jpg" />
-        <title>Bluemoon Restaurant</title>
-      </head>
+      
+<head>
+  <link rel="icon" href="/LOGO.jpg" type="image/jpg" />
+  <title>Bluemoon Restaurant</title>
+</head>
+
       <body className={`${inter.variable} antialiased bg-gray-50 text-gray-900`}>
         <Navbar />
-        <ClientLayout>{children}</ClientLayout> {/* Wrap children with the client component */}
+        <main>{children}</main>
         <Footer />
       </body>
     </html>
