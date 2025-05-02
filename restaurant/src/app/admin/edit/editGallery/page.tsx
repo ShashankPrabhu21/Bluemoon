@@ -22,7 +22,7 @@ export default function EditGalleryPage() {
   const [alt, setAlt] = useState('');
   const [message, setMessage] = useState('');
   const [videos, setVideos] = useState<GalleryItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
