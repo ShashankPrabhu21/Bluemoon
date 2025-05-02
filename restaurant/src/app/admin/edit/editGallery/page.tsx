@@ -21,9 +21,10 @@ export default function EditGalleryPage() {
   const [title, setTitle] = useState('');
   const [alt, setAlt] = useState('');
   const [message, setMessage] = useState('');
-  const [, setVideos] = useState<GalleryItem[]>([]);
-  const [, setLoading] = useState(false);
-  const [, setError] = useState<string | null>(null);
+  const [videos, setVideos] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -42,8 +43,7 @@ export default function EditGalleryPage() {
         } else {
           setError('An unexpected error occurred.');
         }
-      }
-       finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -57,6 +57,10 @@ export default function EditGalleryPage() {
       setMessage('Please enter a valid YouTube URL');
       return;
     }
+
+    setIsAdding(true);
+    setMessage('Adding video...');
+    setError(null);
 
     try {
       const res = await axios.post('/api/gallery/add', {
@@ -78,25 +82,35 @@ export default function EditGalleryPage() {
         setMessage('Failed to add video. Try again.');
       }
     } catch (err: unknown) {
-        if (err instanceof Error) {
-          console.error(err);
-          setMessage('Error adding video.');
-        } else {
-          console.error('Unknown error');
-          setMessage('Error adding video.');
-        }
+      if (err instanceof Error) {
+        console.error(err);
+        setMessage('Error adding video.');
+      } else {
+        console.error('Unknown error');
+        setMessage('Error adding video.');
       }
+      setError('Failed to add video.');
+    } finally {
+      setIsAdding(false);
+    }
   };
-
+  const convertToEmbedUrl = (url: string): string => {
+    const youtubeRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
+    const match = url.match(youtubeRegex);
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}`;
+    }
+    return url; // fallback (not ideal)
+  };
   
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 to-black flex md:flex-row flex-col p-6 mt-32 space-y-8">
       <EditUserSidebar />
       <div className="flex-grow ">
-      <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-center text-blue-600">
-  Add and Manage Event Videos
-</h1>
-
+        <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-center text-blue-600">
+          Add and Manage Event Videos
+        </h1>
 
         {/* Add Video Form */}
         <div className="bg-white text-black rounded-xl p-8 shadow-xl max-w-3xl mx-auto ">
@@ -143,15 +157,42 @@ export default function EditGalleryPage() {
             <Button
               type="submit"
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+              disabled={isAdding}
             >
-              Add Video
+              {isAdding ? 'Adding...' : 'Add Video'}
             </Button>
           </form>
-          {message && <p className="mt-4 text-sm text-center text-white">{message}</p>}
+          {message && <p className={`mt-4 text-sm text-center ${message.includes('successfully') ? 'text-green-500' : 'text-white'}`}>{message}</p>}
+          {error && <p className="mt-4 text-sm text-center text-red-500">{error}</p>}
         </div>
 
-        
+        {/* Display Added Videos */}
+        {videos.length > 0 && (
+          <div className="mt-12 bg-white text-black rounded-xl p-8 shadow-xl max-w-3xl mx-auto">
+            <h2 className="text-2xl font-semibold mb-4 text-blue-700">Recently Added Videos</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {videos.map((video) => (
+                <div key={video.id} className="rounded-lg overflow-hidden shadow-md">
+                  <div className="aspect-w-16 aspect-h-9">
+                  <iframe
+  src={convertToEmbedUrl(video.src)}
+  title={video.title}
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowFullScreen
+  className="w-full h-56"
+></iframe>
 
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-lg">{video.title}</h3>
+                    <p className="text-sm text-gray-600">{video.alt}</p>
+                    <p className="text-xs text-gray-500 mt-1">Added on: {new Date(video.created_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
