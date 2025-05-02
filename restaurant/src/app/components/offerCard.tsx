@@ -1,3 +1,4 @@
+// OffersCarousel.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +24,7 @@ interface Offer {
 const OffersCarousel = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+  const [foodItemLookup, setFoodItemLookup] = useState<Record<number, FoodItem>>({}); // New lookup
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -54,6 +56,15 @@ const OffersCarousel = () => {
   }, []);
 
   useEffect(() => {
+    // Create the food item lookup when foodItems are available
+    const lookup: Record<number, FoodItem> = {};
+    foodItems.forEach((item) => {
+      lookup[item.item_id] = item;
+    });
+    setFoodItemLookup(lookup);
+  }, [foodItems]);
+
+  useEffect(() => {
     if (offers.length > 1 && !isHovered) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % offers.length);
@@ -77,10 +88,8 @@ const OffersCarousel = () => {
 
   const getSelectedItems = (offer: Offer) => {
     try {
-      const itemIds = JSON.parse(offer.selected_items);
-      return itemIds
-        .map((id: number) => foodItems.find((item) => item.item_id === id))
-        .filter(Boolean) as FoodItem[];
+      const itemIds = JSON.parse(offer.selected_items) as number[];
+      return itemIds.map((id) => foodItemLookup[id]).filter(Boolean) as FoodItem[];
     } catch (error) {
       console.error("Error parsing selected_items:", error);
       return [];
@@ -140,10 +149,10 @@ const OffersCarousel = () => {
         <motion.div
           key={currentIndex}
           className="relative w-[90%] max-w-[700px] md:max-w-[600px] sm:max-w-[450px]
-                           min-h-[360px] lg:min-h-[500px] h-auto
-                           bg-[#131722] text-white rounded-2xl p-6 sm:p-10 shadow-xl border border-gray-700
-                           flex flex-col items-center justify-between
-                           mt-2 sm:mt-0 lg:mt-6 mb-2 sm:mb-0 lg:mb-6"
+                            min-h-[360px] lg:min-h-[500px] h-auto
+                            bg-[#131722] text-white rounded-2xl p-6 sm:p-10 shadow-xl border border-gray-700
+                            flex flex-col items-center justify-between
+                            mt-2 sm:mt-0 lg:mt-6 mb-2 sm:mb-0 lg:mb-6"
           initial={{ x: "100vw" }}
           animate={{ x: "0vw" }}
           exit={{ x: "-25vw" }}
@@ -151,7 +160,7 @@ const OffersCarousel = () => {
         >
           {/* Offer Header */}
           <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold bg-gradient-to-r from-yellow-500 to-orange-500 text-white
-                              px-6 py-3 sm:px-7 sm:py-4 rounded-lg flex items-center gap-3 w-full text-center justify-center shadow-lg">
+                            px-6 py-3 sm:px-7 sm:py-4 rounded-lg flex items-center gap-3 w-full text-center justify-center shadow-lg">
             <MdLocalOffer className="text-white text-xl sm:text-2xl lg:text-3xl" />
             {offers[currentIndex].offer_type} Offer
           </h2>
