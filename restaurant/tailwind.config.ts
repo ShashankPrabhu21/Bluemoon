@@ -1,3 +1,4 @@
+//tailwing.config.ts
 import type { Config } from "tailwindcss";
 
 export default {

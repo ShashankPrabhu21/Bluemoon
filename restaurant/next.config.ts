@@ -3,6 +3,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    turbo: false, // ensures Webpack is used for dev too
+  },
   images: {
     domains: ['res.cloudinary.com'],
   },
