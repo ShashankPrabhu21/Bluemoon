@@ -61,7 +61,7 @@ export default function Navbar() {
                 <FaWhatsapp className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
             </a>
             <Link href="https://www.facebook.com/bluemmoonrestaurant/" target="_blank"><Facebook className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" /></Link>
-            <Link href="https://www.youtube.com/@metromtv" target="_blank"><Youtube className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" /></Link>
+            <Link href="https://www.youtube.com/channel/UCjDVQoe48ygvcF4a3lRiz7w" target="_blank"><Youtube className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" /></Link>
             <a href="https://www.instagram.com/bluemoonrestaurant1/" target="_blank" rel="noopener noreferrer">
                 <FaInstagram className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
             </a>
