@@ -269,7 +269,7 @@ const Gallery = () => {
                     )}
                     {item.type === "video" && getVideoId(item.src) && (
                       <iframe
-                        src={`http://www.youtube.com/embed/${getVideoId(item.src)}`}
+                        src={`https://www.youtube-nocookie.com/embed/${getVideoId(item.src)}`} // Use https://
                         title={item.title}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
@@ -330,14 +330,14 @@ const Gallery = () => {
               />
             )}
             {filteredItems[currentImageIndex].type === "video" && getVideoId(filteredItems[currentImageIndex].src) && (
-              <iframe
-                src={`http://www.youtube.com/embed/${getVideoId(filteredItems[currentImageIndex].src)}?autoplay=1&mute=1`}
-                title={filteredItems[currentImageIndex].title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="w-full h-full"
-              ></iframe>
-            )}
+  <iframe
+    src={`https://www.youtube-nocookie.com/embed/${getVideoId(filteredItems[currentImageIndex].src)}?autoplay=1&mute=1`} // Use https://
+    title={filteredItems[currentImageIndex].title}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+    className="w-full h-full"
+  ></iframe>
+)}
             {filteredItems[currentImageIndex].type === "video" && !getVideoId(filteredItems[currentImageIndex].src) && (
               <video
                 src={filteredItems[currentImageIndex].src}
