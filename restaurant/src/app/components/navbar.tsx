@@ -47,7 +47,7 @@ export default function Navbar() {
       <div className="hidden lg:flex justify-between items-center px-6 py-2 text-base font-medium">
     <div className="flex items-center space-x-5">
         <span>📞 0422 306 777</span>
-        <span>✉ bluemoon@gmail.com</span>
+        <span>✉contact@bluemoonrestaurants.com</span>
     </div>
     {/* Social Media & Admin Icons (Right-Aligned) */}
     <div className="flex items-center flex-row-reverse">
