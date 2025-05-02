@@ -1,10 +1,9 @@
-
-import { useEffect } from 'react';
 import { Inter } from "next/font/google";
 import "./globals.css";
 
 import Footer from "./components/footer";
 import Navbar from "./components/navbar";
+import ClientLayout from "./components/clientLayout";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -12,7 +11,7 @@ const inter = Inter({
   display: "swap",
 });
 
-// Metadata can stay exported separately
+// Metadata MUST be exported here (in the server component)
 export const metadata = {
   title: "Bluemoon Restaurant",
   description: "Fine dining at its best.",
@@ -46,17 +45,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // 🛠️ ChunkLoadError auto reload
-  useEffect(() => {
-    const errorHandler = (event: ErrorEvent) => {
-      if (event?.message?.includes('ChunkLoadError')) {
-        window.location.reload();
-      }
-    };
-    window.addEventListener('error', errorHandler);
-    return () => window.removeEventListener('error', errorHandler);
-  }, []);
-
   return (
     <html lang="en">
       <head>
@@ -65,7 +53,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} antialiased bg-gray-50 text-gray-900`}>
         <Navbar />
-        <main>{children}</main>
+        <ClientLayout>{children}</ClientLayout> {/* Wrap children with the client component */}
         <Footer />
       </body>
     </html>
