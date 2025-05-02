@@ -1,5 +1,7 @@
+'use client'; // 👈 Add this at the very top to enable client-side behavior
 
-import { Inter } from "next/font/google"; 
+import { useEffect } from 'react';
+import { Inter } from "next/font/google";
 import "./globals.css";
 
 import Footer from "./components/footer";
@@ -11,17 +13,17 @@ const inter = Inter({
   display: "swap",
 });
 
-// app/layout.tsx
+// Metadata can stay exported separately
 export const metadata = {
   title: "Bluemoon Restaurant",
   description: "Fine dining at its best.",
   icons: {
-    icon: "/favicon.ico", // You will update this file below
+    icon: "/favicon.ico",
   },
   keywords: [
     "Bluemoon",
-    "Kerala Restaurant",
-    "Kerala",
+    "Kerala Restaurant Australia",
+    "Restaurant in Australia",
     "Bluemoon Restaurant",
     "Indian restaurant Australia",
     "authentic Indian food",
@@ -40,20 +42,28 @@ export const metadata = {
   creator: "Bluemoon Restaurant",
 };
 
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // 🛠️ ChunkLoadError auto reload
+  useEffect(() => {
+    const errorHandler = (event: ErrorEvent) => {
+      if (event?.message?.includes('ChunkLoadError')) {
+        window.location.reload();
+      }
+    };
+    window.addEventListener('error', errorHandler);
+    return () => window.removeEventListener('error', errorHandler);
+  }, []);
+
   return (
     <html lang="en">
-      
-<head>
-  <link rel="icon" href="/LOGO.jpg" type="image/jpg" />
-  <title>Bluemoon Restaurant</title>
-</head>
-
+      <head>
+        <link rel="icon" href="/LOGO.jpg" type="image/jpg" />
+        <title>Bluemoon Restaurant</title>
+      </head>
       <body className={`${inter.variable} antialiased bg-gray-50 text-gray-900`}>
         <Navbar />
         <main>{children}</main>
