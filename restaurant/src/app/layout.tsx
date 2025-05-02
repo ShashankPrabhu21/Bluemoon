@@ -1,4 +1,3 @@
-'use client'; // 👈 Add this at the very top to enable client-side behavior
 
 import { useEffect } from 'react';
 import { Inter } from "next/font/google";
@@ -7,14 +6,13 @@ import "./globals.css";
 import Footer from "./components/footer";
 import Navbar from "./components/navbar";
 
-// Add the Inter font configuration
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
 
-// Export metadata separately (this can be used in your Head component)
+// Metadata can stay exported separately
 export const metadata = {
   title: "Bluemoon Restaurant",
   description: "Fine dining at its best.",
@@ -43,7 +41,11 @@ export const metadata = {
   creator: "Bluemoon Restaurant",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   // 🛠️ ChunkLoadError auto reload
   useEffect(() => {
     const errorHandler = (event: ErrorEvent) => {
@@ -59,16 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <link rel="icon" href="/LOGO.jpg" type="image/jpg" />
-        <title>{metadata.title}</title>
-        {/* Use the Head component from Next.js to set metadata */}
-        <meta name="description" content={metadata.description} />
-        <meta name="keywords" content={metadata.keywords.join(', ')} />
-        <meta property="og:title" content={metadata.openGraph.title} />
-        <meta property="og:description" content={metadata.openGraph.description} />
-        <meta property="og:url" content={metadata.openGraph.url} />
-        <meta property="og:site_name" content={metadata.openGraph.siteName} />
-        <meta property="og:locale" content={metadata.openGraph.locale} />
-        <meta property="og:type" content={metadata.openGraph.type} />
+        <title>Bluemoon Restaurant</title>
       </head>
       <body className={`${inter.variable} antialiased bg-gray-50 text-gray-900`}>
         <Navbar />
