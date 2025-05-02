@@ -2,16 +2,54 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db"; // Ensure your database connection is correct
 import db from "@/lib/db";
-// ✅ Handle GET requests (Fetch all menu items)
-export async function GET() {
+
+// ✅ Mapping Category IDs to Names (from your frontend)
+const categoryMappingFrontend = {
+  1: "Breakfast",
+  2: "Main Course",
+  3: "Desserts",
+  4: "Snacks",
+  5: "Drinks",
+};
+
+// ✅ Handle GET requests (Fetch menu items, optionally by category)
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const categoryName = searchParams.get("category"); // Get the 'category' parameter from the URL
+
   try {
-    const result = await db.query("SELECT * FROM menu_items ORDER BY created_at DESC");
+    let query = "SELECT * FROM menu_items ORDER BY created_at DESC"; // Default query to fetch all
+    let values = [];
+
+    if (categoryName && categoryName !== "All Menu") {
+      // Reverse lookup to find category_id from categoryName
+      let categoryId;
+      for (const id in categoryMappingFrontend) {
+        if (categoryMappingFrontend[id] === categoryName) {
+          categoryId = parseInt(id); // Convert the key (which is a string) to an integer
+          break;
+        }
+      }
+
+      if (categoryId) {
+        query = "SELECT * FROM menu_items WHERE category_id = $1 ORDER BY created_at DESC";
+        values = [categoryId];
+      } else {
+        // If the category name from the frontend doesn't match any in our mapping,
+        // we can return an empty array or handle it as you see fit.
+        return NextResponse.json([], { status: 200 });
+      }
+    }
+
+    const result = await db.query(query, values);
     return NextResponse.json(result.rows, { status: 200 });
   } catch (error) {
     console.error("Database Error:", error);
     return NextResponse.json({ error: "Failed to fetch menu items" }, { status: 500 });
   }
 }
+
+
 
 // ✅ Handle POST requests (Add a new menu item)
 
