@@ -116,11 +116,11 @@ export default function EditGalleryPage() {
         <div className="bg-white text-black rounded-xl p-8 shadow-xl max-w-3xl mx-auto ">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="url" className="text-blue-700 text-lg font-medium">YouTube URL</label>
+              <label htmlFor="url" className="text-blue-700 text-lg font-medium">YouTube Video URL</label>
               <input
                 id="url"
                 type="text"
-                placeholder="Enter YouTube URL"
+                placeholder="Enter YouTube Video URL ONLY (NO Youtube Shorts)"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 required
