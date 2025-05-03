@@ -1,6 +1,7 @@
 
 import { Inter } from "next/font/google"; 
 import "./globals.css";
+import { Metadata } from 'next'
 
 import Footer from "./components/footer";
 import Navbar from "./components/navbar";
@@ -12,7 +13,7 @@ const inter = Inter({
 });
 
 // app/layout.tsx
-export const metadata = {
+export const metadata: Metadata = {
   title: "Bluemoon Restaurant",
   description: "Fine dining at its best.",
   icons: {
