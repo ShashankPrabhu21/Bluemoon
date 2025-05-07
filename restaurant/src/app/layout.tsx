@@ -21,14 +21,32 @@ export const metadata: Metadata = {
   },
   keywords: [
     "Bluemoon",
-    "Kerala Restaurant Australia",
-    "Restaurant in Australia",
     "Bluemoon Restaurant",
+    "bluemoonrestaurants",
+    "Bluemoon restaurant Australia",
+    "Bluemoon restaurant Sydney",
+    "Bluemoon restaurant menu",
+    "Kerala Restaurant Australia",
+    "Kerala food near me",
+    "best Kerala food in Australia",
+    "Kerala restaurant in Sydney",
+    "authentic Kerala food Australia",
+    "Kerala cuisine Sydney",
     "Indian restaurant Australia",
-    "authentic Indian food",
     "best Indian cuisine",
+    "authentic Indian food",
+    "Indian food near me",
+    "South Indian food Australia",
+    "top rated Kerala restaurant",
+    "best kerala cuisine in Sydney",
+    "best kerala cuisine in Australia",
     "restaurant booking",
+    "Bluemoon restaurant reviews",
+    "traditional Kerala meals Australia",
+    "Kerala takeaway Sydney",
+    "Kerala lunch and dinner specials"
   ],
+  
   openGraph: {
     title: "Bluemoon Restaurant",
     description: "Authentic Indian Cuisine in Australia – Dine in or order online.",
@@ -53,6 +71,16 @@ export default function RootLayout({
 <head>
   <link rel="icon" href="/LOGO.jpg" type="image/jpg" />
   <title>Bluemoon Restaurant</title>
+  {/* ✅ Structured Data for Logo */}
+  <script type="application/ld+json" dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Bluemoon Restaurant",
+            "url": "https://bluemoonrestaurants.com",
+            "logo": "https://bluemoonrestaurants.com/LOGO.jpg"
+          })
+        }} />
 </head>
 
       <body className={`${inter.variable} antialiased bg-gray-50 text-gray-900`}>

@@ -235,7 +235,7 @@ export default function EditBlog() {
             {/* Image Upload */}
             <div>
               <label className="block text-md font-semibold text-blue-400">
-                🖼️ Upload Image
+                🖼️ Upload Image (Image size less than 500KB)
               </label>
               <input
                 type="file"
