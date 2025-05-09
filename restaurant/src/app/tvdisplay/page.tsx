@@ -95,7 +95,7 @@ const HeroSection = () => {
       const container = foodItemsContainerRef.current;
       let animationFrameId: number | null = null;
       let startTime: number | null = null;
-      const duration = 30000;
+      const duration = 60000;
 
       const scroll = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
