@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import pool from "@/lib/db"; // Ensure your database connection is correct
 import db from "@/lib/db";
 
-// ✅ Mapping Category IDs to Names (same as frontend for consistency)
+// ✅ Mapping Category IDs to Names (from your frontend) - Consistent naming
 const categoryMapping = {
   1: "Breakfast",
   2: "Main Course",
@@ -12,15 +12,43 @@ const categoryMapping = {
   5: "Drinks",
 };
 
-// ✅ Handle GET requests (Fetch menu items)
+// ✅ Handle GET requests (Fetch menu items, optionally by category)
 export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const categoryName = searchParams.get("category"); // Get the 'category' parameter from the URL
+
   try {
-    const query = "SELECT * FROM menu_items ORDER BY created_at DESC";
-    const result = await db.query(query);
-    const menuItemsWithCategoryName = result.rows.map((item) => ({
+    let query = "SELECT * FROM menu_items ORDER BY created_at DESC"; // Default query to fetch all
+    let values = [];
+
+    if (categoryName && categoryName !== "All Menu") {
+      // Reverse lookup to find category_id from categoryName
+      let categoryId;
+      for (const id in categoryMapping) {
+        if (categoryMapping[id] === categoryName) {
+          categoryId = parseInt(id); // Convert the key (which is a string) to an integer
+          break;
+        }
+      }
+
+      if (categoryId) {
+        query = "SELECT * FROM menu_items WHERE category_id = $1 ORDER BY created_at DESC";
+        values = [categoryId];
+      } else {
+        // If the category name from the frontend doesn't match any in our mapping,
+        // we return an empty array.  Important for consistent behavior.
+        return NextResponse.json([], { status: 200 });
+      }
+    }
+
+    const result = await db.query(query, values);
+
+    // Add category_name to each item in the result
+    const menuItemsWithCategoryName = result.rows.map(item => ({
       ...item,
-      category_name: categoryMapping[item.category_id] || "Unknown", // Add category name
+      category_name: categoryMapping[item.category_id] || "Unknown" // Add category name, handle unknown
     }));
+
     return NextResponse.json(menuItemsWithCategoryName, { status: 200 });
   } catch (error) {
     console.error("Database Error:", error);
