@@ -38,7 +38,6 @@ const HeroSection = () => {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const foodItemsContainerRef = useRef<HTMLDivElement>(null);
   const cycleTimeout = useRef<NodeJS.Timeout | null>(null);
-  const isScrolling = useRef(false);
 
   const resetCycle = () => {
     setShowFoodItemsSection(false);
