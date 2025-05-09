@@ -171,7 +171,7 @@ const HeroSection = () => {
       const container = galleryContainerRef.current;
       let animationFrameId: number | null = null;
       let startTime: number | null = null;
-      const duration = 23000;
+      const duration = 18000;
 
       const scroll = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
