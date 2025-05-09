@@ -134,7 +134,7 @@ const HeroSection = () => {
       const container = foodItemsContainerRef.current;
       let animationFrameId: number | null = null;
       let startTime: number | null = null;
-      const duration = 90000;
+      const duration = 140000;
 
       const scroll = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
@@ -171,7 +171,7 @@ const HeroSection = () => {
       const container = galleryContainerRef.current;
       let animationFrameId: number | null = null;
       let startTime: number | null = null;
-      const duration = 48000;
+      const duration = 23000;
 
       const scroll = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
@@ -259,7 +259,7 @@ const HeroSection = () => {
         // ----------------- FOOD ITEMS SECTION ------------------
         <section className="relative py-24 mt-12 overflow-hidden bg-[url('/sec11.jpg')] bg-cover bg-center">
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/85 to-black/90 z-0"></div>
-          <div className="container mx-auto px-4 relative z-10">
+          <div className=" relative container mx-auto px-4 relative z-10">
             <div
               className="flex flex-col gap-8 overflow-y-auto max-h-[75vh]"
               ref={foodItemsContainerRef}
@@ -268,7 +268,7 @@ const HeroSection = () => {
                 foodItemsByCategory[categoryName] &&
                 foodItemsByCategory[categoryName].length > 0 && (
                   <div key={categoryName}>
-                    <div className="flex justify-center mt-12">
+                    <div className="relative flex justify-center mt-12">
                         <h2 className="relative inline-block text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#d2d7ef] via-[#cad1f6] to-[#cbd2f4] tracking-wider mb-8 drop-shadow-[0_4px_10px_rgba(74,96,210,0.35)] after:content-[''] after:block after:h-[4px] after:w-20 after:mx-auto after:mt-3 after:bg-gradient-to-r after:from-[#2C3E91] after:to-[#4A60D2] after:rounded-full">
                           {categoryName}
                         </h2>
