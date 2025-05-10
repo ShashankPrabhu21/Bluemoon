@@ -134,7 +134,7 @@ const HeroSection = () => {
       const container = foodItemsContainerRef.current;
       let animationFrameId: number | null = null;
       let startTime: number | null = null;
-      const duration = 140000;
+      const duration = 300000;
 
       const scroll = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
@@ -171,7 +171,7 @@ const HeroSection = () => {
       const container = galleryContainerRef.current;
       let animationFrameId: number | null = null;
       let startTime: number | null = null;
-      const duration = 18000;
+      const duration = 22000;
 
       const scroll = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
