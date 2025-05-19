@@ -56,9 +56,14 @@ const FoodDisplayPage = () => {
           }
         });
         setFoodItemsByCategory(grouped);
-      } catch (error: any) { // Catch specific error type for better handling
+      } catch (error: unknown) { // *** CHANGED from 'any' to 'unknown' ***
         console.error("Error fetching menu items:", error);
-        setError(`Failed to load menu items: ${error.message}`);
+        // *** SAFELY ACCESS ERROR MESSAGE ***
+        if (error instanceof Error) {
+           setError(`Failed to load menu items: ${error.message}`);
+        } else {
+           setError("An unknown error occurred while loading menu items.");
+        }
       } finally {
         setIsLoading(false); // End loading
       }
