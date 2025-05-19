@@ -67,7 +67,7 @@ const FoodDisplayPage = () => {
 
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
-        let progress = elapsed / duration;
+        const progress = elapsed / duration;
 
         // Ensure progress doesn't exceed 1, but allow it to be slightly over to detect loop completion
         // container.scrollHeight can change if images load late, recalculate target scroll
