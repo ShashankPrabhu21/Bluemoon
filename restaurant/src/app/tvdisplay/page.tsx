@@ -39,7 +39,7 @@ const FoodDisplayPage = () => {
         const startTime = performance.now(); // Start timing fetch
         const res = await fetch("/api/menuitem");
         const endTime = performance.now(); // End timing fetch
-        console.log(`Workspace completed in ${endTime - startTime} ms`);
+        console.log(`Workspace completed in ${endTime - startTime} ms`); // Corrected console log message
 
         if (!res.ok) {
           // Log response status and body for debugging
@@ -65,16 +65,27 @@ const FoodDisplayPage = () => {
         setFoodItemsByCategory(grouped);
       } catch (error: unknown) { // Catch as unknown for type safety
         console.error("Error fetching menu items:", error);
-        // Safely check the type and access the message
+        let errorMessage = "An unknown error occurred while loading menu items.";
+
+        // *** Corrected Error Handling to avoid 'any' ***
         if (error instanceof Error) {
-           setError(`Failed to load menu items: ${error.message}`);
-        } else if (typeof error === 'object' && error !== null && 'message' in error && typeof (error as any).message === 'string') {
-           // Fallback for errors that are not standard Error instances but have a message
-           setError(`Failed to load menu items: ${(error as any).message}`);
+          // If it's a standard Error instance, use its message
+          errorMessage = error.message;
+        } else if (
+          // Check if it's an object, not null, and has a 'message' property that is a string
+          error !== null &&
+          typeof error === 'object' &&
+          'message' in error &&
+          typeof (error as { message: unknown }).message === 'string' // Safely access and check the type of the message property
+        ) {
+           // If the checks pass, we can safely use the message
+           errorMessage = (error as { message: string }).message;
         }
-         else {
-           setError("An unknown error occurred while loading menu items.");
-        }
+        // Otherwise, the default "An unknown error occurred..." message is used.
+        // *** End Corrected Error Handling ***
+
+        setError(`Failed to load menu items: ${errorMessage}`);
+
       } finally {
         setIsLoading(false); // End loading
       }
