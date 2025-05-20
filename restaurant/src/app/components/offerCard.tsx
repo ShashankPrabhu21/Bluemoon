@@ -146,27 +146,28 @@ const OffersCarousel = () => {
         </motion.div>
 
         {/* Center Slide */}
-        <motion.div
-          key={currentIndex}
-          className="relative w-[90%] max-w-[700px] md:max-w-[600px] sm:max-w-[450px]
-                       min-h-[500px] lg:min-h-[560px] h-auto
-                       bg-[#131722] text-white rounded-2xl p-6 sm:p-10 shadow-xl border border-gray-700
-                       flex flex-col items-center justify-between
-                       mt-2 sm:mt-0 lg:mt-6 mb-2 sm:mb-0 lg:mb-6"
-          initial={{ x: "100vw" }}
-          animate={{ x: "0vw" }}
-          exit={{ x: "-25vw" }}
-          transition={{ duration: 1, ease: "easeOut" }}
-        >
+<motion.div
+  key={currentIndex}
+  className="relative w-[90%] max-w-[700px] md:max-w-[600px] sm:max-w-[450px]
+             min-h-[500px] lg:min-h-[560px] h-auto
+             bg-[#131722] text-white rounded-2xl p-6 sm:p-10 shadow-xl border border-gray-700
+             flex flex-col items-center justify-between
+             mt-6 sm:mt-10 lg:mt-14 mb-6 sm:mb-10 lg:mb-14"
+  initial={{ x: "100vw" }}
+  animate={{ x: "0vw" }}
+  exit={{ x: "-25vw" }}
+  transition={{ duration: 1, ease: "easeOut" }}
+>
+
           {/* Offer Header */}
-          <h2 className="mt-2 text-lg sm:text-xl lg:text-2xl font-semibold bg-gradient-to-r from-yellow-500 to-orange-500 text-white
+          <h2 className="mt-6 text-lg sm:text-xl lg:text-2xl font-semibold bg-gradient-to-r from-yellow-500 to-orange-500 text-white
                          px-6 py-3 sm:px-7 sm:py-4 rounded-lg flex items-center gap-3 w-full text-center justify-center shadow-lg">
             <MdLocalOffer className="text-white text-xl sm:text-2xl lg:text-3xl" />
             {offers[currentIndex].offer_type} Offer
           </h2>
 
           {/* Items Section - Adjusted for up to 5 items */}
-          <div className="flex flex-wrap justify-center gap-x-3 sm:gap-x-5 lg:gap-x-7 gap-y-4 mt-3 sm:mt-5 lg:mt-6 overflow-hidden">
+          <div className="flex flex-wrap justify-center gap-x-3 sm:gap-x-5 lg:gap-x-7 gap-y-3 mt-2 sm:mt-3 lg:mt-4 overflow-hidden">
             {getSelectedItems(offers[currentIndex]).map((item) => (
               <div key={item.item_id} className="text-center flex flex-col items-center w-[75px] sm:w-[90px] lg:w-[100px] flex-shrink-0">
                 {/* Image Container */}
@@ -190,7 +191,7 @@ const OffersCarousel = () => {
           </div>
 
           {/* Price Section */}
-          <div className="mt-4 sm:mt-6 text-center text-xl sm:text-2xl lg:text-2xl font-semibold mb-5">
+          <div className="mt-2 sm:mt-4 text-center text-xl sm:text-2xl lg:text-2xl font-semibold mb-5">
             <p className="text-gray-400 line-through">Actual Price: ${offers[currentIndex].total_price}</p>
             <p className="text-yellow-300 font-bold text-2xl sm:text-3xl lg:text-3xl">
               Discounted Price: ${offers[currentIndex].discounted_price}
