@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 
 interface FoodItem {
@@ -10,7 +9,6 @@ interface FoodItem {
   price: number;
   image_url: string;
   quantity: number;
-  // Add other fields if needed
 }
 
 const categoryImages: Record<string, string> = {
@@ -34,6 +32,7 @@ const MenuPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Fetch all items once when page loads
     const fetchAllItems = async () => {
       setLoading(true);
       try {
@@ -70,6 +69,7 @@ const MenuPage = () => {
       style={{ backgroundImage: "url(/sec11.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}>
       <div className="absolute inset-0 bg-black opacity-70" />
       <div className="relative z-10 min-h-screen p-6">
+        {/* Loader */}
         {loading ? (
           <div className="flex justify-center items-center mt-32">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
@@ -77,6 +77,7 @@ const MenuPage = () => {
           </div>
         ) : (
           <>
+            {/* Categories */}
             {!selectedCategory && (
               <div className="flex flex-wrap justify-center gap-10 mt-16">
                 {[{ label: "All Menu" }, ...Object.values(categoryMapping).map(label => ({ label }))].map(({ label }) => (
@@ -92,35 +93,38 @@ const MenuPage = () => {
               </div>
             )}
 
+            {/* Back Button and Filtered Items/All Items Display */}
             {selectedCategory && (
-              <div className="flex justify-center mt-12">
-                <button onClick={() => handleCategoryClick(null)}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-full shadow-xl hover:scale-105">
-                  ⬅️ Back to Categories
-                </button>
-              </div>
-            )}
+              <>
+                <div className="flex justify-center mt-12">
+                  <button onClick={() => handleCategoryClick(null)}
+                    className="mt-12 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-full shadow-xl hover:scale-105">
+                    ⬅️ Back to Categories
+                  </button>
+                </div>
 
-            <div className="mt-12">
-              {selectedCategory === "All Menu" || selectedCategory === null ? (
-                ["Breakfast", "Main Course", "Entree", "Drinks"].map(category => (
-                  <div key={category} className="mb-10">
-                    <h2 className="text-3xl text-white font-bold mb-4">{category}</h2>
+                <div className="mt-12">
+                  {selectedCategory === "All Menu" ? (
+                    ["Breakfast", "Main Course", "Entree", "Drinks"].map(category => (
+                      <div key={category} className="mb-10">
+                        <h2 className="text-3xl text-white font-bold mb-4">{category}</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                          {groupedItems[category]?.map((item, index) => (
+                            <Card key={item.id ?? `${category}-${index}`} item={item} />
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                      {groupedItems[category]?.map((item, index) => (
-                        <Card key={item.id ?? `${category}-${index}`} item={item} />
+                      {filteredItems.map((item, index) => (
+                        <Card key={item.id ?? `filtered-${index}`} item={item} />
                       ))}
                     </div>
-                  </div>
-                ))
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {filteredItems.map((item, index) => (
-                    <Card key={item.id ?? `filtered-${index}`} item={item} />
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
           </>
         )}
       </div>
@@ -132,12 +136,16 @@ const Card = ({ item }: { item: FoodItem }) => (
   <div className="shadow-xl rounded-xl overflow-hidden transform transition duration-300 hover:scale-105 bg-white/30 backdrop-blur-md hover:bg-white/40">
     <img src={item.image_url || "/placeholder.jpg"} alt={item.name} className="w-full h-52 object-cover" />
     <div className="p-4 bg-black/30 text-white">
-      <h4 className="text-xs font-semibold mb-2 uppercase">{categoryMapping[item.category_id] || "Category"}</h4>
-      <h3 className="text-xl font-bold mb-1">{item.name}</h3>
-      <p className="text-sm line-clamp-2 mb-3">{item.description}</p>
-      <div className="flex justify-between items-center">
-        <span className="text-base font-semibold">${item.price.toFixed(2)}</span>
-        <span className="text-xs font-bold px-2 py-1 rounded-md bg-yellow-400 text-black">Qty: {item.quantity}</span>
+      <h4 className="text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 px-2 py-1 rounded-full inline-block mb-2">
+        {categoryMapping[item.category_id] || "Uncategorized"}
+      </h4>
+      <h3 className="text-xl font-bold">{item.name}</h3>
+      <p className="text-sm text-white/90">
+        {item.description.length > 50 ? `${item.description.slice(0, 50)}...` : item.description}
+      </p>
+      <div className="flex justify-between items-center mt-3">
+        <span className="text-lg font-bold text-red-400">${item.price}</span>
+        <span className="text-sm font-bold bg-white/10 px-3 py-1 rounded-md">🏷️ {item.quantity}</span>
       </div>
     </div>
   </div>
