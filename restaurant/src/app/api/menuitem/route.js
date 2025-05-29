@@ -7,8 +7,8 @@ import db from "@/lib/db";
 const categoryMapping = {
   1: "Breakfast",
   2: "Main Course",
-  3: "Desserts",
-  4: "Snacks",
+
+  4: "Entree",
   5: "Drinks",
 };
 

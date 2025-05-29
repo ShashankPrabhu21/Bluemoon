@@ -20,7 +20,7 @@ const FoodDisplayPage = () => {
   const [foodItemsByCategory, setFoodItemsByCategory] = useState<{ [key: string]: FoodItem[] }>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const categoryOrder = ["Breakfast", "Main Course", "Snacks", "Drinks", "Desserts"];
+  const categoryOrder = ["Breakfast", "Main Course", "Entree", "Drinks"];
 
   // Fetch food items once
   useEffect(() => {

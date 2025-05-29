@@ -17,16 +17,14 @@ const categoryImages: Record<string, string> = {
   Breakfast: "/breakfast.png",
   "Main Course": "/1.jpg",
   Drinks: "/tea.png",
-  Desserts: "/kheer.jpg",
-  Snacks: "/snacks.jpg",
+  Entree: "/snacks.jpg",
 };
 
 // 🔹 Mapping Category IDs to Names
 const categoryMapping: Record<number, string> = {
   1: "Breakfast",
   2: "Main Course",
-  3: "Desserts",
-  4: "Snacks",
+  4: "Entree",
   5: "Drinks",
 };
 

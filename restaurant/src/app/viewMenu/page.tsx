@@ -31,8 +31,8 @@ interface CartItem {
 const categoryMapping: Record<number, string> = {
   1: "Breakfast",
   2: "Main Course",
-  3: "Desserts",
-  4: "Snacks",
+
+  4: "Entree",
   5: "Drinks",
 };
 

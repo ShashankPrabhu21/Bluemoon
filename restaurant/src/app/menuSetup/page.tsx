@@ -17,8 +17,8 @@ interface FoodItem {
 const categoryMapping: Record<string, number> = {
   "Breakfast": 1,
   "Main Course": 2,
-  "Desserts": 3,
-  "Snacks": 4,
+
+  "Entree": 4,
   "Drinks": 5,
 };
 
