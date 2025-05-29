@@ -173,7 +173,7 @@ const MenuPage = () => {
             </div>
 
             {/* 🔁 Loop through each category with custom order */}
-            {["Breakfast", "Main Course", "Snacks", "Drinks", "Desserts"].map((category) => (
+            {["Breakfast", "Main Course", "Entree", "Drinks"].map((category) => (
               <div key={category} className="space-y-8">
                 {/* 🔹 Category Header */}
                 <div className="relative py-8">
