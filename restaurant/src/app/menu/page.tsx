@@ -68,7 +68,7 @@ const MenuPage = () => {
     if (category === "All Menu" || !allData) {
       setLoading(true);
       try {
-        let url = "/api/menuitem"; // This fetches ALL items
+        const url = "/api/menuitem"; // This fetches ALL items
         console.log("Fetching ALL menu items on user click:", url);
         const res = await fetch(url);
         if (!res.ok) throw new Error("Failed to fetch all menu items on click");
