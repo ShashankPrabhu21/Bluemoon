@@ -54,7 +54,7 @@ const FoodDisplayPage = () => {
 
     let animationFrameId: number;
     let startTime: number | null = null;
-    const duration = 30000; // 5 minutes
+    const duration = 300000; // 5 minutes
 
     const scrollStep = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
