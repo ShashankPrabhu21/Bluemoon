@@ -48,16 +48,15 @@ const MenuPage = () => {
       console.error("Error fetching menu items:", error);
       // Optionally set an error state here
     } finally {
-      setLoading(false); // Set loading to false when fetching completes (success or error)
+      setLoading(false); // Set loading to false when fetching completes
     }
   };
 
   useEffect(() => {
-    // Fetch all menu items initially
-    fetchMenuItems(null);
+   
   }, []);
 
-  // ➕ Group menu items by category
+  // Group menu items by category
   const groupedMenuItems = menuItems.reduce((acc, item) => {
     const categoryName = categoryMapping[item.category_id] || "Uncategorized";
     if (!acc[categoryName]) {
@@ -99,7 +98,7 @@ const MenuPage = () => {
 
 {!loading && selectedCategory && selectedCategory !== "All Menu" && (
   <div>
-    {/* 🔙 Back Button */}
+    {/* Back Button */}
     <div className="flex justify-center mt-32">
       <button
         onClick={() => handleCategoryClick(null)}
@@ -134,19 +133,19 @@ const MenuPage = () => {
               {categoryMapping[item.category_id] || "Uncategorized"}
             </h4>
 
-            {/* 🍛 Food Name */}
+            {/*  Food Name */}
             <h3 className="text-2xl font-bold text-white tracking-wide leading-tight drop-shadow-lg">
               {item.name}
             </h3>
 
-            {/* 📝 Description */}
+            {/*  Description */}
             <p className="text-white/90 text-xs leading-snug drop-shadow-md">
               {item.description.length > 50
                 ? `${item.description.substring(0, 50)}...`
                 : item.description}
             </p>
 
-            {/* 💲 Price & Item Number */}
+            {/*  Price & Item Number */}
             <div className="flex justify-between items-center mt-1 px-3">
               <span className="text-2xl font-extrabold text-red-600 flex items-center gap-1">
                 <span className="drop-shadow-md">${item.price}</span>
@@ -162,7 +161,7 @@ const MenuPage = () => {
   </div>
 )}
 
-        {/* ➕ Section-wise display under "All Menu" - Direct Display */}
+        {/*  Section-wise display under "All Menu" - Direct Display */}
         {!loading && selectedCategory === "All Menu" && (
           <div className="mt-32 space-y-16 px-4">
             {/* 🔙 Back Button */}
@@ -244,7 +243,7 @@ const MenuPage = () => {
           </div>
         )}
 
-        {/* ➕ Show Categories with Images */}
+        {/*  Show Categories with Images */}
         {!loading && !selectedCategory && (
           <div className="flex flex-wrap justify-center gap-10 mt-16">
             {[{ label: "All Menu" }, ...Object.values(categoryMapping).map((cat) => ({ label: cat }))].map(({ label }) => (
