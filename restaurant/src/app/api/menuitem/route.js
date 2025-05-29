@@ -12,7 +12,6 @@ const categoryMapping = {
 };
 
 // ✅ Handle GET requests (Fetch menu items, optionally by category)
-// ✅ Handle GET requests (Fetch menu items, optionally by category)
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const categoryName = searchParams.get("category"); // Get the 'category' parameter from the URL
@@ -35,11 +34,13 @@ export async function GET(req) {
         query = "SELECT * FROM menu_items WHERE category_id = $1 ORDER BY created_at DESC";
         values = [categoryId];
       } else {
+        // If the category name from the frontend doesn't match any in our mapping,
+        // we return an empty array.  Important for consistent behavior.
         return NextResponse.json([], { status: 200 });
       }
     }
 
-    const result = await db.query(query, values); // <--- This is the key execution point.
+    const result = await db.query(query, values);
 
     // Add category_name to each item in the result
     const menuItemsWithCategoryName = result.rows.map(item => ({
