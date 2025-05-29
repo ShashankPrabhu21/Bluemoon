@@ -45,45 +45,49 @@ export default function Navbar() {
       <div className="hidden lg:flex justify-between items-center px-6 py-2 text-base font-medium">
         <div className="flex items-center space-x-5">
           <span>📞 0422 306 777</span>
-          <span>✉contact@bluemoonrestaurants.com</span>
+          <span>✉ contact@bluemoonrestaurants.com</span>
         </div>
         <div className="flex items-center flex-row-reverse">
-          {/* Admin icon always visible — moved outside lg:hidden */}
+          {/* Admin icon (on right side) */}
           <div className="ml-10">
             <Link href="/admin">
               <FaUser className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
             </Link>
           </div>
           <div className="flex space-x-3">
-            <a
-              href="/QRCode.jpg"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="/QRCode.jpg" target="_blank" rel="noopener noreferrer">
               <FaWhatsapp className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
             </a>
-            <Link
-              href="https://www.facebook.com/bluemmoonrestaurant/"
-              target="_blank"
-            >
+            <Link href="https://www.facebook.com/bluemmoonrestaurant/" target="_blank">
               <Facebook className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
             </Link>
-            <Link
-              href="https://www.youtube.com/channel/UCjDVQoe48ygvcF4a3lRiz7w"
-              target="_blank"
-            >
+            <Link href="https://www.youtube.com/channel/UCjDVQoe48ygvcF4a3lRiz7w" target="_blank">
               <Youtube className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
             </Link>
-            <a
-              href="https://www.instagram.com/bluemoonrestaurant1/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="https://www.instagram.com/bluemoonrestaurant1/" target="_blank" rel="noopener noreferrer">
               <FaInstagram className="w-6 h-6 cursor-pointer hover:scale-105 transition-transform duration-200" />
             </a>
           </div>
         </div>
       </div>
+
+      {/* Mobile Top Social Icons (above nav) */}
+      {isMobile && (
+        <div className="flex justify-end px-6 pt-2 space-x-4 xl:hidden lg:hidden">
+          <a href="/QRCode.jpg" target="_blank" rel="noopener noreferrer">
+            <FaWhatsapp className="w-5 h-5" />
+          </a>
+          <Link href="https://www.facebook.com/bluemmoonrestaurant/" target="_blank">
+            <Facebook className="w-5 h-5" />
+          </Link>
+          <Link href="https://www.youtube.com/channel/UCjDVQoe48ygvcF4a3lRiz7w" target="_blank">
+            <Youtube className="w-5 h-5" />
+          </Link>
+          <a href="https://www.instagram.com/bluemoonrestaurant1/" target="_blank" rel="noopener noreferrer">
+            <FaInstagram className="w-5 h-5" />
+          </a>
+        </div>
+      )}
 
       {/* Navbar Main Section */}
       <nav className="py-4 shadow-md px-6 flex justify-between items-center">
@@ -109,40 +113,19 @@ export default function Navbar() {
         {/* Desktop Navbar */}
         {!isMobile && (
           <ul className="flex space-x-6 text-lg font-medium items-center">
-            <li className="cursor-pointer hover:text-gray-300">
-              <Link href="/">Home</Link>
-            </li>
-            <li className="cursor-pointer hover:text-gray-300">
-              <Link href="/menu">Menu</Link>
-            </li>
-            <li className="cursor-pointer hover:text-gray-300">
-              <Link href="/about">About</Link>
-            </li>
-            <li className="cursor-pointer hover:text-gray-300">
-              <Link href="/delivery">Delivery</Link>
-            </li>
-            <li className="cursor-pointer hover:text-gray-300">
-              <Link href="/gallery">Gallery</Link>
-            </li>
-            <li className="cursor-pointer hover:text-gray-300 whitespace-nowrap">
-              <Link href="/cooking">Cooking Videos</Link>
-            </li>
-            <li className="cursor-pointer hover:text-gray-300">
-              <Link href="/contact">Contact</Link>
-            </li>
-            <li className="cursor-pointer hover:text-gray-300">
-              <Link href="/table">Reservation</Link>
-            </li>
+            <li><Link href="/">Home</Link></li>
+            <li><Link href="/menu">Menu</Link></li>
+            <li><Link href="/about">About</Link></li>
+            <li><Link href="/delivery">Delivery</Link></li>
+            <li><Link href="/gallery">Gallery</Link></li>
+            <li><Link href="/cooking">Cooking Videos</Link></li>
+            <li><Link href="/contact">Contact</Link></li>
+            <li><Link href="/table">Reservation</Link></li>
 
-            {/* Extra Links */}
             {extraLinks && (
               <>
-                <li className="cursor-pointer hover:text-gray-300">
-                  <Link href="/blog">Blog</Link>
-                </li>
-                <li className="cursor-pointer hover:text-gray-300">
-                  <Link href="/order">Online Order</Link>
-                </li>
+                <li><Link href="/blog">Blog</Link></li>
+                <li><Link href="/order">Online Order</Link></li>
               </>
             )}
 
@@ -152,7 +135,7 @@ export default function Navbar() {
               className="cursor-pointer ml-4"
             >
               <MoreHorizontal
-                className={`w-6 h-6 text-white transition-transform duration-200 ${
+                className={`w-6 h-6 transition-transform duration-200 ${
                   extraLinks ? "text-gray-400" : "hover:scale-110"
                 }`}
               />
@@ -160,16 +143,16 @@ export default function Navbar() {
           </ul>
         )}
 
-        {/* Always-visible Admin Icon on Small Screens */}
+       {/* Always-visible Admin Icon on Small Screens */}
         {isMobile && (
           <Link href="/admin" className="mr-[-25px] xl:hidden lg:hidden md:mr-[-400px]">
             <FaUser className="w-6 h-5 cursor-pointer hover:scale-105 transition-transform duration-200" />
           </Link>
         )}
 
-        {/* Mobile Menu Toggle Button */}
+        {/* Mobile Menu Toggle */}
         {isMobile && (
-          <button onClick={() => setMenuOpen(!menuOpen)} className="block xl:hidden">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="block">
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         )}
@@ -177,7 +160,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Content */}
       {menuOpen && isMobile && (
-        <div className="absolute top-0 left-0 w-full h-screen bg-gradient-to-b from-black/90 to-black/90 backdrop-blur-lg p-6 z-50 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent">
+        <div className="absolute top-0 left-0 w-full h-screen bg-gradient-to-b from-black/90 to-black/90 backdrop-blur-lg p-6 z-50 overflow-y-auto">
           {/* Logo & Close */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-2">
@@ -198,7 +181,7 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Links */}
+          {/* Mobile Links */}
           <ul className="flex flex-col items-center space-y-4 text-lg font-medium">
             {[
               { href: "/", label: "Home" },
