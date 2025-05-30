@@ -368,7 +368,7 @@ const OnlineOrderPage = () => {
               </h2>
               {categoryItems.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
-                  {categoryItems.map((item, index) => {
+                  {categoryItems.map((item) => {
                     // Attach ref only to the last item in the *entire* `items` array for IntersectionObserver
                     const isLastItemInOverallList =
                       items.length === items.indexOf(item) + 1;
