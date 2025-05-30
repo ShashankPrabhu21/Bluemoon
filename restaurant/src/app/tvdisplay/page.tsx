@@ -25,6 +25,11 @@ const FoodDisplayPage = () => {
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
+  // New state to keep track of loaded categories
+  const [loadedCategories, setLoadedCategories] = useState<Set<string>>(new Set());
+  // Ref to store IntersectionObserver instances for each category
+  const categoryObserverRefs = useRef<Record<string, IntersectionObserver | null>>({});
+
   const categoryOrder = ["Breakfast", "Main Course", "Entree", "Drinks"];
 
   // Memoized fetch function with timeout and retry logic
@@ -36,6 +41,8 @@ const FoodDisplayPage = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+      // We still fetch all data initially for this page's design.
+      // The lazy loading will happen at the rendering level per category.
       const res = await fetch("/api/menuitem?no_pagination=true", {
         signal: controller.signal,
         headers: {
@@ -85,6 +92,50 @@ const FoodDisplayPage = () => {
     fetchMenuItems();
   }, [fetchMenuItems]);
 
+  // Intersection Observer for Category Visibility
+  // This useEffect will manage observers for each category section
+  useEffect(() => {
+    const observerOptions = {
+      root: containerRef.current, // Observe visibility within the scrolling container
+      rootMargin: '0px',
+      threshold: 0.1, // Category is considered visible when 10% is in view
+    };
+
+    // Disconnect previous observers if any
+    Object.values(categoryObserverRefs.current).forEach(observer => {
+      if (observer) observer.disconnect();
+    });
+    categoryObserverRefs.current = {}; // Clear the ref map
+
+    categoryOrder.forEach(categoryName => {
+      const categorySection = document.getElementById(`category-${categoryName.replace(/\s+/g, '-')}`);
+      if (categorySection) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              setLoadedCategories(prev => new Set(prev).add(categoryName));
+              // Once loaded, we can stop observing this category
+              if (categoryObserverRefs.current[categoryName]) {
+                categoryObserverRefs.current[categoryName]?.disconnect();
+                categoryObserverRefs.current[categoryName] = null; // Clear the observer
+              }
+            }
+          });
+        }, observerOptions);
+        observer.observe(categorySection);
+        categoryObserverRefs.current[categoryName] = observer; // Store the observer
+      }
+    });
+
+    // Cleanup observers when component unmounts or dependencies change
+    return () => {
+      Object.values(categoryObserverRefs.current).forEach(observer => {
+        if (observer) observer.disconnect();
+      });
+      categoryObserverRefs.current = {};
+    };
+  }, [foodItemsByCategory, isLoading]); // Re-run if food items change or loading state changes
+
   // Optimized scroll animation with better performance
   useEffect(() => {
     const container = containerRef.current;
@@ -120,7 +171,7 @@ const FoodDisplayPage = () => {
         } else {
           // Reset and start over
           container.scrollTop = 0;
-          startTime = null;
+          startTime = null; // Reset startTime for a fresh loop
           animationFrameRef.current = requestAnimationFrame(scrollStep);
         }
       };
@@ -136,7 +187,7 @@ const FoodDisplayPage = () => {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [foodItemsByCategory, error, isLoading]);
+  }, [foodItemsByCategory, error, isLoading]); // Dependencies for auto-scroll
 
   // Loading state
   if (isLoading) {
@@ -182,48 +233,58 @@ const FoodDisplayPage = () => {
         <div className="relative container mx-auto px-4 z-10">
           <div
             ref={containerRef}
-            // Add the new class here
             className="flex flex-col gap-8 overflow-y-auto max-h-[75vh] hide-scrollbar" 
             style={{ scrollBehavior: "auto" }}
           >
             {categoryOrder.map(
               (categoryName) =>
                 foodItemsByCategory[categoryName]?.length > 0 && (
-                  <div key={categoryName}>
+                  <div key={categoryName} id={`category-${categoryName.replace(/\s+/g, '-')}`}>
                     <div className="relative flex justify-center mt-12">
                       <h2 className="relative inline-block text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#d2d7ef] via-[#cad1f6] to-[#cbd2f4] tracking-wider mb-8 drop-shadow-[0_4px_10px_rgba(74,96,210,0.35)] after:content-[''] after:block after:h-[4px] after:w-20 after:mx-auto after:mt-3 after:bg-gradient-to-r after:from-[#2C3E91] after:to-[#4A60D2] after:rounded-full">
                         {categoryName}
                       </h2>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                      {foodItemsByCategory[categoryName].map((item) => (
-                        <div
-                          key={item.item_id}
-                          className="relative h-60 rounded-xl overflow-hidden group shadow-md hover:shadow-xl transition-shadow duration-300"
-                        >
-                          <Image
-                            src={item.image_url || "/placeholder.jpg"}
-                            alt={item.name}
-                            fill
-                            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                            style={{ objectFit: "cover" }}
-                            className="group-hover:scale-110 transition-transform duration-300"
-                            priority={false}
-                            loading="lazy"
-                            placeholder="blur"
-                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAwERAAIRAQ/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAQIAEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Wque2nLVwm7Hp7cWG3M4QLrBM6XEJwUFsAE8DgBgdAbT3RCxJz5j4RCSF0UEbUcnJTEu5rqr35kYdGb2w/rLNKBBAAAG/bE8T1zxe+5kXTPk0/9k="
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent flex flex-col justify-end p-4">
-                            <h3 className="text-lg md:text-xl font-extrabold text-white drop-shadow-sm">
-                              {item.name}
-                            </h3>
-                            <p className="text-sm text-gray-200 drop-shadow-sm">Token: {item.quantity}</p>
-                            <p className="text-xl font-bold text-yellow-400 drop-shadow-sm">${item.price}</p>
+                    {/* Conditionally render items only if the category has been loaded */}
+                    {loadedCategories.has(categoryName) ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                        {foodItemsByCategory[categoryName].map((item) => (
+                          <div
+                            key={item.item_id}
+                            className="relative h-60 rounded-xl overflow-hidden group shadow-md hover:shadow-xl transition-shadow duration-300"
+                          >
+                            <Image
+                              src={item.image_url || "/placeholder.jpg"}
+                              alt={item.name}
+                              fill
+                              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                              style={{ objectFit: "cover" }}
+                              className="group-hover:scale-110 transition-transform duration-300"
+                              priority={false}
+                              loading="lazy"
+                              placeholder="blur"
+                              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAwAQAFwBAAgBAAENAAIf/xAAUAAEAAAAAAAAAAAAAAAAAAAAJ/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAQIAEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Wque2nLVwm7Hp7cWG3M4QLrBM6XEJwUFsAE8DgBgdAbT3RCxJz5j4RCSF0UEbUcnJTEu5rqr35kYdGb2w/rLNKBBAAAG/bE8T1zxe+5kXTPk0/9k="
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent flex flex-col justify-end p-4">
+                              <h3 className="text-lg md:text-xl font-extrabold text-white drop-shadow-sm">
+                                {item.name}
+                              </h3>
+                              <p className="text-sm text-gray-200 drop-shadow-sm">Token: {item.quantity}</p>
+                              <p className="text-xl font-bold text-yellow-400 drop-shadow-sm">${item.price}</p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      // Placeholder for not-yet-loaded categories
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                        {/* Render skeleton loaders for a few items to indicate content is coming */}
+                        {Array.from({ length: 5 }).map((_, idx) => (
+                          <div key={`skeleton-${categoryName}-${idx}`} className="relative h-60 rounded-xl overflow-hidden animate-pulse bg-gray-700" />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )
             )}
