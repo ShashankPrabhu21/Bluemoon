@@ -48,7 +48,7 @@ const OnlineOrderPage = () => {
   const [page, setPage] = useState(0); // Current page for pagination (0-indexed)
   const [hasMore, setHasMore] = useState(true); // True if there's more data to load
   const [filteredCategory, setFilteredCategory] = useState<string | null>(
-    null // Default to null for "All Menu" initially
+    null
   ); // New state to hold the currently filtered category
 
   // --- Intersection Observer for Infinite Scrolling ---
@@ -165,7 +165,7 @@ const OnlineOrderPage = () => {
   useEffect(() => {
     const handleInitialLoad = async () => {
       // Set an initial category to trigger the first fetch
-      setFilteredCategory("All Menu"); // This will trigger the useEffect below to fetch initial data
+      setFilteredCategory("All Menu");
 
       if (sessionStorage.getItem("fromCart") === "true") {
         await fetchCartItems();
@@ -173,7 +173,7 @@ const OnlineOrderPage = () => {
       } else {
         await clearCart();
       }
-      await fetchCartItems(); // Ensure cart is fetched after initial load/clear
+      await fetchCartItems(); // Fetch cart in any case.
     };
 
     handleInitialLoad();
@@ -182,11 +182,13 @@ const OnlineOrderPage = () => {
   // Effect to trigger menu item fetch when filteredCategory changes or page changes
   useEffect(() => {
     if (filteredCategory !== null) {
+      // Clear items and reset page only when category changes, not just page
       if (page === 0) {
         setItems([]); // Clear existing items when category changes (or initial load)
         setHasMore(true); // Assume there's more data for the new category
         fetchMenuItems(filteredCategory, 0); // Fetch the first page for the new category
       } else {
+        // Only fetch more if a category is selected and we're not on the initial load (page 0 handled above)
         fetchMenuItems(filteredCategory, page);
       }
     }
@@ -219,7 +221,8 @@ const OnlineOrderPage = () => {
           )}`
         );
       }
-      await fetchCartItems(); // Re-fetch cart after adding
+      const cartData = await (await fetch("/api/cart/get")).json();
+      setCart(cartData);
     } catch (error) {
       console.error("Error adding to cart:", error);
       setError("Failed to add item to cart. Please try again."); // Set a user-friendly error
@@ -259,24 +262,6 @@ const OnlineOrderPage = () => {
     { label: "All Menu", value: null }, // Representing "All Menu" by null to fetch all
     ...Object.values(categoryMapping).map((label) => ({ label, value: label })),
   ];
-
-  // Group items by category for rendering with separate headings
-  const groupedItems = items.reduce((acc, item) => {
-    const categoryName = categoryMapping[item.category_id];
-    if (categoryName) {
-      if (!acc[categoryName]) {
-        acc[categoryName] = [];
-      }
-      acc[categoryName].push(item);
-    }
-    return acc;
-  }, {} as Record<string, FoodItem[]>);
-
-  // Determine which categories to render based on filter
-  const categoriesToRender =
-    filteredCategory && filteredCategory !== "All Menu"
-      ? [filteredCategory]
-      : Object.values(categoryMapping);
 
   return (
     <div className="min-h-screen py-6 bg-[url('/sec1.jpg')] bg-cover bg-center bg-no-repeat relative">
@@ -352,58 +337,53 @@ const OnlineOrderPage = () => {
         ))}
       </div>
 
-      {/* Display Items by Category */}
+      {/* Display Items based on Filter */}
       <div className="mt-12 px-2 sm:px-4">
-        {categoriesToRender.map((category) => {
-          const categoryItems = groupedItems[category] || [];
-          if (categoryItems.length === 0 && !loading) {
-            // Don't show category heading if no items and not loading for this category
-            return null;
-          }
-          return (
-            <div key={category} className="mb-10">
-              <h2 className="mb-6 text-3xl font-bold text-center text-white py-3 relative uppercase tracking-wide">
-                {category}
-                <span className="absolute left-1/2 bottom-0 w-16 h-1 bg-gradient-to-r from-[#3345A7] to-blue-400 transform -translate-x-1/2"></span>
-              </h2>
-              {categoryItems.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
-                  {categoryItems.map((item) => {
-                    // Attach ref only to the last item in the *entire* `items` array for IntersectionObserver
-                    const isLastItemInOverallList =
-                      items.length === items.indexOf(item) + 1;
-                    return (
-                      <div
-                        ref={isLastItemInOverallList ? lastItemElementRef : null}
-                        key={`item-${item.item_id}`}
-                        className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
-                      >
-                        <Card item={item} setSelectedItem={setSelectedItem} />
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                !loading && (
-                  <p className="text-center text-white text-lg mt-8">
-                    No items found in this category.
-                  </p>
-                )
-              )}
-            </div>
-          );
-        })}
+        <h2 className="mb-6 text-3xl font-bold text-center text-white py-3 relative uppercase tracking-wide">
+          {filteredCategory === null || filteredCategory === "All Menu"
+            ? "All Menu"
+            : filteredCategory}
+          <span className="absolute left-1/2 bottom-0 w-16 h-1 bg-gradient-to-r from-[#3345A7] to-blue-400 transform -translate-x-1/2"></span>
+        </h2>
+        {items.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
+            {items.map((item, index) => {
+              // Attach ref to the last item for IntersectionObserver
+              if (items.length === index + 1) {
+                return (
+                  <div
+                    ref={lastItemElementRef}
+                    key={`item-${item.item_id}`}
+                    className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
+                  >
+                    <Card item={item} setSelectedItem={setSelectedItem} />
+                  </div>
+                );
+              } else {
+                return (
+                  <div
+                    key={`item-${item.item_id}`}
+                    className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
+                  >
+                    <Card item={item} setSelectedItem={setSelectedItem} />
+                  </div>
+                );
+              }
+            })}
+          </div>
+        ) : (
+          !loading && (
+            <p className="text-center text-white text-lg mt-8">
+              No items found for this category.
+            </p>
+          )
+        )}
 
         {/* Loading indicator and messages */}
         {loading && <SkeletonGrid />}
-        {!loading && items.length === 0 && filteredCategory && filteredCategory !== "All Menu" && (
+        {!loading && items.length === 0 && !hasMore && (
           <p className="text-white text-center mt-8 text-lg">
-            No items found for the selected category.
-          </p>
-        )}
-        {!loading && items.length === 0 && (filteredCategory === null || filteredCategory === "All Menu") && (
-          <p className="text-white text-center mt-8 text-lg">
-            No menu items available at this time.
+            No items found for this category.
           </p>
         )}
         {!hasMore && !loading && items.length > 0 && (
