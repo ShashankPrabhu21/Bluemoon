@@ -1,3 +1,4 @@
+//app/menu/page.tsx
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -245,7 +246,7 @@ catch (err: unknown) { // Changed 'any' to 'unknown'
               )}
               {!hasMore && !loading && items.length > 0 && (
                 <p className="text-white text-center mt-8 text-lg">
-                  You`&apos;`ve reached the end of the menu!
+                  You&apos;ve reached the end of the menu!
                 </p>
               )}
             </div>

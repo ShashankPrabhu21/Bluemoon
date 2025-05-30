@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { FiShoppingCart } from "react-icons/fi";
+import Image from "next/image"; // <--- ADDED: Import Next.js Image component
 import OrderModal from "../components/OrderModal";
 
 interface FoodItem {
@@ -47,10 +48,10 @@ const OnlineOrderPage = () => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        // --- START CHANGE ---
-        // Fetch all items by sending a flag to the API to disable pagination
+        // We assume the /api/menuitem endpoint has been updated
+        // to handle a 'no_pagination=true' flag to return all items,
+        // as discussed in the previous interaction.
         const res = await fetch("/api/menuitem?no_pagination=true");
-        // --- END CHANGE ---
         if (!res.ok) throw new Error("Failed to fetch menu items");
         const data = await res.json();
         setFoodItems(data);
@@ -212,14 +213,24 @@ const OnlineOrderPage = () => {
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
                 {filteredItems.map((item) => (
                   <div
-                    key={item.item_id} // Correctly using item_id for the key
+                    key={item.item_id}
                     className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
                   >
-                    <img
-                      src={item.image_url || "/placeholder.jpg"}
-                      alt={item.name}
-                      className="w-full h-32 sm:h-48 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-110"
-                    />
+                    {/* START: Image Component Change */}
+                    <div className="relative w-full h-32 sm:h-48">
+                      <Image
+                        src={item.image_url || "/placeholder.jpg"}
+                        alt={item.name}
+                        fill // Makes the image fill its parent div
+                        className="object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-110"
+                        // `sizes` attribute is crucial for Next.js Image optimization
+                        // It tells Next.js how wide the image will be at different breakpoints
+                        // Adjust these values to match your actual CSS grid and responsive layout
+                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+                        loading="lazy" // Ensures images outside viewport are lazy-loaded
+                      />
+                    </div>
+                    {/* END: Image Component Change */}
 
                     <div className="p-2 sm:p-3 text-center rounded-b-xl">
                       <h3 className="text-sm sm:text-lg font-bold text-blue-900 tracking-wide truncate">

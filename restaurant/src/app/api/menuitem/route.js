@@ -1,6 +1,5 @@
-//api/menuitem/route.js
+// api/menuitem/route.js
 import { NextResponse } from "next/server";
-// Make sure this path is correct for your database connection
 import db from "@/lib/db"; // Assuming db is the correct import for your PostgreSQL connection
 
 // Mapping Category IDs to Names
@@ -15,45 +14,52 @@ const categoryMapping = {
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const categoryName = searchParams.get("category"); // Get the 'category' parameter
-  // Default to page 0 and ITEMS_PER_PAGE for limit if not provided
-  const page = parseInt(searchParams.get("page") || "0");
-  const limit = parseInt(searchParams.get("limit") || "12"); // Ensure this matches ITEMS_PER_PAGE in frontend
+  const noPagination = searchParams.get("no_pagination") === "true"; // Check for no_pagination flag
 
-  const offset = page * limit; // Calculate the offset for SQL LIMIT/OFFSET
+  let query = "SELECT * FROM menu_items"; // Base query for all items
+  let values = [];
+  let paramIndex = 1; // Used to track parameter positions for parameterized queries
 
-  try {
-    let query = "SELECT * FROM menu_items"; // Base query for all items
-    let values = [];
-    let paramIndex = 1; // Used to track parameter positions for parameterized queries
-
-    // Add WHERE clause if a category is specified (and it's not "All Menu")
-    if (categoryName && categoryName !== "All Menu") {
-      let categoryId = null;
-      for (const id in categoryMapping) {
-        if (categoryMapping[id] === categoryName) {
-          categoryId = parseInt(id);
-          break;
-        }
-      }
-
-      if (categoryId !== null) {
-        query += ` WHERE category_id = $${paramIndex++}`;
-        values.push(categoryId);
-      } else {
-        // If the category name from the frontend doesn't match any in our mapping,
-        // we return an empty array without hitting the database.
-        return NextResponse.json([], { status: 200 });
+  // Add WHERE clause if a category is specified (and it's not "All Menu")
+  if (categoryName && categoryName !== "All Menu") {
+    let categoryId = null;
+    for (const id in categoryMapping) {
+      if (categoryMapping[id] === categoryName) {
+        categoryId = parseInt(id);
+        break;
       }
     }
 
-    // Always append ORDER BY, LIMIT, and OFFSET for pagination
+    if (categoryId !== null) {
+      query += ` WHERE category_id = $${paramIndex++}`;
+      values.push(categoryId);
+    } else {
+      // If the category name from the frontend doesn't match any in our mapping,
+      // we return an empty array without hitting the database.
+      return NextResponse.json([], { status: 200 });
+    }
+  }
+
+  // --- CRITICAL CHANGE START ---
+  // Only apply LIMIT and OFFSET if no_pagination is NOT true
+  if (!noPagination) {
+    // If no_pagination is false, parse page and limit for pagination
+    const page = parseInt(searchParams.get("page") || "0");
+    const limit = parseInt(searchParams.get("limit") || "12"); // Ensure this matches ITEMS_PER_PAGE in frontend
+    const offset = page * limit; // Calculate the offset for SQL LIMIT/OFFSET
+
     query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
-    
     values.push(limit, offset); // Add limit and offset to values array
+  } else {
+    // If no_pagination is true, just order the results, no LIMIT/OFFSET
+    query += ` ORDER BY created_at DESC`;
+  }
+  // --- CRITICAL CHANGE END ---
 
-    console.log("Executing query:", query);
-    console.log("With values:", values);
+  console.log("Executing query:", query);
+  console.log("With values:", values);
 
+  try {
     const result = await db.query(query, values);
 
     // Add category_name to each item in the result
@@ -83,9 +89,6 @@ export async function POST(req) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
-    // Check for duplicate quantity
-    // NOTE: This check should ideally be on a truly unique business key, not just 'quantity'.
-    // If 'quantity' is not meant to be unique across all items, this check might be problematic.
     const quantityCheck = await db.query("SELECT * FROM menu_items WHERE quantity = $1", [quantity]);
     if (quantityCheck.rows.length > 0) {
         return NextResponse.json({ error: "Item with this number already exists." }, { status: 400 });
@@ -107,14 +110,14 @@ export async function POST(req) {
 export async function DELETE(req) {
   try {
     const body = await req.json();
-    console.log("Received delete request body:", body); // Debugging
+    console.log("Received delete request body:", body);
 
-    const { item_id } = body; // Corrected: Using item_id from the body
+    const { item_id } = body;
     if (!item_id) {
       return NextResponse.json({ error: "item_id is required" }, { status: 400 });
     }
 
-    const result = await db.query("DELETE FROM menu_items WHERE item_id = $1", [item_id]); // Corrected: Using item_id
+    const result = await db.query("DELETE FROM menu_items WHERE item_id = $1", [item_id]);
 
     if (result.rowCount === 0) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
@@ -130,24 +133,24 @@ export async function DELETE(req) {
 export async function PUT(req) {
   try {
     const body = await req.json();
-    console.log("Received PUT request body:", body); // Debugging
+    console.log("Received PUT request body:", body);
 
-    const { item_id, category_id, name, description, price, availability, image_url, quantity, spicy_level } = body; // Corrected: Using item_id
+    const { item_id, category_id, name, description, price, availability, image_url, quantity, spicy_level } = body;
 
     if (!item_id) {
       return NextResponse.json({ error: "item_id is required" }, { status: 400 });
     }
 
     const result = await db.query(
-      `UPDATE menu_items 
-        SET category_id = $1, name = $2, description = $3, price = $4, availability = $5, 
-            image_url = $6, quantity = $7, spicy_level = $8, updated_at = NOW() 
-        WHERE item_id = $9 
-        RETURNING *`, // Corrected: Using item_id
+      `UPDATE menu_items
+         SET category_id = $1, name = $2, description = $3, price = $4, availability = $5,
+             image_url = $6, quantity = $7, spicy_level = $8, updated_at = NOW()
+         WHERE item_id = $9
+         RETURNING *`,
       [category_id, name, description, price, availability, image_url, quantity, spicy_level, item_id]
     );
 
-    console.log("Update result:", result.rows); // Debugging
+    console.log("Update result:", result.rows);
 
     if (result.rowCount === 0) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
