@@ -178,7 +178,7 @@ catch (err: unknown) { // Changed 'any' to 'unknown'
         backgroundPosition: "center",
       }}
     >
-      <div className="absolute inset-0 bg-black opacity-70" />
+      <div className="absolute inset-0 bg-black opacity-80" />
       <div className="relative z-10 min-h-screen p-6">
         {/* Category Cards - Shown when no category is selected */}
         {!selectedCategory && (
@@ -283,9 +283,13 @@ const CategoryCard = React.memo(
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         priority={label === "All Menu"} // Prioritize "All Menu" image
       />
-      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-        <h3 className="text-white text-2xl font-bold">{label}</h3>
-      </div>
+<div className="absolute bottom-0 w-full h-[20%] bg-black/40 backdrop-blur-md rounded-b-xl p-4 flex items-center justify-center">
+  <h2 className="text-2xl font-extrabold text-white drop-shadow-lg tracking-wider">
+    {label}
+  </h2>
+</div>
+
+
     </div>
   )
 );

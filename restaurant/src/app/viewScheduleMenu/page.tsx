@@ -16,6 +16,8 @@ interface FoodItem {
   image_url: string;
   spicy_level: string;
   quantity: number;
+  // --- ADDED THIS LINE ---
+  category_name?: string; // Add category_name to the interface
 }
 
 interface CartItem {
@@ -124,10 +126,17 @@ const ViewScheduleMenuContent = () => {
           data
         );
 
+        // Map category_id to category_name for each item
+        const itemsWithCategoryNames = data.map(item => ({
+          ...item,
+          category_name: categoryMapping[item.category_id] || 'Unknown Category'
+        }));
+
+
         if (currentPage === 0) {
-          setItems(data);
+          setItems(itemsWithCategoryNames);
         } else {
-          setItems((prevItems) => [...prevItems, ...data]);
+          setItems((prevItems) => [...prevItems, ...itemsWithCategoryNames]);
         }
 
         setHasMore(data.length === ITEMS_PER_PAGE);
@@ -430,6 +439,13 @@ const Card = React.memo(
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
           loading="lazy"
         />
+        {/* --- ADDED THIS BLOCK --- */}
+        {item.category_name && (
+          <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-md">
+            {item.category_name}
+          </div>
+        )}
+        {/* --- END ADDED BLOCK --- */}
       </div>
       <div className="p-2 sm:p-3 text-center rounded-b-xl">
         <h3 className="text-sm sm:text-lg font-bold text-blue-900 tracking-wide truncate">

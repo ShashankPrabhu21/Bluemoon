@@ -11,6 +11,7 @@ interface FoodItem {
   image_url: string;
   spicy_level: string;
   quantity: number;
+  category_name:string;
 }
 
 const categoryMapping: Record<string, number> = {
@@ -310,6 +311,11 @@ const AdminPage = () => {
                   alt={item.name}
                   className="w-full h-52 object-cover rounded-t-2xl"
                 />
+                {item.category_name && (
+          <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-md">
+            {item.category_name}
+          </div>
+        )}
                 <div className="p-4 text-center space-y-2">
                   <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
                   <p className="text-gray-500 text-sm">{item.description}</p>
