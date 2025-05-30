@@ -104,17 +104,23 @@ const MenuPage = () => {
         }
 
         setHasMore(data.length === ITEMS_PER_PAGE); // If we received less than ITEMS_PER_PAGE, assume no more data
-      } catch (err: any) {
-        console.error("Failed to fetch menu items:", err);
-        if (err.name === "AbortError") {
-          setError("Request timed out. Please try again.");
-        } else {
-          setError(err.message || "Failed to load menu items.");
-        }
-        setHasMore(false); // Stop trying to load more on error
-      } finally {
-        setLoading(false);
-      }
+      }// Inside your fetchItems useCallback:
+catch (err: unknown) { // Changed 'any' to 'unknown'
+  console.error("Failed to fetch menu items:", err);
+  if (err instanceof Error) { // Type guard: check if err is an instance of Error
+    if (err.name === "AbortError") {
+      setError("Request timed out. Please try again.");
+    } else {
+      setError(err.message || "Failed to load menu items.");
+    }
+  } else {
+    // Handle cases where the error is not an Error object (e.g., a string or number)
+    setError("An unknown error occurred.");
+  }
+  setHasMore(false); // Stop trying to load more on error
+} finally {
+  setLoading(false);
+}
     },
     [] // No dependencies, this function reference remains stable
   );
@@ -239,7 +245,7 @@ const MenuPage = () => {
               )}
               {!hasMore && !loading && items.length > 0 && (
                 <p className="text-white text-center mt-8 text-lg">
-                  You've reached the end of the menu!
+                  You`&apos;`ve reached the end of the menu!
                 </p>
               )}
             </div>
