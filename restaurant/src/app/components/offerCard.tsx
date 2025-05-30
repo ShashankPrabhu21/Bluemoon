@@ -1,6 +1,6 @@
 // OffersCarousel.tsx
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdLocalOffer } from "react-icons/md";
 
@@ -15,131 +15,86 @@ interface Offer {
   id: number;
   total_price: number | string | null;
   discounted_price: number | string | null;
-  selected_items: string; // Stored as a JSON string
+  selected_items: string;
   offer_type: string;
   start_date: string;
   end_date: string;
 }
 
-// Data structure expected from the API after optimization
-interface FetchedData {
-  offers: Offer[];
-  foodItems: FoodItem[];
-}
-
 const OffersCarousel = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
-  const [foodItemLookup, setFoodItemLookup] = useState<Record<number, FoodItem>>({});
+  const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+  const [foodItemLookup, setFoodItemLookup] = useState<Record<number, FoodItem>>({}); // New lookup
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); // Added error state
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
   const totalSlides = offers.length;
 
-  // Use useCallback to memoize the fetch function, preventing unnecessary re-renders
-  const fetchOffersAndItems = useCallback(async () => {
-    setLoading(true); // Start loading
-    setError(null); // Clear any previous errors
-    try {
-      // Fetch both offers and food items in a single API call
-      // The API should be designed to return both efficiently.
-      const res = await fetch("/api/offers?include_food_items=true"); // Suggesting a new query param
-      
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+  useEffect(() => {
+    const fetchOffersAndItems = async () => {
+      try {
+        const res = await fetch("/api/offers");
+        const data = await res.json();
+
+        if (!data || !Array.isArray(data.foodItems)) {
+          console.error("Invalid data format:", data);
+          setFoodItems([]);
+          return;
+        }
+
+        setFoodItems(data.foodItems);
+        setOffers(data.offers || []);
+      } catch (err) {
+        console.error("Error fetching offers:", err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const data: FetchedData = await res.json();
-
-      if (!data || !Array.isArray(data.offers) || !Array.isArray(data.foodItems)) {
-        console.error("Invalid data format from API:", data);
-        setError("Invalid data received. Please check the API response format.");
-        setOffers([]);
-        setFoodItemLookup({});
-        return;
-      }
-
-      setOffers(data.offers);
-
-      // Create lookup table for fast access to food item details
-      const lookup: Record<number, FoodItem> = {};
-      data.foodItems.forEach((item) => {
-        lookup[item.item_id] = item;
-      });
-      setFoodItemLookup(lookup);
-
-    } catch (err) {
-      console.error("Error fetching offers and food items:", err);
-      setError("Failed to load offers. Please try again later.");
-      setOffers([]);
-      setFoodItemLookup({});
-    } finally {
-      setLoading(false); // End loading regardless of success or failure
-    }
-  }, []); // Empty dependency array means this function is created once
+    fetchOffersAndItems();
+  }, []);
 
   useEffect(() => {
-    fetchOffersAndItems();
-  }, [fetchOffersAndItems]); // Depend on the memoized function
+    // Create the food item lookup when foodItems are available
+    const lookup: Record<number, FoodItem> = {};
+    foodItems.forEach((item) => {
+      lookup[item.item_id] = item;
+    });
+    setFoodItemLookup(lookup);
+  }, [foodItems]);
 
   useEffect(() => {
     if (offers.length > 1 && !isHovered) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % offers.length);
-      }, 3000); // Auto-slide every 3 seconds
+      }, 3000);
 
-      return () => clearInterval(interval); // Clear interval on component unmount or dependencies change
+      return () => clearInterval(interval);
     }
-  }, [offers, isHovered]); // Re-run if offers or hover state changes
+  }, [offers, isHovered]);
+
+  if (loading)
+    return (
+      <div className="w-full h-[500px] flex justify-center items-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-yellow-500"></div>
+        <span className="ml-3 text-gray-700 font-semibold">Loading offers...</span>
+      </div>
+    );
+  if (offers.length === 0) return <p>No offers available.</p>;
+
+  const prevIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+  const nextIndex = (currentIndex + 1) % totalSlides;
 
   const getSelectedItems = (offer: Offer) => {
     try {
       const itemIds = JSON.parse(offer.selected_items) as number[];
-      // Use the pre-built lookup table for O(1) average time complexity item retrieval
       return itemIds.map((id) => foodItemLookup[id]).filter(Boolean) as FoodItem[];
     } catch (error) {
-      console.error("Error parsing selected_items JSON:", error);
+      console.error("Error parsing selected_items:", error);
       return [];
     }
   };
-
-  if (loading) {
-    return (
-      <div className="w-full h-[500px] flex flex-col justify-center items-center bg-gray-100 rounded-lg shadow-inner">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-yellow-500 mb-3"></div>
-        <p className="text-xl text-gray-700 font-semibold">Loading exciting offers...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full h-[500px] flex flex-col justify-center items-center bg-red-100 text-red-700 p-4 rounded-lg shadow-md">
-        <p className="text-2xl font-bold mb-4">Oops! Something went wrong.</p>
-        <p className="text-lg text-center">{error}</p>
-        <button
-          onClick={fetchOffersAndItems}
-          className="mt-6 px-6 py-3 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-colors duration-300"
-        >
-          Try Again
-        </button>
-      </div>
-    );
-  }
-
-  if (offers.length === 0) {
-    return (
-      <div className="w-full h-[500px] flex flex-col justify-center items-center bg-gray-100 rounded-lg shadow-inner">
-        <p className="text-2xl font-bold text-gray-600 mb-2">No offers available right now.</p>
-        <p className="text-lg text-gray-500">Check back soon for new deals!</p>
-      </div>
-    );
-  }
-
-  // Calculate indices safely, especially for small number of offers
-  const prevIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-  const nextIndex = (currentIndex + 1) % totalSlides;
 
   return (
     <div
@@ -147,7 +102,7 @@ const OffersCarousel = () => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-           <AnimatePresence>
+      <AnimatePresence>
         {/* Previous Slide */}
         <motion.div
           key={prevIndex}
@@ -237,9 +192,9 @@ const OffersCarousel = () => {
 
           {/* Price Section */}
           <div className="mt-2 sm:mt-4 text-center text-xl sm:text-2xl lg:text-2xl font-semibold mb-5">
-            <p className="text-gray-400 line-through">Actual Price: ${Number(offers[currentIndex].total_price).toFixed(2)}</p>
+            <p className="text-gray-400 line-through">Actual Price: ${offers[currentIndex].total_price}</p>
             <p className="text-yellow-300 font-bold text-2xl sm:text-3xl lg:text-3xl">
-              Discounted Price: ${Number(offers[currentIndex].discounted_price).toFixed(2)}
+              Discounted Price: ${offers[currentIndex].discounted_price}
             </p>
             {/* 🗓️ Display Date Range for Center Slide */}
             <p className="text-gray-400 text-sm mt-1">
@@ -253,9 +208,9 @@ const OffersCarousel = () => {
         <motion.div
           key={nextIndex}
           className="absolute right-[15%] w-[380px] h-[380px] flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-white shadow-2xl rounded-xl p-4 opacity-70 border border-gray-700 hidden xl:flex"
-          initial={{ x: "100vw", opacity: 0 }}
-          animate={{ x: "25vw", opacity: 0.7 }}
-          exit={{ x: "100vw", opacity: 0 }}
+          initial={{ x: "100vw" }}
+          animate={{ x: "25vw" }}
+          exit={{ x: "100vw" }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
           <h2 className="text-lg bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-semibold px-3 py-1 rounded-lg mb-3 mt-[-50px] w-[200px] text-center flex items-center justify-center gap-1 shadow-xl">
@@ -282,8 +237,8 @@ const OffersCarousel = () => {
             ))}
           </div>
           <div className="mt-3 text-center text-base font-semibold">
-            <p className="text-gray-400 line-through text-sm">Actual Price: ${Number(offers[nextIndex].total_price).toFixed(2)}</p>
-            <p className="text-yellow-300 font-bold text-xl">Discounted Price: ${Number(offers[nextIndex].discounted_price).toFixed(2)}</p>
+            <p className="text-gray-400 line-through text-sm">Actual Price: ${offers[nextIndex].total_price}</p>
+            <p className="text-yellow-300 font-bold text-xl">Discounted Price: ${offers[nextIndex].discounted_price}</p>
             <p className="text-gray-400 text-xs mt-1">
               🗓️ {new Date(offers[nextIndex].start_date).toLocaleDateString('en-GB')} -{" "}
               {new Date(offers[nextIndex].end_date).toLocaleDateString('en-GB')}
