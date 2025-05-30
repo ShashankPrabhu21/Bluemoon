@@ -5,15 +5,15 @@ import pool from "@/lib/db";
 // GET: Fetch all food items and offers (now with optional pagination for food items)
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
-  const fetchFoodItems = searchParams.get("fetch_food_items") === "true";
-  const fetchOffers = searchParams.get("fetch_offers") === "true"; // New parameter to fetch only offers
- 
+  const fetchFoodItems = searchParams.get("fetch_food_items") === "true"; // Used by OfferSetup
+  const fetchOffers = searchParams.get("fetch_offers") === "true"; // Used by OfferSetup
+  const includeAllFoodItems = searchParams.get("include_all_food_items") === "true"; // <<< NEW PARAMETER for OffersCarousel
 
   try {
     await pool.query("SET search_path TO public");
 
     if (fetchFoodItems) {
-      // Logic to fetch paginated food items
+      // This path is for the OfferSetup page when it needs *only* paginated food items
       const page = parseInt(searchParams.get("page") || "0");
       const limit = parseInt(searchParams.get("limit") || "12");
       const offset = page * limit;
@@ -23,11 +23,10 @@ export async function GET(req) {
         [limit, offset]
       );
 
-      // Return only food items
       return NextResponse.json(foodItemsQuery.rows, { status: 200 });
     } else if (fetchOffers) {
-      // Logic to fetch all offers (no pagination)
-      const offersQuery = await pool.query("SELECT * FROM public.offers");
+      // This path is for the OfferSetup page when it needs *only* offers
+      const offersQuery = await pool.query("SELECT * FROM public.offers ORDER BY created_at DESC"); // Added ORDER BY
       const offers = offersQuery.rows.map((offer) => ({
         ...offer,
         selected_items:
@@ -35,11 +34,30 @@ export async function GET(req) {
             ? offer.selected_items
             : JSON.stringify(offer.selected_items), // Ensure it's a string
       }));
-      // Return only offers
       return NextResponse.json(offers, { status: 200 });
+    } else if (includeAllFoodItems) {
+      // <<< THIS IS THE CRITICAL CHANGE FOR OffersCarousel >>>
+      // Fetch ALL offers AND ALL food items in a single response for the carousel
+      // This avoids multiple network calls from the carousel component.
+      const [offersResult, foodItemsResult] = await Promise.all([
+        pool.query("SELECT * FROM public.offers ORDER BY created_at DESC"),
+        pool.query("SELECT item_id, name, description, price, availability, image_url, quantity FROM public.menu_items"),
+      ]);
+
+      const offers = offersResult.rows.map((offer) => ({
+        ...offer,
+        selected_items:
+          typeof offer.selected_items === "string"
+            ? offer.selected_items
+            : JSON.stringify(offer.selected_items),
+      }));
+      const foodItems = foodItemsResult.rows;
+
+      return NextResponse.json({ offers, foodItems }, { status: 200 });
     } else {
-      // Original logic for when no specific type is requested (or for legacy calls)
-      // This path is less likely to be hit with the new client logic
+      // Fallback for calls without specific parameters (could be for legacy or if you still use it)
+      // For general use, you might want to consider what a default GET should return.
+      // If this path is never hit by your client, you could remove it.
       const foodItemsQuery = await pool.query("SELECT * FROM public.menu_items");
       const offersQuery = await pool.query("SELECT * FROM public.offers");
 
@@ -87,7 +105,7 @@ export async function POST(req) {
     // Insert offer
     const insertOffer = await pool.query(
       `INSERT INTO public.offers (selected_items, total_price, discounted_price, offer_type, start_date, end_date)
-         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+           VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [JSON.stringify(selectedItems), totalPrice, discountedPrice, offerType, startDate, endDate]
     );
 
@@ -97,13 +115,6 @@ export async function POST(req) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
-
-// Existing PUT and DELETE methods (no changes needed)
-
-// /api/offers/[id]/route.js (for PUT and DELETE on specific offer IDs)
-// This file likely exists in a separate dynamic route: `app/api/offers/[id]/route.js`
-// Ensure your DELETE and PUT operations correctly target the specific offer ID.
-// No changes needed for these methods.
 
 // DELETE: Delete an offer by ID
 export async function DELETE(req, { params }) {
@@ -157,10 +168,10 @@ export async function PUT(req, { params }) {
 
     const result = await pool.query(
       `UPDATE public.offers
-       SET selected_items = $1, total_price = $2, discounted_price = $3, offer_type = $4,
-           start_date = $5, end_date = $6, updated_at = NOW()
-       WHERE id = $7
-       RETURNING *`,
+         SET selected_items = $1, total_price = $2, discounted_price = $3, offer_type = $4,
+             start_date = $5, end_date = $6, updated_at = NOW()
+         WHERE id = $7
+         RETURNING *`,
       [JSON.stringify(selectedItems), totalPrice, discountedPrice, offerType, startDate, endDate, id]
     );
 
