@@ -1,7 +1,5 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-// If you are using Next.js, consider importing and using the Image component for optimized images:
-// import Image from 'next/image';
 
 interface FoodItem {
   item_id: number; // This is the primary key from the database
@@ -13,7 +11,7 @@ interface FoodItem {
   image_url: string;
   spicy_level: string;
   quantity: number;
-  category_name: string; // Added for display convenience
+  category_name:string;
 }
 
 const categoryMapping: Record<string, number> = {
@@ -29,7 +27,7 @@ const AdminPage = () => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [availability] = useState("Available"); // Assuming it's always 'Available' for new items
-  const [image, setImage] = useState<string | null>(null); // This will hold the Data URL or the external image URL
+  const [image, setImage] = useState<string | null>(null);
   const [spicyLevel, setSpicyLevel] = useState("");
   const [quantity, setQuantity] = useState<string>("");
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
@@ -47,8 +45,7 @@ const AdminPage = () => {
     setIsLoading(true); // Set loading true before fetching
     setError(null);    // Clear any previous errors
     try {
-      // --- CRITICAL CHANGE ALREADY HERE: Add no_pagination=true parameter ---
-      // This tells your API route to return ALL items, not just a paginated subset.
+      // --- CRITICAL CHANGE: Add no_pagination=true parameter ---
       const res = await fetch("/api/menuitem?no_pagination=true");
       if (!res.ok) {
         const errorText = await res.text();
@@ -56,7 +53,7 @@ const AdminPage = () => {
       }
       const data = await res.json();
       setFoodItems(data);
-    } catch (err: unknown) {
+    } catch (err: unknown) { // Explicitly type 'err' as 'unknown'
       console.error("Error fetching menu items:", err);
       if (err instanceof Error) {
         setError(err.message || "Failed to load menu items.");
@@ -71,14 +68,14 @@ const AdminPage = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // **IMPORTANT:** For production, you should upload the image to a cloud storage
-      // (like Cloudinary, AWS S3, etc.) and store the resulting URL in your database.
-      // Storing base64 directly in the database is inefficient and makes responses huge.
-      // This FileReader approach is primarily for client-side preview.
-
+      // Optional: Add client-side size check here if needed
+      // if (file.size > 350 * 1024) { // 350 KB
+      //   alert("Image size exceeds 350KB limit.");
+      //   return;
+      // }
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result as string); // Stores as Data URL (base64) for preview and sending
+        setImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -88,26 +85,22 @@ const AdminPage = () => {
     setIsSubmitting(true);
     setError(null); // Clear any previous errors
     try {
-      const category_id = categoryMapping[category];
+      const category_id = categoryMapping[category]; // Use the mapped ID directly
 
       if (category_id === undefined) {
         alert("Please select a valid category.");
-        setIsSubmitting(false); // Stop submission if validation fails
         return;
       }
       if (!name || !description || !price || !spicyLevel || !quantity || !image) {
         alert("All fields are required.");
-        setIsSubmitting(false); // Stop submission if validation fails
         return;
       }
       if (isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
         alert("Please enter a valid price.");
-        setIsSubmitting(false); // Stop submission if validation fails
         return;
       }
       if (isNaN(parseInt(quantity, 10)) || parseInt(quantity, 10) <= 0) {
         alert("Please enter a valid item number (quantity).");
-        setIsSubmitting(false); // Stop submission if validation fails
         return;
       }
 
@@ -120,9 +113,10 @@ const AdminPage = () => {
         description,
         price: parseFloat(price),
         availability,
-        image_url: image, // This will be the base64 string for now, or a cloud URL later
+        image_url: image,
         quantity: parseInt(quantity, 10),
         spicy_level: spicyLevel,
+        // For PUT request, item_id is crucial
         ...(editingId && { item_id: editingId }), // Conditionally add item_id for PUT
       };
 
@@ -145,7 +139,7 @@ const AdminPage = () => {
         alert("Item updated successfully");
       }
 
-      await fetchFoodItems(); // Re-fetch all items to update the list
+      await fetchFoodItems(); // Re-fetch to update the list
       resetForm();
     } catch (err: unknown) {
       console.error("Error saving menu item:", err);
@@ -168,6 +162,7 @@ const AdminPage = () => {
       const res = await fetch("/api/menuitem", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
+        // --- CRITICAL CHANGE: Send item_id, not id ---
         body: JSON.stringify({ item_id: item_id }),
       });
 
@@ -243,7 +238,7 @@ const AdminPage = () => {
         <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Spicy Level - mild/medium/high" value={spicyLevel} onChange={(e) => setSpicyLevel(e.target.value)} />
         <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Item Number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
         <label className="block mb-1 text-sm text-gray-600">
-          Upload Image (Max: 350KB - for preview)
+          Upload Image (Max: 350KB)
         </label>
         <input
           type="file"
@@ -311,27 +306,16 @@ const AdminPage = () => {
                 key={item.item_id}
                 className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105"
               >
-                {/* Use next/image for optimized images if you are in a Next.js project */}
-                {/* Example:
-                <Image
-                  src={item.image_url || "/placeholder.jpg"}
-                  alt={item.name}
-                  width={300} // Set appropriate width based on your design
-                  height={208} // Set appropriate height (52 * 4)
-                  className="w-full h-52 object-cover rounded-t-2xl"
-                  priority={false} // Only true for above-the-fold images
-                />
-                */}
                 <img
                   src={item.image_url || "/placeholder.jpg"}
                   alt={item.name}
                   className="w-full h-52 object-cover rounded-t-2xl"
                 />
                 {item.category_name && (
-                  <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-md">
-                    {item.category_name}
-                  </div>
-                )}
+          <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-md">
+            {item.category_name}
+          </div>
+        )}
                 <div className="p-4 text-center space-y-2">
                   <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
                   <p className="text-gray-500 text-sm">{item.description}</p>

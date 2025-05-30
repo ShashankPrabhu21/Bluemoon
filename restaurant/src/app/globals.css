@@ -27,6 +27,47 @@ html{
     flex-direction: column;
   }
 }
+/* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0; /* For vertical scrollbar */
+  height: 0; /* For horizontal scrollbar */
+}
+
+/* Hide scrollbar for Firefox */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Optional: To ensure no space is taken by scrollbar */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge (older versions) */
+}
+/* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+html::-webkit-scrollbar {
+  display: none;
+  width: 0; /* For vertical scrollbar */
+  height: 0; /* For horizontal scrollbar */
+}
+
+/* Hide scrollbar for Firefox */
+html {
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar for IE and Edge (older versions) */
+html {
+  -ms-overflow-style: none;
+}
+
+/* Ensure the body does not create its own scrollbar if html is handling it */
+body {
+  overflow: hidden; /* This might be needed if body itself creates a scrollbar */
+}
+
+/* Your existing global styles will follow below this */
+/* ... */
+ 
 /* Calendar specific styles */
 .rdp {
   --rdp-cell-size: 40px;

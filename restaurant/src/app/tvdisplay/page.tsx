@@ -1,3 +1,4 @@
+// pages/food-display.tsx
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
@@ -181,7 +182,8 @@ const FoodDisplayPage = () => {
         <div className="relative container mx-auto px-4 z-10">
           <div
             ref={containerRef}
-            className="flex flex-col gap-8 overflow-y-auto max-h-[75vh]"
+            // Add the new class here
+            className="flex flex-col gap-8 overflow-y-auto max-h-[75vh] hide-scrollbar" 
             style={{ scrollBehavior: "auto" }}
           >
             {categoryOrder.map(
@@ -210,7 +212,7 @@ const FoodDisplayPage = () => {
                             priority={false}
                             loading="lazy"
                             placeholder="blur"
-                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAQIAEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Wque2nLVwm7Hp7cWG3M4QLrBM6XEJwUFsAE8DgBgdAbT3RCxJz5j4RCSF0UEbUcnJTEu5rqr35kYdGb2w/rLNKBBAAAG/bE8T1zxe+5kXTPk0/9k="
+                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAwERAAIRAQ/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAQIAEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Wque2nLVwm7Hp7cWG3M4QLrBM6XEJwUFsAE8DgBgdAbT3RCxJz5j4RCSF0UEbUcnJTEu5rqr35kYdGb2w/rLNKBBAAAG/bE8T1zxe+5kXTPk0/9k="
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent flex flex-col justify-end p-4">
                             <h3 className="text-lg md:text-xl font-extrabold text-white drop-shadow-sm">
