@@ -7,7 +7,7 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const fetchFoodItems = searchParams.get("fetch_food_items") === "true";
   const fetchOffers = searchParams.get("fetch_offers") === "true"; // New parameter to fetch only offers
-  const noPagination = searchParams.get("no_pagination") === "true"; // New parameter to bypass pagination
+ 
 
   try {
     await pool.query("SET search_path TO public");
