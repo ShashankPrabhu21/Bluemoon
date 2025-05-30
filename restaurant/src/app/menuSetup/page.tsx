@@ -13,7 +13,7 @@ interface FoodItem {
   image_url: string;
   spicy_level: string;
   quantity: number;
-  category_name: string; // Ensure this is potentially populated from the backend
+  category_name: string; // Ensure this is populated from the backend
 }
 
 const categoryMapping: Record<string, number> = {
@@ -47,17 +47,14 @@ const AdminPage = () => {
     setIsLoading(true); // Set loading true before fetching
     setError(null);    // Clear any previous errors
     try {
-      // --- CRITICAL CHANGE: Add no_pagination=true parameter ---
-      // This fetch is for the initial load of ALL items.
-      // For future operations, we will update local state instead of re-fetching all.
-      const res = await fetch("/api/menuitem?no_pagination=true");
+      const res = await fetch("/api/menuitem?no_pagination=true"); // no_pagination=true is correct here
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Failed to fetch menu items: ${res.status} - ${errorText}`);
       }
       const data = await res.json();
       setFoodItems(data);
-    } catch (err: unknown) { // Explicitly type 'err' as 'unknown'
+    } catch (err: unknown) {
       console.error("Error fetching menu items:", err);
       if (err instanceof Error) {
         setError(err.message || "Failed to load menu items.");
@@ -72,7 +69,6 @@ const AdminPage = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Optional: Add client-side size check here if needed
       if (file.size > 350 * 1024) { // 350 KB
         alert("Image size exceeds 350KB limit.");
         e.target.value = ''; // Clear the input
@@ -91,12 +87,12 @@ const AdminPage = () => {
     setIsSubmitting(true);
     setError(null); // Clear any previous errors
     try {
-      const selectedCategoryName = category; // Store the selected category name
-      const category_id = categoryMapping[selectedCategoryName]; // Use the mapped ID directly
+      const selectedCategoryName = category;
+      const category_id = categoryMapping[selectedCategoryName];
 
       if (category_id === undefined) {
         alert("Please select a valid category.");
-        setIsSubmitting(false); // Make sure to reset submitting state on validation failure
+        setIsSubmitting(false);
         return;
       }
       if (!name || !description || !price || !spicyLevel || !quantity || !image) {
@@ -124,11 +120,10 @@ const AdminPage = () => {
         description,
         price: parseFloat(price),
         availability,
-        image_url: image,
+        image_url: image, // Use the base64 string directly
         quantity: parseInt(quantity, 10),
         spicy_level: spicyLevel,
-        // For PUT request, item_id is crucial
-        ...(editingId && { item_id: editingId }), // Conditionally add item_id for PUT
+        ...(editingId && { item_id: editingId }),
       };
 
       const response = await fetch(url, {
@@ -141,20 +136,25 @@ const AdminPage = () => {
 
       if (!response.ok) {
         alert(result.error || "Failed to save menu item");
-        setIsSubmitting(false); // Reset submitting state on API error
+        setIsSubmitting(false);
         return;
       }
 
-      // --- OPTIMIZATION: Update local state directly ---
       if (method === "POST") {
-        // Assume API returns the full new item including its item_id
-        // Add category_name for display
-        const newItemWithCategory: FoodItem = { ...result.menuItem, category_name: selectedCategoryName };
-        setFoodItems((prev) => [newItemWithCategory, ...prev]); // Add new item to the beginning
+        // The API now explicitly returns `menuItem` directly as the result
+        const newItemWithCategory: FoodItem = {
+            ...result, // Assuming result itself is the new item with category_name
+            // Ensure category_name is present. If your API isn't returning it, add it here:
+            category_name: result.category_name || selectedCategoryName
+        };
+        setFoodItems((prev) => [newItemWithCategory, ...prev]);
         alert("Item added successfully!");
       } else { // PUT
-        // Update the existing item in the local state
-        const updatedItemWithCategory: FoodItem = { ...result.menuItem, category_name: selectedCategoryName };
+        // The API now explicitly returns `menuItem` directly as the result
+        const updatedItemWithCategory: FoodItem = {
+            ...result, // Assuming result itself is the updated item with category_name
+            category_name: result.category_name || selectedCategoryName
+        };
         setFoodItems((prev) =>
           prev.map((item) => (item.item_id === updatedItemWithCategory.item_id ? updatedItemWithCategory : item))
         );
@@ -178,10 +178,7 @@ const AdminPage = () => {
     const confirmDelete = confirm(`Are you sure you want to delete "${itemName}"?`);
     if (!confirmDelete) return;
 
-    setError(null); // Clear any previous errors
-    // Optionally, you can set a loading state specifically for the delete operation
-    // setIsDeleting(true);
-
+    setError(null);
     try {
       const res = await fetch("/api/menuitem", {
         method: "DELETE",
@@ -194,7 +191,6 @@ const AdminPage = () => {
         throw new Error(errorData.error || "Failed to delete menu item");
       }
 
-      // --- OPTIMIZATION: Update local state directly ---
       setFoodItems((prev) => prev.filter((item) => item.item_id !== item_id));
       alert("Item deleted successfully!");
     } catch (err: unknown) {
@@ -205,9 +201,6 @@ const AdminPage = () => {
         setError("An unknown error occurred while deleting.");
       }
     }
-    // finally {
-    //   setIsDeleting(false);
-    // }
   };
 
   const editFoodItem = (item: FoodItem) => {
@@ -215,7 +208,7 @@ const AdminPage = () => {
     setName(item.name);
     setDescription(item.description);
     setPrice(item.price.toString());
-    setImage(item.image_url);
+    setImage(item.image_url); // Set the image state directly from the item's image_url
     setSpicyLevel(item.spicy_level);
     setQuantity(item.quantity.toString());
     setEditingId(item.item_id);
@@ -227,7 +220,7 @@ const AdminPage = () => {
     setName("");
     setDescription("");
     setPrice("");
-    setImage(null);
+    setImage(null); // Clear image preview on reset
     setSpicyLevel("");
     setQuantity("");
     setEditingId(null);
@@ -272,6 +265,8 @@ const AdminPage = () => {
           accept="image/*"
           className="w-full p-2 border rounded-lg"
           onChange={handleImageUpload}
+          // Reset file input value only if image is cleared in resetForm
+          key={image || 'no-image'} // Use a key to force re-render when image changes
         />
 
         {image && <img src={image} alt="Preview" className="w-28 h-28 object-cover rounded-lg shadow-md mt-3" />}
@@ -331,15 +326,18 @@ const AdminPage = () => {
             {foodItems.map((item) => (
               <div
                 key={item.item_id}
-                className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105 relative" // Added relative for absolute positioning of category tag
+                className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105 relative"
               >
-                <Image // Changed to Next.js Image component for optimization
-                  src={item.image_url || "/placeholder.jpg"}
-                  alt={item.name}
-                  width={400} // Example width, adjust as needed
-                  height={208} // Example height (52 * 4, matching h-52)
-                  className="w-full h-52 object-cover rounded-t-2xl"
-                />
+               <Image
+  src={item.image_url || "/placeholder.jpg"}
+  alt={item.name}
+  width={400}
+  height={208}
+  className="w-full h-52 object-cover rounded-t-2xl"
+  priority={true}
+  unoptimized={!!(item.image_url && item.image_url.startsWith('data:image/'))}
+/>
+
                 {item.category_name && (
                   <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-md">
                     {item.category_name}
