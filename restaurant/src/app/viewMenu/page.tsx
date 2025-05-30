@@ -31,7 +31,6 @@ interface CartItem {
 const categoryMapping: Record<number, string> = {
   1: "Breakfast",
   2: "Main Course",
-
   4: "Entree",
   5: "Drinks",
 };
@@ -48,7 +47,10 @@ const OnlineOrderPage = () => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const res = await fetch("/api/menuitem");
+        // --- START CHANGE ---
+        // Fetch all items by sending a flag to the API to disable pagination
+        const res = await fetch("/api/menuitem?no_pagination=true");
+        // --- END CHANGE ---
         if (!res.ok) throw new Error("Failed to fetch menu items");
         const data = await res.json();
         setFoodItems(data);
@@ -96,7 +98,11 @@ const OnlineOrderPage = () => {
     handleCartLogic();
   }, []);
 
-  const addToCart = async (item: FoodItem, quantity: number, specialNote: string) => {
+  const addToCart = async (
+    item: FoodItem,
+    quantity: number,
+    specialNote: string
+  ) => {
     try {
       const response = await fetch("/api/cart/add", {
         method: "POST",
@@ -113,7 +119,11 @@ const OnlineOrderPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(`Failed to add to cart: ${response.status} - ${response.statusText} - ${JSON.stringify(errorData)}`);
+        throw new Error(
+          `Failed to add to cart: ${response.status} - ${
+            response.statusText
+          } - ${JSON.stringify(errorData)}`
+        );
       }
       const cartData = await (await fetch("/api/cart/get")).json();
       setCart(cartData);
@@ -142,7 +152,9 @@ const OnlineOrderPage = () => {
             className="mb-4 lg:mb-0 flex items-center space-x-2 bg-blue-600 text-white px-4 sm:px-5 py-3 sm:py-3 rounded-lg shadow-md hover:bg-blue-500 transition"
           >
             <FiShoppingCart size={22} className="sm:size-[26px]" />
-            <span className="text-base sm:text-lg font-semibold">Cart ({cart.length})</span>
+            <span className="text-base sm:text-lg font-semibold">
+              Cart ({cart.length})
+            </span>
           </Link>
         </div>
 
@@ -162,9 +174,10 @@ const OnlineOrderPage = () => {
           <button
             onClick={() => setServiceType("pickup")}
             className={`px-6 sm:px-8 py-2 sm:py-2.5 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 ease-in-out
-              ${serviceType === "pickup"
-                ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
-                : "bg-transparent text-gray-700 hover:text-blue-500"
+              ${
+                serviceType === "pickup"
+                  ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
+                  : "bg-transparent text-gray-700 hover:text-blue-500"
               }`}
           >
             Pickup
@@ -173,9 +186,10 @@ const OnlineOrderPage = () => {
           <button
             onClick={() => setServiceType("delivery")}
             className={`px-6 sm:px-8 py-2 sm:py-2.5 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 ease-in-out
-              ${serviceType === "delivery"
-                ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
-                : "bg-transparent text-gray-700 hover:text-blue-500"
+              ${
+                serviceType === "delivery"
+                  ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
+                  : "bg-transparent text-gray-700 hover:text-blue-500"
               }`}
           >
             Delivery
@@ -184,7 +198,9 @@ const OnlineOrderPage = () => {
       </div>
 
       {categories.map((category) => {
-        const filteredItems = foodItems.filter((item) => categoryMapping[item.category_id] === category);
+        const filteredItems = foodItems.filter(
+          (item) => categoryMapping[item.category_id] === category
+        );
         return (
           <div key={category} className="mb-10">
             <h2 className="mb-6 text-3xl font-bold text-center text-white py-3 relative uppercase tracking-wide">
@@ -196,7 +212,7 @@ const OnlineOrderPage = () => {
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
                 {filteredItems.map((item) => (
                   <div
-                    key={item.item_id}
+                    key={item.item_id} // Correctly using item_id for the key
                     className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
                   >
                     <img
@@ -206,11 +222,19 @@ const OnlineOrderPage = () => {
                     />
 
                     <div className="p-2 sm:p-3 text-center rounded-b-xl">
-                      <h3 className="text-sm sm:text-lg font-bold text-blue-900 tracking-wide truncate">{item.name}</h3>
-                      <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2">{item.description}</p>
+                      <h3 className="text-sm sm:text-lg font-bold text-blue-900 tracking-wide truncate">
+                        {item.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2">
+                        {item.description}
+                      </p>
                       <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-gray-700 bg-gray-100 p-2 rounded-md mb-2 sm:mb-4">
-                        <span className="text-blue-800 font-semibold">${item.price}</span>
-                        <span className="text-gray-500">Item No: {item.quantity}</span>
+                        <span className="text-blue-800 font-semibold">
+                          ${item.price}
+                        </span>
+                        <span className="text-gray-500">
+                          Item No: {item.quantity}
+                        </span>
                       </div>
 
                       <button
@@ -224,14 +248,21 @@ const OnlineOrderPage = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-500">No items found in {category}</p>
+              <p className="text-center text-gray-500">
+                No items found in {category}
+              </p>
             )}
           </div>
         );
       })}
 
       {selectedItem && (
-        <OrderModal item={selectedItem} onClose={() => setSelectedItem(null)} onAddToCart={addToCart} serviceType={serviceType}/>
+        <OrderModal
+          item={selectedItem}
+          onClose={() => setSelectedItem(null)}
+          onAddToCart={addToCart}
+          serviceType={serviceType}
+        />
       )}
     </div>
   );
