@@ -1,4 +1,3 @@
-// api/menuitem/route.js
 import { NextResponse } from "next/server";
 import db from "@/lib/db"; // Assuming db is the correct import for your PostgreSQL connection
 
@@ -41,7 +40,7 @@ export async function GET(req) {
   }
 
   // --- CRITICAL CHANGE START ---
-  // Only apply LIMIT and OFFSET if no_pagination is NOT true
+  // Only apply LIMIT and OFFSET if noPagination is NOT true
   if (!noPagination) {
     // If no_pagination is false, parse page and limit for pagination
     const page = parseInt(searchParams.get("page") || "0");
@@ -52,7 +51,7 @@ export async function GET(req) {
     values.push(limit, offset); // Add limit and offset to values array
   } else {
     // If no_pagination is true, just order the results, no LIMIT/OFFSET
-    query += ` ORDER BY created_at DESC`;
+    query += ` ORDER BY created_at DESC`; // Order to ensure consistent display
   }
   // --- CRITICAL CHANGE END ---
 
@@ -143,10 +142,10 @@ export async function PUT(req) {
 
     const result = await db.query(
       `UPDATE menu_items
-         SET category_id = $1, name = $2, description = $3, price = $4, availability = $5,
-             image_url = $6, quantity = $7, spicy_level = $8, updated_at = NOW()
-         WHERE item_id = $9
-         RETURNING *`,
+          SET category_id = $1, name = $2, description = $3, price = $4, availability = $5,
+              image_url = $6, quantity = $7, spicy_level = $8, updated_at = NOW()
+          WHERE item_id = $9
+          RETURNING *`,
       [category_id, name, description, price, availability, image_url, quantity, spicy_level, item_id]
     );
 

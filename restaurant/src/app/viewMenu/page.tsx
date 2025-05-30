@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FiShoppingCart } from "react-icons/fi";
-import Image from "next/image"; // <--- ADDED: Import Next.js Image component
+import Image from "next/image";
 import OrderModal from "../components/OrderModal";
 
 interface FoodItem {
@@ -26,7 +26,7 @@ interface CartItem {
   special_note: string;
   item_id: number;
   user_id: number;
-  service_type: string; // Added service_type
+  service_type: string;
 }
 
 const categoryMapping: Record<number, string> = {
@@ -36,68 +36,161 @@ const categoryMapping: Record<number, string> = {
   5: "Drinks",
 };
 
-const categories = Object.values(categoryMapping);
+const ITEMS_PER_PAGE = 12; // Define how many items to load per request, same as MenuPage
 
 const OnlineOrderPage = () => {
-  const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+  const [items, setItems] = useState<FoodItem[]>([]); // Renamed from foodItems to items for consistency
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [serviceType, setServiceType] = useState<string>("delivery"); // Default service type
-  const [loading, setLoading] = useState(true); // Added loading state
+  const [serviceType, setServiceType] = useState<string>("delivery");
+  const [loading, setLoading] = useState(false); // Initialize as false, fetch will set it to true
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(0); // Current page for pagination (0-indexed)
+  const [hasMore, setHasMore] = useState(true); // True if there's more data to load
+  const [filteredCategory, setFilteredCategory] = useState<string | null>(
+    null // Default to null for "All Menu" initially
+  ); // New state to hold the currently filtered category
 
-  useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        // We assume the /api/menuitem endpoint has been updated
-        // to handle a 'no_pagination=true' flag to return all items,
-        // as discussed in the previous interaction.
-        const res = await fetch("/api/menuitem?no_pagination=true");
-        if (!res.ok) throw new Error("Failed to fetch menu items");
-        const data = await res.json();
-        setFoodItems(data);
-      } catch (error) {
-        console.error("Error fetching menu items:", error);
-      }
-    };
+  // --- Intersection Observer for Infinite Scrolling ---
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastItemElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
 
-    const fetchCartItems = async () => {
-      try {
-        const res = await fetch("/api/cart/get");
-        if (res.ok) {
-          const cartData = await res.json();
-          setCart(cartData);
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1);
         }
-      } catch (error) {
-        console.error("Error fetching cart:", error);
-      }
-    };
+      });
 
-    const clearCart = async () => {
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
+
+  // --- Data Fetching Logic for Menu Items ---
+  const fetchMenuItems = useCallback(
+    async (category: string | null, currentPage: number) => {
+      setLoading(true);
+      setError(null);
       try {
-        await fetch("/api/cart/clear", {
-          method: "POST",
-        });
-        setCart([]);
-      } catch (error) {
-        console.error("Error clearing cart:", error);
-      }
-    };
+        const queryParams = new URLSearchParams();
+        queryParams.append("page", currentPage.toString());
+        queryParams.append("limit", ITEMS_PER_PAGE.toString());
 
-    const handleCartLogic = async () => {
-      await fetchMenuItems();
+        if (category && category !== "All Menu") {
+          queryParams.append("category", category);
+        }
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+        const res = await fetch(`/api/menuitem?${queryParams.toString()}`, {
+          cache: "no-store",
+          signal: controller.signal,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(
+            `HTTP error! status: ${res.status}, Message: ${errorText}`
+          );
+        }
+
+        const data: FoodItem[] = await res.json();
+        console.log(
+          `Fetched page ${currentPage} for category "${
+            category || "All Menu"
+          }":`,
+          data
+        );
+
+        if (currentPage === 0) {
+          setItems(data);
+        } else {
+          setItems((prevItems) => [...prevItems, ...data]);
+        }
+
+        setHasMore(data.length === ITEMS_PER_PAGE);
+      } catch (err: unknown) {
+        console.error("Failed to fetch menu items:", err);
+        if (err instanceof Error) {
+          if (err.name === "AbortError") {
+            setError("Request timed out. Please try again.");
+          } else {
+            setError(err.message || "Failed to load menu items.");
+          }
+        } else {
+          setError("An unknown error occurred.");
+        }
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  // --- Data Fetching Logic for Cart Items ---
+  const fetchCartItems = async () => {
+    try {
+      const res = await fetch("/api/cart/get");
+      if (res.ok) {
+        const cartData = await res.json();
+        setCart(cartData);
+      }
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      await fetch("/api/cart/clear", {
+        method: "POST",
+      });
+      setCart([]);
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+    }
+  };
+
+  // Initial load effect for menu items and cart logic
+  useEffect(() => {
+    const handleInitialLoad = async () => {
+      // Set an initial category to trigger the first fetch
+      setFilteredCategory("All Menu"); // This will trigger the useEffect below to fetch initial data
 
       if (sessionStorage.getItem("fromCart") === "true") {
         await fetchCartItems();
-        sessionStorage.removeItem("fromCart"); // Clear the flag after fetching
+        sessionStorage.removeItem("fromCart");
       } else {
-        await clearCart(); // Clear cart unless coming from cart page.
+        await clearCart();
       }
-      await fetchCartItems(); // Fetch cart in any case.
-      setLoading(false); // Set loading to false after all data is fetched
+      await fetchCartItems(); // Ensure cart is fetched after initial load/clear
     };
 
-    handleCartLogic();
+    handleInitialLoad();
   }, []);
+
+  // Effect to trigger menu item fetch when filteredCategory changes or page changes
+  useEffect(() => {
+    if (filteredCategory !== null) {
+      if (page === 0) {
+        setItems([]); // Clear existing items when category changes (or initial load)
+        setHasMore(true); // Assume there's more data for the new category
+        fetchMenuItems(filteredCategory, 0); // Fetch the first page for the new category
+      } else {
+        fetchMenuItems(filteredCategory, page);
+      }
+    }
+  }, [filteredCategory, page, fetchMenuItems]);
 
   const addToCart = async (
     item: FoodItem,
@@ -114,33 +207,76 @@ const OnlineOrderPage = () => {
           item_id: item.item_id,
           quantity: quantity,
           special_note: specialNote,
-          service_type: serviceType, // Include service type
+          service_type: serviceType,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          `Failed to add to cart: ${response.status} - ${
-            response.statusText
-          } - ${JSON.stringify(errorData)}`
+          `Failed to add to cart: ${response.status} - ${response.statusText} - ${JSON.stringify(
+            errorData
+          )}`
         );
       }
-      const cartData = await (await fetch("/api/cart/get")).json();
-      setCart(cartData);
+      await fetchCartItems(); // Re-fetch cart after adding
     } catch (error) {
       console.error("Error adding to cart:", error);
+      setError("Failed to add item to cart. Please try again."); // Set a user-friendly error
     }
   };
 
-  if (loading) {
+  const handleCategoryFilter = useCallback((category: string | null) => {
+    setFilteredCategory(category);
+    setPage(0); // Reset page when filtering by category
+    setItems([]); // Clear current items to show skeleton loader for new category
+    setHasMore(true); // Assume there's more data for the new category
+  }, []);
+
+  // Show error state
+  if (error) {
     return (
-      <div className="min-h-screen flex justify-center items-center bg-gray-100">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-        <span className="ml-3 text-blue-500 font-semibold">Loading menu...</span>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center p-8">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">
+            Error Loading Menu
+          </h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            type="button"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
+
+  // Define categories for display, including "All Menu"
+  const displayCategories = [
+    { label: "All Menu", value: null }, // Representing "All Menu" by null to fetch all
+    ...Object.values(categoryMapping).map((label) => ({ label, value: label })),
+  ];
+
+  // Group items by category for rendering with separate headings
+  const groupedItems = items.reduce((acc, item) => {
+    const categoryName = categoryMapping[item.category_id];
+    if (categoryName) {
+      if (!acc[categoryName]) {
+        acc[categoryName] = [];
+      }
+      acc[categoryName].push(item);
+    }
+    return acc;
+  }, {} as Record<string, FoodItem[]>);
+
+  // Determine which categories to render based on filter
+  const categoriesToRender =
+    filteredCategory && filteredCategory !== "All Menu"
+      ? [filteredCategory]
+      : Object.values(categoryMapping);
 
   return (
     <div className="min-h-screen py-6 bg-[url('/sec1.jpg')] bg-cover bg-center bg-no-repeat relative">
@@ -198,74 +334,84 @@ const OnlineOrderPage = () => {
         </div>
       </div>
 
-      {categories.map((category) => {
-        const filteredItems = foodItems.filter(
-          (item) => categoryMapping[item.category_id] === category
-        );
-        return (
-          <div key={category} className="mb-10">
-            <h2 className="mb-6 text-3xl font-bold text-center text-white py-3 relative uppercase tracking-wide">
-              {category}
-              <span className="absolute left-1/2 bottom-0 w-16 h-1 bg-gradient-to-r from-[#3345A7] to-blue-400 transform -translate-x-1/2"></span>
-            </h2>
+      {/* Category Filter Buttons */}
+      <div className="z-10 flex flex-wrap justify-center gap-4 mb-8 px-4">
+        {displayCategories.map((cat) => (
+          <button
+            key={cat.label}
+            onClick={() => handleCategoryFilter(cat.value)}
+            className={`px-5 py-2 rounded-full font-semibold transition-all duration-300 ease-in-out
+              ${
+                filteredCategory === cat.value
+                  ? "bg-gradient-to-r from-red-600 to-red-400 text-white shadow-lg"
+                  : "bg-white/20 text-white hover:bg-white/40"
+              }`}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
 
-            {filteredItems.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
-                {filteredItems.map((item) => (
-                  <div
-                    key={item.item_id}
-                    className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
-                  >
-                    {/* START: Image Component Change */}
-                    <div className="relative w-full h-32 sm:h-48">
-                      <Image
-                        src={item.image_url || "/placeholder.jpg"}
-                        alt={item.name}
-                        fill // Makes the image fill its parent div
-                        className="object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-110"
-                        // `sizes` attribute is crucial for Next.js Image optimization
-                        // It tells Next.js how wide the image will be at different breakpoints
-                        // Adjust these values to match your actual CSS grid and responsive layout
-                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
-                        loading="lazy" // Ensures images outside viewport are lazy-loaded
-                      />
-                    </div>
-                    {/* END: Image Component Change */}
-
-                    <div className="p-2 sm:p-3 text-center rounded-b-xl">
-                      <h3 className="text-sm sm:text-lg font-bold text-blue-900 tracking-wide truncate">
-                        {item.name}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2">
-                        {item.description}
-                      </p>
-                      <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-gray-700 bg-gray-100 p-2 rounded-md mb-2 sm:mb-4">
-                        <span className="text-blue-800 font-semibold">
-                          ${item.price}
-                        </span>
-                        <span className="text-gray-500">
-                          Item No: {item.quantity}
-                        </span>
-                      </div>
-
-                      <button
-                        onClick={() => setSelectedItem(item)}
-                        className="w-full py-2 sm:py-2.5 text-white font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition duration-200 shadow-md hover:shadow-lg active:scale-95"
+      {/* Display Items by Category */}
+      <div className="mt-12 px-2 sm:px-4">
+        {categoriesToRender.map((category) => {
+          const categoryItems = groupedItems[category] || [];
+          if (categoryItems.length === 0 && !loading) {
+            // Don't show category heading if no items and not loading for this category
+            return null;
+          }
+          return (
+            <div key={category} className="mb-10">
+              <h2 className="mb-6 text-3xl font-bold text-center text-white py-3 relative uppercase tracking-wide">
+                {category}
+                <span className="absolute left-1/2 bottom-0 w-16 h-1 bg-gradient-to-r from-[#3345A7] to-blue-400 transform -translate-x-1/2"></span>
+              </h2>
+              {categoryItems.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
+                  {categoryItems.map((item, index) => {
+                    // Attach ref only to the last item in the *entire* `items` array for IntersectionObserver
+                    const isLastItemInOverallList =
+                      items.length === items.indexOf(item) + 1;
+                    return (
+                      <div
+                        ref={isLastItemInOverallList ? lastItemElementRef : null}
+                        key={`item-${item.item_id}`}
+                        className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
                       >
-                        Order Now
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-gray-500">
-                No items found in {category}
-              </p>
-            )}
-          </div>
-        );
-      })}
+                        <Card item={item} setSelectedItem={setSelectedItem} />
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                !loading && (
+                  <p className="text-center text-white text-lg mt-8">
+                    No items found in this category.
+                  </p>
+                )
+              )}
+            </div>
+          );
+        })}
+
+        {/* Loading indicator and messages */}
+        {loading && <SkeletonGrid />}
+        {!loading && items.length === 0 && filteredCategory && filteredCategory !== "All Menu" && (
+          <p className="text-white text-center mt-8 text-lg">
+            No items found for the selected category.
+          </p>
+        )}
+        {!loading && items.length === 0 && (filteredCategory === null || filteredCategory === "All Menu") && (
+          <p className="text-white text-center mt-8 text-lg">
+            No menu items available at this time.
+          </p>
+        )}
+        {!hasMore && !loading && items.length > 0 && (
+          <p className="text-white text-center mt-8 text-lg">
+            You&apos;ve reached the end of the menu!
+          </p>
+        )}
+      </div>
 
       {selectedItem && (
         <OrderModal
@@ -278,5 +424,62 @@ const OnlineOrderPage = () => {
     </div>
   );
 };
+
+// Memoized card component for better performance, modified to handle order button click
+const Card = React.memo(
+  ({
+    item,
+    setSelectedItem,
+  }: {
+    item: FoodItem;
+    setSelectedItem: (item: FoodItem) => void;
+  }) => (
+    <>
+      <div className="relative w-full h-32 sm:h-48">
+        <Image
+          src={item.image_url || "/placeholder.jpg"}
+          alt={item.name}
+          fill
+          className="object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-110"
+          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+          loading="lazy"
+        />
+      </div>
+      <div className="p-2 sm:p-3 text-center rounded-b-xl">
+        <h3 className="text-sm sm:text-lg font-bold text-blue-900 tracking-wide truncate">
+          {item.name}
+        </h3>
+        <p className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-2">
+          {item.description}
+        </p>
+        <div className="flex justify-between items-center text-xs sm:text-sm font-semibold text-gray-700 bg-gray-100 p-2 rounded-md mb-2 sm:mb-4">
+          <span className="text-blue-800 font-semibold">${item.price}</span>
+          <span className="text-gray-500">Item No: {item.quantity}</span>
+        </div>
+
+        <button
+          onClick={() => setSelectedItem(item)}
+          className="w-full py-2 sm:py-2.5 text-white font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition duration-200 shadow-md hover:shadow-lg active:scale-95"
+        >
+          Order Now
+        </button>
+      </div>
+    </>
+  )
+);
+
+Card.displayName = "Card";
+
+// Optimized skeleton grid to match ITEMS_PER_PAGE
+const SkeletonGrid = () => (
+  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4 mt-8">
+    {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+      <div
+        key={`skeleton-${i}`}
+        className="animate-pulse bg-white/20 rounded-xl h-64 w-full"
+      />
+    ))}
+  </div>
+);
 
 export default OnlineOrderPage;

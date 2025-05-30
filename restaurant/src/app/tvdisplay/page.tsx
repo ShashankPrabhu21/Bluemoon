@@ -18,6 +18,7 @@ interface FoodItem {
 
 const FoodDisplayPage = () => {
   const [foodItemsByCategory, setFoodItemsByCategory] = useState<{ [key: string]: FoodItem[] }>({});
+  const [error, setError] = useState<string | null>(null); // Add this line
   const containerRef = useRef<HTMLDivElement>(null);
 
   const categoryOrder = ["Breakfast", "Main Course", "Entree", "Drinks"];
@@ -26,8 +27,11 @@ const FoodDisplayPage = () => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const res = await fetch("/api/menuitem");
-        if (!res.ok) throw new Error("Failed to fetch menu items");
+        const res = await fetch("/api/menuitem?no_pagination=true");
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`Failed to fetch menu items: ${res.status} - ${errorText}`);
+        }
         const data: FoodItem[] = await res.json();
 
         const grouped: { [key: string]: FoodItem[] } = {};
@@ -39,8 +43,14 @@ const FoodDisplayPage = () => {
         });
 
         setFoodItemsByCategory(grouped);
-      } catch (err) {
+        setError(null); // Clear any previous errors on successful fetch
+      } catch (err: unknown) { // Explicitly type 'err' as 'unknown'
         console.error("Error fetching menu items:", err);
+        if (err instanceof Error) {
+          setError(err.message || "Failed to load menu items.");
+        } else {
+          setError("An unknown error occurred.");
+        }
       }
     };
 
@@ -52,6 +62,12 @@ const FoodDisplayPage = () => {
     const container = containerRef.current;
     if (!container) return;
 
+    // Check if there's content to scroll before starting animation
+    if (container.scrollHeight <= container.clientHeight && Object.keys(foodItemsByCategory).length === 0) {
+      console.log("No scrollable content or no items loaded yet. Skipping scroll animation.");
+      return;
+    }
+
     let animationFrameId: number;
     let startTime: number | null = null;
     const duration = 300000; // 5 minutes
@@ -62,7 +78,9 @@ const FoodDisplayPage = () => {
 
       const targetScroll = container.scrollHeight - container.clientHeight;
       if (targetScroll <= 0) {
-        // Wait a bit, then try again (content might not be fully rendered)
+        // If content is not scrollable (e.g., very few items), reset and wait
+        container.scrollTop = 0;
+        startTime = null; // Reset startTime to recalculate on next frame
         animationFrameId = requestAnimationFrame(scrollStep);
         return;
       }
@@ -75,14 +93,32 @@ const FoodDisplayPage = () => {
       } else {
         // Reset scroll and start over
         container.scrollTop = 0;
-        startTime = null;
+        startTime = null; // Reset startTime for the next full scroll cycle
         animationFrameId = requestAnimationFrame(scrollStep);
       }
     };
 
-    animationFrameId = requestAnimationFrame(scrollStep);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [foodItemsByCategory]);
+    // Start the scroll animation only if there are items to display and no error
+    if (Object.keys(foodItemsByCategory).length > 0 && !error) {
+      animationFrameId = requestAnimationFrame(scrollStep);
+    }
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [foodItemsByCategory, error]); // Add 'error' to dependencies
+
+  // Render a loading state or message if no items are loaded yet
+  if (Object.keys(foodItemsByCategory).length === 0 && !error) {
+    return (
+      <div className="relative min-h-screen w-full flex items-center justify-center bg-[url('/sec11.jpg')] bg-cover bg-center before:absolute before:inset-0 before:bg-gradient-to-b before:from-black/70 before:to-black/80 before:z-0">
+        <TVNavbar />
+        <p className="relative z-10 text-white text-3xl font-bold">Loading Menu...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-[url('/sec11.jpg')] bg-cover bg-center before:absolute before:inset-0 before:bg-gradient-to-b before:from-black/70 before:to-black/80 before:z-0">
@@ -96,6 +132,13 @@ const FoodDisplayPage = () => {
             className="flex flex-col gap-8 overflow-y-auto max-h-[75vh]"
             style={{ scrollBehavior: "auto" }}
           >
+            {/* Display error message if fetching failed */}
+            {error && (
+              <div className="text-center text-red-500 text-2xl font-bold mb-8">
+                {error}
+              </div>
+            )}
+
             {categoryOrder.map(
               (categoryName) =>
                 foodItemsByCategory[categoryName]?.length > 0 && (

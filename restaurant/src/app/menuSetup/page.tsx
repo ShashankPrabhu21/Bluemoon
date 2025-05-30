@@ -2,8 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 interface FoodItem {
-  item_id: number;
-  id: number;
+  item_id: number; // This is the primary key from the database
   category_id: number;
   name: string;
   description: string;
@@ -17,7 +16,6 @@ interface FoodItem {
 const categoryMapping: Record<string, number> = {
   "Breakfast": 1,
   "Main Course": 2,
-
   "Entree": 4,
   "Drinks": 5,
 };
@@ -27,13 +25,15 @@ const AdminPage = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [availability] = useState("Available");
+  const [availability] = useState("Available"); // Assuming it's always 'Available' for new items
   const [image, setImage] = useState<string | null>(null);
   const [spicyLevel, setSpicyLevel] = useState("");
   const [quantity, setQuantity] = useState<string>("");
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
+  const [error, setError] = useState<string | null>(null); // Added error state
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,19 +41,37 @@ const AdminPage = () => {
   }, []);
 
   const fetchFoodItems = async () => {
+    setIsLoading(true); // Set loading true before fetching
+    setError(null);    // Clear any previous errors
     try {
-      const res = await fetch("/api/menuitem");
-      if (!res.ok) throw new Error("Failed to fetch menu items");
+      // --- CRITICAL CHANGE: Add no_pagination=true parameter ---
+      const res = await fetch("/api/menuitem?no_pagination=true");
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Failed to fetch menu items: ${res.status} - ${errorText}`);
+      }
       const data = await res.json();
       setFoodItems(data);
-    } catch (error) {
-      console.error("Error fetching menu items:", error);
+    } catch (err: unknown) { // Explicitly type 'err' as 'unknown'
+      console.error("Error fetching menu items:", err);
+      if (err instanceof Error) {
+        setError(err.message || "Failed to load menu items.");
+      } else {
+        setError("An unknown error occurred while fetching.");
+      }
+    } finally {
+      setIsLoading(false); // Set loading false after fetch (success or failure)
     }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Optional: Add client-side size check here if needed
+      // if (file.size > 350 * 1024) { // 350 KB
+      //   alert("Image size exceeds 350KB limit.");
+      //   return;
+      // }
       const reader = new FileReader();
       reader.onloadend = () => {
         setImage(reader.result as string);
@@ -64,25 +82,47 @@ const AdminPage = () => {
 
   const handleFoodSubmit = async () => {
     setIsSubmitting(true);
+    setError(null); // Clear any previous errors
     try {
-      const category_id = categoryMapping[category] || 1;
+      const category_id = categoryMapping[category]; // Use the mapped ID directly
+
+      if (category_id === undefined) {
+        alert("Please select a valid category.");
+        return;
+      }
+      if (!name || !description || !price || !spicyLevel || !quantity || !image) {
+        alert("All fields are required.");
+        return;
+      }
+      if (isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
+        alert("Please enter a valid price.");
+        return;
+      }
+      if (isNaN(parseInt(quantity, 10)) || parseInt(quantity, 10) <= 0) {
+        alert("Please enter a valid item number (quantity).");
+        return;
+      }
+
       const method = editingId ? "PUT" : "POST";
       const url = "/api/menuitem";
+
+      const bodyData = {
+        category_id,
+        name,
+        description,
+        price: parseFloat(price),
+        availability,
+        image_url: image,
+        quantity: parseInt(quantity, 10),
+        spicy_level: spicyLevel,
+        // For PUT request, item_id is crucial
+        ...(editingId && { item_id: editingId }), // Conditionally add item_id for PUT
+      };
 
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: editingId,
-          category_id,
-          name,
-          description,
-          price: parseFloat(price),
-          availability,
-          image_url: image,
-          quantity: parseInt(quantity, 10),
-          spicy_level: spicyLevel,
-        }),
+        body: JSON.stringify(bodyData),
       });
 
       const result = await response.json();
@@ -98,10 +138,15 @@ const AdminPage = () => {
         alert("Item updated successfully");
       }
 
-      await fetchFoodItems();
+      await fetchFoodItems(); // Re-fetch to update the list
       resetForm();
-    } catch (error) {
-      console.error("Error saving menu item:", error);
+    } catch (err: unknown) {
+      console.error("Error saving menu item:", err);
+      if (err instanceof Error) {
+        setError(err.message || "Failed to save menu item.");
+      } else {
+        setError("An unknown error occurred while saving.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -111,11 +156,13 @@ const AdminPage = () => {
     const confirmDelete = confirm(`Are you sure you want to delete "${itemName}"?`);
     if (!confirmDelete) return;
 
+    setError(null); // Clear any previous errors
     try {
       const res = await fetch("/api/menuitem", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: item_id }),
+        // --- CRITICAL CHANGE: Send item_id, not id ---
+        body: JSON.stringify({ item_id: item_id }),
       });
 
       if (!res.ok) {
@@ -124,8 +171,14 @@ const AdminPage = () => {
       }
 
       setFoodItems((prev) => prev.filter((item) => item.item_id !== item_id));
-    } catch (error) {
-      console.error("Error deleting food item:", error);
+      alert("Item deleted successfully!");
+    } catch (err: unknown) {
+      console.error("Error deleting food item:", err);
+      if (err instanceof Error) {
+        setError(err.message || "Failed to delete item.");
+      } else {
+        setError("An unknown error occurred while deleting.");
+      }
     }
   };
 
@@ -183,15 +236,15 @@ const AdminPage = () => {
         <textarea className="w-full mb-3 p-2 border rounded-lg" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
         <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Spicy Level - mild/medium/high" value={spicyLevel} onChange={(e) => setSpicyLevel(e.target.value)} />
         <input className="w-full mb-3 p-2 border rounded-lg" type="text" placeholder="Item Number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-      <label className="block mb-1 text-sm text-gray-600">
-   Upload Image (Max: 350KB)
-</label>
-<input
-  type="file"
-  accept="image/*"
-  className="w-full p-2 border rounded-lg"
-  onChange={handleImageUpload}
-/>
+        <label className="block mb-1 text-sm text-gray-600">
+          Upload Image (Max: 350KB)
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          className="w-full p-2 border rounded-lg"
+          onChange={handleImageUpload}
+        />
 
         {image && <img src={image} alt="Preview" className="w-28 h-28 object-cover rounded-lg shadow-md mt-3" />}
 
@@ -208,47 +261,82 @@ const AdminPage = () => {
             ? "Update Food"
             : "Add Food"}
         </button>
+        {editingId && (
+          <button
+            className="w-full mt-2 py-2 text-blue-800 border border-blue-800 font-semibold rounded-lg hover:bg-blue-100 transition-all duration-300"
+            onClick={resetForm}
+            disabled={isSubmitting}
+          >
+            Cancel Edit
+          </button>
+        )}
       </div>
 
       {/* Food List */}
       <div className="w-full max-w-screen-xl mx-auto p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {foodItems.map((item) => (
-            <div
-              key={item.item_id}
-              className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105"
+        {isLoading ? (
+          // Skeleton Loader
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="bg-gray-200 rounded-2xl h-72 animate-pulse"></div>
+            ))}
+          </div>
+        ) : error ? (
+          // Error Message
+          <div className="text-center text-red-500 text-xl font-semibold mt-10">
+            Error: {error}
+            <button
+              onClick={fetchFoodItems}
+              className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              <img
-                src={item.image_url || "/placeholder.jpg"}
-                alt={item.name}
-                className="w-full h-52 object-cover rounded-t-2xl"
-              />
-              <div className="p-4 text-center space-y-2">
-                <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
-                <p className="text-gray-500 text-sm">{item.description}</p>
-                <p className="text-xl font-semibold text-blue-800">${item.price}</p>
-                <p className="text-md font-medium text-green-700">
-                  Item Number: {item.quantity}
-                </p>
+              Retry
+            </button>
+          </div>
+        ) : foodItems.length === 0 ? (
+          // No Items Message
+          <div className="text-center text-gray-600 text-xl font-semibold mt-10">
+            No menu items available. Start by adding one!
+          </div>
+        ) : (
+          // Display Food Items
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {foodItems.map((item) => (
+              <div
+                key={item.item_id}
+                className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105"
+              >
+                <img
+                  src={item.image_url || "/placeholder.jpg"}
+                  alt={item.name}
+                  className="w-full h-52 object-cover rounded-t-2xl"
+                />
+                <div className="p-4 text-center space-y-2">
+                  <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
+                  <p className="text-gray-500 text-sm">{item.description}</p>
+                  <p className="text-xl font-semibold text-blue-800">${item.price}</p>
+                  <p className="text-md font-medium text-green-700">
+                    Item Number: {item.quantity}
+                  </p>
 
-                <div className="flex justify-center gap-4 mt-4">
-                  <button
-                    onClick={() => editFoodItem(item)}
-                    className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-yellow-600 transition-all"
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    onClick={() => deleteFoodItem(item.item_id, item.name)}
-                    className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-red-600 transition-all"
-                  >
-                    🗑️ Delete
-                  </button>
+                  <div className="flex justify-center gap-4 mt-4">
+                    <button
+                      onClick={() => editFoodItem(item)}
+                      className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-yellow-600 transition-all"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      onClick={() => deleteFoodItem(item.item_id, item.name)}
+                      className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-red-600 transition-all"
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
