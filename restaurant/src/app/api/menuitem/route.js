@@ -74,8 +74,6 @@ export async function GET(req) {
   }
 }
 
-// POST, PUT, DELETE functions remain the same as your original api/menuitem/route.js
-// ... (your existing POST, DELETE, PUT exports)
 // POST: Insert a new item
 export async function POST(req) {
     const client = await db.connect(); // Get a client for transaction
