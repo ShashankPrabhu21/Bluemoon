@@ -24,7 +24,7 @@ interface Offer {
 const OffersCarousel = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
-  const [foodItemLookup, setFoodItemLookup] = useState<Record<number, FoodItem>>({}); // New lookup
+  const [foodItemLookup, setFoodItemLookup] = useState<Record<number, FoodItem>>({});
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -34,19 +34,23 @@ const OffersCarousel = () => {
   useEffect(() => {
     const fetchOffersAndItems = async () => {
       try {
-        const res = await fetch("/api/offers");
+        // --- CRITICAL CHANGE HERE ---
+        // Add the include_all_food_items=true parameter to the fetch URL
+        const res = await fetch("/api/offers?include_all_food_items=true");
         const data = await res.json();
 
-        if (!data || !Array.isArray(data.foodItems)) {
+        if (!data || !Array.isArray(data.foodItems) || !Array.isArray(data.offers)) {
           console.error("Invalid data format:", data);
           setFoodItems([]);
+          setOffers([]);
           return;
         }
 
         setFoodItems(data.foodItems);
-        setOffers(data.offers || []);
+        setOffers(data.offers); // Assuming data.offers is now populated correctly
       } catch (err) {
         console.error("Error fetching offers:", err);
+        // Optionally set an error state here to inform the user
       } finally {
         setLoading(false);
       }
@@ -56,7 +60,6 @@ const OffersCarousel = () => {
   }, []);
 
   useEffect(() => {
-    // Create the food item lookup when foodItems are available
     const lookup: Record<number, FoodItem> = {};
     foodItems.forEach((item) => {
       lookup[item.item_id] = item;
@@ -89,6 +92,7 @@ const OffersCarousel = () => {
   const getSelectedItems = (offer: Offer) => {
     try {
       const itemIds = JSON.parse(offer.selected_items) as number[];
+      // Use the pre-built foodItemLookup for O(1) access
       return itemIds.map((id) => foodItemLookup[id]).filter(Boolean) as FoodItem[];
     } catch (error) {
       console.error("Error parsing selected_items:", error);
@@ -146,22 +150,22 @@ const OffersCarousel = () => {
         </motion.div>
 
         {/* Center Slide */}
-<motion.div
-  key={currentIndex}
-  className="relative w-[90%] max-w-[700px] md:max-w-[600px] sm:max-w-[450px]
-             min-h-[500px] lg:min-h-[560px] h-auto
-             bg-[#131722] text-white rounded-2xl p-6 sm:p-10 shadow-xl border border-gray-700
-             flex flex-col items-center justify-between
-             mt-6 sm:mt-10 lg:mt-14 mb-6 sm:mb-10 lg:mb-14"
-  initial={{ x: "100vw" }}
-  animate={{ x: "0vw" }}
-  exit={{ x: "-25vw" }}
-  transition={{ duration: 1, ease: "easeOut" }}
->
+        <motion.div
+          key={currentIndex}
+          className="relative w-[90%] max-w-[700px] md:max-w-[600px] sm:max-w-[450px]
+                     min-h-[500px] lg:min-h-[560px] h-auto
+                     bg-[#131722] text-white rounded-2xl p-6 sm:p-10 shadow-xl border border-gray-700
+                     flex flex-col items-center justify-between
+                     mt-6 sm:mt-10 lg:mt-14 mb-6 sm:mb-10 lg:mb-14"
+          initial={{ x: "100vw" }}
+          animate={{ x: "0vw" }}
+          exit={{ x: "-25vw" }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
 
           {/* Offer Header */}
           <h2 className="mt-6 text-lg sm:text-xl lg:text-2xl font-semibold bg-gradient-to-r from-yellow-500 to-orange-500 text-white
-                         px-6 py-3 sm:px-7 sm:py-4 rounded-lg flex items-center gap-3 w-full text-center justify-center shadow-lg">
+                                  px-6 py-3 sm:px-7 sm:py-4 rounded-lg flex items-center gap-3 w-full text-center justify-center shadow-lg">
             <MdLocalOffer className="text-white text-xl sm:text-2xl lg:text-3xl" />
             {offers[currentIndex].offer_type} Offer
           </h2>
