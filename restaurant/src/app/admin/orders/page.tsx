@@ -41,10 +41,10 @@ export default function OrdersPage() {
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
-      // Define a type for the raw data coming from the API
+      // CORRECTED: Specify CartItem[] directly for cart_items in ApiResponse
       interface ApiResponse {
         success: boolean;
-        orders: Array<Omit<Order, 'total_amount' | 'cart_items'> & { total_amount: string; cart_items: any }>; // `any` for cart_items is fine for now, as it's JSONB and already parsed, but you could refine this if needed
+        orders: Array<Omit<Order, 'total_amount'> & { total_amount: string; cart_items: CartItem[] }>;
         error?: string;
       }
 
@@ -53,16 +53,16 @@ export default function OrdersPage() {
       if (data.success) {
         const parsedOrders: Order[] = data.orders.map((orderData) => ({
           ...orderData,
-          cart_items: orderData.cart_items, // The `pg` driver likely parses JSONB to object automatically
-          total_amount: parseFloat(orderData.total_amount), // Convert string to number
+          // cart_items should already be correctly typed from the API response
+          cart_items: orderData.cart_items,
+          total_amount: parseFloat(orderData.total_amount),
         }));
         setOrders(parsedOrders);
       } else {
         setError(data.error || "Failed to fetch orders.");
       }
-    } catch (err) { // No 'any' needed here, use 'unknown' and narrow down
+    } catch (err) {
       console.error("Error fetching orders:", err);
-      // Type assertion for error message
       setError(err instanceof Error ? err.message : "An unknown error occurred.");
     } finally {
       setLoading(false);
@@ -92,13 +92,12 @@ export default function OrdersPage() {
 
       if (response.ok && data.success) {
         toast.success("Order deleted successfully!", { id: "deleteToast" });
-        fetchOrders(); // Refresh the orders list
+        fetchOrders();
       } else {
         throw new Error(data.error || "Failed to delete order.");
       }
-    } catch (err) { // No 'any' needed here, use 'unknown' and narrow down
+    } catch (err) {
       console.error("Deletion error:", err);
-      // Type assertion for error message
       toast.error(`Error deleting order: ${err instanceof Error ? err.message : "An unknown error occurred."}`, { id: "deleteToast" });
     }
   };
