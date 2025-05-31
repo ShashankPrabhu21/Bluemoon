@@ -3,12 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { toast, Toaster } from "react-hot-toast"; // For better user feedback
-
-// You'll need to install react-hot-toast if you haven't already:
-// npm install react-hot-toast
-// or
-// yarn add react-hot-toast
+import { toast, Toaster } from "react-hot-toast";
 
 interface CartItem {
   food_name: string;
@@ -38,7 +33,6 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Function to fetch orders (re-usable)
   const fetchOrders = async () => {
     setLoading(true);
     setError(null);
@@ -47,20 +41,29 @@ export default function OrdersPage() {
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
-      const data = await response.json();
+      // Define a type for the raw data coming from the API
+      interface ApiResponse {
+        success: boolean;
+        orders: Array<Omit<Order, 'total_amount' | 'cart_items'> & { total_amount: string; cart_items: any }>; // `any` for cart_items is fine for now, as it's JSONB and already parsed, but you could refine this if needed
+        error?: string;
+      }
+
+      const data: ApiResponse = await response.json();
+
       if (data.success) {
-        const parsedOrders = data.orders.map((order: any) => ({
-          ...order,
-          cart_items: order.cart_items,
-          total_amount: parseFloat(order.total_amount),
+        const parsedOrders: Order[] = data.orders.map((orderData) => ({
+          ...orderData,
+          cart_items: orderData.cart_items, // The `pg` driver likely parses JSONB to object automatically
+          total_amount: parseFloat(orderData.total_amount), // Convert string to number
         }));
         setOrders(parsedOrders);
       } else {
         setError(data.error || "Failed to fetch orders.");
       }
-    } catch (err: any) {
+    } catch (err) { // No 'any' needed here, use 'unknown' and narrow down
       console.error("Error fetching orders:", err);
-      setError(err.message);
+      // Type assertion for error message
+      setError(err instanceof Error ? err.message : "An unknown error occurred.");
     } finally {
       setLoading(false);
     }
@@ -70,10 +73,9 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  // Handler for deleting an order
   const handleDeleteOrder = async (orderId: number) => {
     if (!window.confirm("Are you sure you want to delete this order? This action cannot be undone.")) {
-      return; // User cancelled the deletion
+      return;
     }
 
     try {
@@ -90,14 +92,14 @@ export default function OrdersPage() {
 
       if (response.ok && data.success) {
         toast.success("Order deleted successfully!", { id: "deleteToast" });
-        // Refresh the orders list after deletion
-        fetchOrders();
+        fetchOrders(); // Refresh the orders list
       } else {
         throw new Error(data.error || "Failed to delete order.");
       }
-    } catch (err: any) {
+    } catch (err) { // No 'any' needed here, use 'unknown' and narrow down
       console.error("Deletion error:", err);
-      toast.error(`Error deleting order: ${err.message}`, { id: "deleteToast" });
+      // Type assertion for error message
+      toast.error(`Error deleting order: ${err instanceof Error ? err.message : "An unknown error occurred."}`, { id: "deleteToast" });
     }
   };
 
@@ -119,9 +121,9 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8 mt-[100px]">
-      <Toaster /> {/* Add Toaster component for notifications */}
+      <Toaster />
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8"> {/* Added margin-bottom */}
+        <div className="text-center mb-8">
           <Link
             href="/adminDashboard"
             className="inline-block bg-blue-600 text-white font-medium px-8 py-4 rounded-full shadow-lg text-lg hover:bg-blue-700 transition duration-300"
@@ -224,14 +226,13 @@ export default function OrdersPage() {
                   </ul>
                 </div>
 
-                <div className="flex justify-between items-center border-t border-gray-200 pt-4"> {/* Changed to justify-between */}
+                <div className="flex justify-between items-center border-t border-gray-200 pt-4">
                   <span className="text-xl font-bold text-gray-800">
                     Total Amount:
                   </span>
                   <span className="text-3xl font-extrabold text-indigo-700 ml-4">
                     ${order.total_amount.toFixed(2)}
                   </span>
-                  {/* DELETE Button */}
                   <button
                     onClick={() => handleDeleteOrder(order.id)}
                     className="ml-6 bg-red-500 text-white font-medium px-4 py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300 flex items-center"
