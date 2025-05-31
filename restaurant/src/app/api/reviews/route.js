@@ -1,3 +1,4 @@
+// app/api/reviews/route.ts
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
@@ -15,7 +16,6 @@ export async function GET() {
   }
 }
 
-
 // Add a new review
 export async function POST(req) {
   try {
@@ -32,7 +32,36 @@ export async function POST(req) {
 
     return NextResponse.json(result.rows[0], { status: 201 });
   } catch (error) {
-    console.error("POST Error:", error); // ✅ Log the error
+    console.error("POST Error:", error);
     return NextResponse.json({ error: 'Failed to insert review' }, { status: 500 });
+  }
+}
+
+// --- NEW DELETE FUNCTION ---
+export async function DELETE(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'Review ID is required' }, { status: 400 });
+    }
+
+    // Ensure the ID is a valid number to prevent SQL injection (though parameterized queries help)
+    if (isNaN(Number(id))) {
+      return NextResponse.json({ error: 'Invalid review ID' }, { status: 400 });
+    }
+
+    await pool.query('SET search_path TO public');
+    const result = await pool.query('DELETE FROM public.reviews WHERE id = $1 RETURNING id', [id]);
+
+    if (result.rowCount === 0) {
+      return NextResponse.json({ error: 'Review not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: 'Review deleted successfully', id: result.rows[0].id }, { status: 200 });
+  } catch (error) {
+    console.error("DELETE Error:", error);
+    return NextResponse.json({ error: 'Failed to delete review' }, { status: 500 });
   }
 }

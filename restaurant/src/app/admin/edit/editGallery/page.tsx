@@ -105,10 +105,10 @@ export default function EditGalleryPage() {
   
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-black flex md:flex-row flex-col p-6 mt-32 space-y-8">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-br from-gray-800 to-black text-white mt-24">
       <EditUserSidebar />
       <div className="flex-grow ">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-center text-blue-600">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-center text-blue-600 mt-12">
           Add and Manage Event Videos
         </h1>
 
