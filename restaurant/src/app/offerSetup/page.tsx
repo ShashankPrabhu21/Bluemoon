@@ -25,7 +25,7 @@ interface Offer {
   created_at: string;
 }
 
-const ITEMS_PER_PAGE_FOOD = 4; // Define how many food items to load per request
+const ITEMS_PER_PAGE_FOOD = 8; // Define how many food items to load per request
 
 export default function OfferSetup() {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);

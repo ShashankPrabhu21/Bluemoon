@@ -20,30 +20,38 @@ interface FoodItem {
 const FoodDisplayPage = () => {
   const [foodItemsByCategory, setFoodItemsByCategory] = useState<{ [key: string]: FoodItem[] }>({});
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true); // Renamed for clarity
+  const [loadingCategoryData, setLoadingCategoryData] = useState<Set<string>>(new Set()); // Tracks categories whose data is being fetched
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
-  // New state to keep track of loaded categories
-  const [loadedCategories, setLoadedCategories] = useState<Set<string>>(new Set());
+  // New state to keep track of categories whose UI content has been "activated" by Intersection Observer
+  const [activatedCategories, setActivatedCategories] = useState<Set<string>>(new Set());
   // Ref to store IntersectionObserver instances for each category
   const categoryObserverRefs = useRef<Record<string, IntersectionObserver | null>>({});
 
   const categoryOrder = ["Breakfast", "Main Course", "Entree", "Drinks"];
 
-  // Memoized fetch function with timeout and retry logic
-  const fetchMenuItems = useCallback(async (retryCount = 0) => {
+  // Function to fetch data for a specific category
+  const fetchCategoryItems = useCallback(async (categoryName: string, retryCount = 0) => {
     const maxRetries = 3;
     const timeout = 10000; // 10 seconds timeout
+
+    if (loadingCategoryData.has(categoryName)) {
+      console.log(`Already fetching data for ${categoryName}. Skipping.`);
+      return; // Prevent duplicate fetches
+    }
+
+    setLoadingCategoryData(prev => new Set(prev).add(categoryName));
+    setError(null); // Clear any previous errors
 
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-      // We still fetch all data initially for this page's design.
-      // The lazy loading will happen at the rendering level per category.
-      const res = await fetch("/api/menuitem?no_pagination=true", {
+      // Fetch only items for the specific category, without pagination for this display
+      const res = await fetch(`/api/menuitem?category=${encodeURIComponent(categoryName)}&no_pagination=true`, {
         signal: controller.signal,
         headers: {
           'Cache-Control': 'no-cache',
@@ -58,47 +66,60 @@ const FoodDisplayPage = () => {
       }
 
       const data: FoodItem[] = await res.json();
+      console.log(`Fetched data for category: ${categoryName}`, data);
 
-      // Group items by category
-      const grouped: { [key: string]: FoodItem[] } = {};
-      data.forEach((item) => {
-        if (item.category_name) {
-          if (!grouped[item.category_name]) grouped[item.category_name] = [];
-          grouped[item.category_name].push(item);
-        }
+      setFoodItemsByCategory(prev => ({
+        ...prev,
+        [categoryName]: data
+      }));
+      setLoadingCategoryData(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(categoryName);
+        return newSet;
       });
-
-      setFoodItemsByCategory(grouped);
-      setError(null);
-      setIsLoading(false);
+      setIsLoadingInitial(false); // If this is the initial fetch for the first category
 
     } catch (err: unknown) {
-      console.error(`Fetch attempt ${retryCount + 1} failed:`, err);
-      
+      console.error(`Fetch attempt ${retryCount + 1} for ${categoryName} failed:`, err);
+      setLoadingCategoryData(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(categoryName);
+        return newSet;
+      });
+
       if (retryCount < maxRetries) {
-        // Exponential backoff: wait 1s, 2s, 4s
         const delay = Math.pow(2, retryCount) * 1000;
-        setTimeout(() => fetchMenuItems(retryCount + 1), delay);
+        setTimeout(() => fetchCategoryItems(categoryName, retryCount + 1), delay);
       } else {
         const errorMessage = err instanceof Error ? err.message : "Network error - please check connection";
-        setError(errorMessage);
-        setIsLoading(false);
+        setError(`Failed to load ${categoryName}: ${errorMessage}`);
+        setIsLoadingInitial(false);
       }
     }
-  }, []);
+  }, [loadingCategoryData]); // Depend on loadingCategoryData to prevent re-creating this function unnecessarily
 
-  // Fetch data on component mount
+  // Initial fetch: only for the first category
   useEffect(() => {
-    fetchMenuItems();
-  }, [fetchMenuItems]);
+    if (categoryOrder.length > 0 && !foodItemsByCategory[categoryOrder[0]] && !isLoadingInitial) {
+      // If the first category isn't loaded yet, and it's not the initial loading state (which would already trigger a fetch)
+      fetchCategoryItems(categoryOrder[0]);
+    } else if (categoryOrder.length > 0 && isLoadingInitial) {
+        // This is the initial fetch for the first category
+        fetchCategoryItems(categoryOrder[0]).then(() => {
+          setIsLoadingInitial(false); // Mark initial loading as complete after the first category loads
+          setActivatedCategories(prev => new Set(prev).add(categoryOrder[0])); // Immediately activate the first category
+        });
+    } else if (categoryOrder.length === 0) {
+      setIsLoadingInitial(false); // No categories to load
+    }
+  }, [fetchCategoryItems, categoryOrder, foodItemsByCategory, isLoadingInitial]);
 
-  // Intersection Observer for Category Visibility
-  // This useEffect will manage observers for each category section
+  // Intersection Observer for Category Visibility (to trigger data fetch and UI activation)
   useEffect(() => {
     const observerOptions = {
       root: containerRef.current, // Observe visibility within the scrolling container
-      rootMargin: '0px',
-      threshold: 0.1, // Category is considered visible when 10% is in view
+      rootMargin: '0px 0px 100px 0px', // Load categories slightly before they are fully in view
+      threshold: 0.05, // Category is considered visible when 5% is in view
     };
 
     // Disconnect previous observers if any
@@ -113,11 +134,15 @@ const FoodDisplayPage = () => {
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
-              setLoadedCategories(prev => new Set(prev).add(categoryName));
-              // Once loaded, we can stop observing this category
-              if (categoryObserverRefs.current[categoryName]) {
-                categoryObserverRefs.current[categoryName]?.disconnect();
-                categoryObserverRefs.current[categoryName] = null; // Clear the observer
+              setActivatedCategories(prev => new Set(prev).add(categoryName)); // Activate UI rendering
+              // If data for this category isn't loaded yet, fetch it
+              if (!foodItemsByCategory[categoryName] && !loadingCategoryData.has(categoryName)) {
+                fetchCategoryItems(categoryName);
+              }
+              // Once activated and data loaded, we can stop observing this category's section
+              if (foodItemsByCategory[categoryName] && categoryObserverRefs.current[categoryName]) {
+                 categoryObserverRefs.current[categoryName]?.disconnect();
+                 categoryObserverRefs.current[categoryName] = null; // Clear the observer
               }
             }
           });
@@ -134,12 +159,13 @@ const FoodDisplayPage = () => {
       });
       categoryObserverRefs.current = {};
     };
-  }, [foodItemsByCategory, isLoading]); // Re-run if food items change or loading state changes
+  }, [categoryOrder, foodItemsByCategory, fetchCategoryItems, loadingCategoryData]);
 
   // Optimized scroll animation with better performance
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || isLoading || error || Object.keys(foodItemsByCategory).length === 0) {
+    // Only start scrolling if initial loading is done, no error, and at least some categories have been loaded
+    if (!container || isLoadingInitial || error || Object.keys(foodItemsByCategory).length === 0) {
       return;
     }
 
@@ -151,20 +177,20 @@ const FoodDisplayPage = () => {
       clearTimeout(scrollTimeoutRef.current);
     }
 
-    // Delay scroll start to allow images to load
+    // Delay scroll start to allow initial categories/images to load
     scrollTimeoutRef.current = setTimeout(() => {
       let startTime: number | null = null;
       const duration = 300000; // 5 minutes
-      const targetScroll = container.scrollHeight - container.clientHeight;
+      const totalScrollHeight = container.scrollHeight - container.clientHeight;
 
-      if (targetScroll <= 0) return;
+      if (totalScrollHeight <= 0) return; // No need to scroll if content fits
 
       const scrollStep = (timestamp: number) => {
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
         
-        container.scrollTop = progress * targetScroll;
+        container.scrollTop = progress * totalScrollHeight;
 
         if (progress < 1) {
           animationFrameRef.current = requestAnimationFrame(scrollStep);
@@ -177,7 +203,7 @@ const FoodDisplayPage = () => {
       };
 
       animationFrameRef.current = requestAnimationFrame(scrollStep);
-    }, 2000); // Wait 2 seconds before starting scroll
+    }, 2000); // Wait 2 seconds for initial content to settle before starting scroll
 
     return () => {
       if (animationFrameRef.current) {
@@ -187,10 +213,10 @@ const FoodDisplayPage = () => {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [foodItemsByCategory, error, isLoading]); // Dependencies for auto-scroll
+  }, [foodItemsByCategory, error, isLoadingInitial]); // Dependencies for auto-scroll
 
-  // Loading state
-  if (isLoading) {
+  // Loading state (initial page load)
+  if (isLoadingInitial) {
     return (
       <div className="relative min-h-screen w-full flex items-center justify-center bg-[url('/sec11.jpg')] bg-cover bg-center before:absolute before:inset-0 before:bg-gradient-to-b before:from-black/70 before:to-black/80 before:z-0">
         <TVNavbar />
@@ -209,11 +235,16 @@ const FoodDisplayPage = () => {
         <TVNavbar />
         <div className="relative z-10 text-center">
           <p className="text-red-400 text-2xl font-bold mb-4">⚠️ {error}</p>
-          <button 
+          <button
             onClick={() => {
-              setIsLoading(true);
+              setIsLoadingInitial(true); // Reset initial loading state
               setError(null);
-              fetchMenuItems();
+              // Trigger initial fetch for the first category again
+              if (categoryOrder.length > 0) {
+                fetchCategoryItems(categoryOrder[0]).then(() => setIsLoadingInitial(false));
+              } else {
+                setIsLoadingInitial(false); // No categories to load
+              }
             }}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
           >
@@ -233,12 +264,12 @@ const FoodDisplayPage = () => {
         <div className="relative container mx-auto px-4 z-10">
           <div
             ref={containerRef}
-            className="flex flex-col gap-8 overflow-y-auto max-h-[75vh] hide-scrollbar" 
+            className="flex flex-col gap-8 overflow-y-auto max-h-[75vh] hide-scrollbar"
             style={{ scrollBehavior: "auto" }}
           >
             {categoryOrder.map(
-              (categoryName) =>
-                foodItemsByCategory[categoryName]?.length > 0 && (
+              (categoryName, index) =>
+                (foodItemsByCategory[categoryName]?.length > 0 || !foodItemsByCategory[categoryName]) && ( // Render section even if data not loaded yet for skeleton
                   <div key={categoryName} id={`category-${categoryName.replace(/\s+/g, '-')}`}>
                     <div className="relative flex justify-center mt-12">
                       <h2 className="relative inline-block text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#d2d7ef] via-[#cad1f6] to-[#cbd2f4] tracking-wider mb-8 drop-shadow-[0_4px_10px_rgba(74,96,210,0.35)] after:content-[''] after:block after:h-[4px] after:w-20 after:mx-auto after:mt-3 after:bg-gradient-to-r after:from-[#2C3E91] after:to-[#4A60D2] after:rounded-full">
@@ -246,8 +277,8 @@ const FoodDisplayPage = () => {
                       </h2>
                     </div>
 
-                    {/* Conditionally render items only if the category has been loaded */}
-                    {loadedCategories.has(categoryName) ? (
+                    {/* Conditionally render items or skeleton loaders */}
+                    {activatedCategories.has(categoryName) && foodItemsByCategory[categoryName] ? (
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                         {foodItemsByCategory[categoryName].map((item) => (
                           <div
@@ -260,11 +291,11 @@ const FoodDisplayPage = () => {
                               fill
                               sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                               style={{ objectFit: "cover" }}
-                              className="group-hover:scale-110 transition-transform duration-300"
-                              priority={false}
-                              loading="lazy"
+                              // Priority for the first category, lazy for others
+                              priority={index === 0}
+                              loading={index === 0 ? "eager" : "lazy"}
                               placeholder="blur"
-                              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAwAQAFwBAAgBAAENAAIf/xAAUAAEAAAAAAAAAAAAAAAAAAAAJ/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAQIAEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Wque2nLVwm7Hp7cWG3M4QLrBM6XEJwUFsAE8DgBgdAbT3RCxJz5j4RCSF0UEbUcnJTEu5rqr35kYdGb2w/rLNKBBAAAG/bE8T1zxe+5kXTPk0/9k="
+                              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAwAQAFwBAAgBAAENAAIf/xAAUAAEAAAAAAAAAAAAAAAAAAAAJ/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/xAGhEAAgIDAAAAAAAAAAAAAAAAAQIAEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+Wque2nLVwm7Hp7cWG3M4QLrBM6XEJwUFsAE8DgBgdAbT3RCxJz5j4RCSF0UEbUcnJTEu5rqr35kYdGb2w/rLNKBBAAAG/bE8T1zxe+5kXTPk0/9k="
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent flex flex-col justify-end p-4">
                               <h3 className="text-lg md:text-xl font-extrabold text-white drop-shadow-sm">
@@ -277,9 +308,8 @@ const FoodDisplayPage = () => {
                         ))}
                       </div>
                     ) : (
-                      // Placeholder for not-yet-loaded categories
+                      // Render skeleton loaders if category is activated but data isn't loaded yet, or if it's the first category loading
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                        {/* Render skeleton loaders for a few items to indicate content is coming */}
                         {Array.from({ length: 5 }).map((_, idx) => (
                           <div key={`skeleton-${categoryName}-${idx}`} className="relative h-60 rounded-xl overflow-hidden animate-pulse bg-gray-700" />
                         ))}

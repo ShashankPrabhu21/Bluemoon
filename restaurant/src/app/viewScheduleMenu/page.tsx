@@ -41,7 +41,7 @@ const categoryMapping: Record<number, string> = {
   5: "Drinks",
 };
 
-const ITEMS_PER_PAGE = 4; // Define how many items to load per request, consistent with other pages
+const ITEMS_PER_PAGE = 6; // Define how many items to load per request, consistent with other pages
 
 const ViewScheduleMenuPage = () => {
   return (

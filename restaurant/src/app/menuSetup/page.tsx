@@ -23,7 +23,7 @@ const categoryMapping: Record<string, number> = {
   "Drinks": 5,
 };
 
-const ITEMS_PER_PAGE_ADMIN_FOOD = 4; // Define how many food items to load per request
+const ITEMS_PER_PAGE_ADMIN_FOOD = 6; // Define how many food items to load per request
 
 const AdminPage = () => {
   const [category, setCategory] = useState("");

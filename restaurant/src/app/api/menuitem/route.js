@@ -13,18 +13,19 @@ const categoryMapping = {
 // Handle GET requests with optimized queries
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
-  const categoryName = searchParams.get("category");
-  // const noPagination = searchParams.get("no_pagination") === "true"; // This parameter will now be unused for general fetch
+  const categoryNameParam = searchParams.get("category"); // New parameter for category name
+
 
   let query = "SELECT item_id, category_id, name, description, price, availability, image_url, spicy_level, quantity, created_at FROM menu_items";
   let values = [];
   let paramIndex = 1;
 
-  // Add WHERE clause if a category is specified (this part remains the same)
-  if (categoryName && categoryName !== "All Menu") {
+  // --- IMPORTANT: Separated Logic for query construction ---
+  if (categoryNameParam) {
+    // Logic for TV Display: Fetch specific category (no pagination needed here as all items of a category are loaded for TV)
     let categoryId = null;
     for (const id in categoryMapping) {
-      if (categoryMapping[id] === categoryName) {
+      if (categoryMapping[id] === categoryNameParam) {
         categoryId = parseInt(id);
         break;
       }
@@ -34,19 +35,20 @@ export async function GET(req) {
       query += ` WHERE category_id = $${paramIndex++}`;
       values.push(categoryId);
     } else {
+      // If category name is invalid, return empty array for that category
       return NextResponse.json([], { status: 200 });
     }
+    // Always order by created_at for TV display consistency
+    query += ` ORDER BY created_at ASC`;
+  } else {
+    // Logic for Admin Display: Fetch paginated items (general menu items)
+    const page = parseInt(searchParams.get("page") || "0");
+    const limit = parseInt(searchParams.get("limit") || "8"); // Use 6 as defined in admin page
+    const offset = page * limit; // Calculate offset correctly
+
+    query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
+    values.push(limit, offset);
   }
-
-  // --- IMPORTANT: Modified Pagination logic ---
-  // Always apply pagination now. The 'no_pagination' parameter is effectively removed for this GET endpoint's main purpose.
-  const page = parseInt(searchParams.get("page") || "0");
-  const limit = parseInt(searchParams.get("limit") || "4"); // Use a default limit if not provided
-  const offset = page * limit;
-
-  query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
-  values.push(limit, offset);
-
 
   console.log("Executing query:", query);
   console.log("With values:", values);
@@ -54,16 +56,14 @@ export async function GET(req) {
   try {
     const result = await db.query(query, values);
 
-    // Add category_name to each item
     const menuItemsWithCategoryName = result.rows.map((item) => ({
       ...item,
       category_name: categoryMapping[item.category_id] || "Unknown",
     }));
 
-    // Set cache headers for better performance (adjust max-age as needed)
     const response = NextResponse.json(menuItemsWithCategoryName, { status: 200 });
     response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
-    
+
     return response;
   } catch (error) {
     console.error("Database Error in GET:", error);
@@ -74,6 +74,8 @@ export async function GET(req) {
   }
 }
 
+// POST, PUT, DELETE functions remain the same as your original api/menuitem/route.js
+// ... (your existing POST, DELETE, PUT exports)
 // POST: Insert a new item
 export async function POST(req) {
     const client = await db.connect(); // Get a client for transaction
