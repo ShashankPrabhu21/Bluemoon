@@ -49,6 +49,12 @@ export default function AdminDashboard() {
           >
             ✏️ EDIT
           </button>
+           <button
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg"
+            onClick={() => router.push("/admin/orders")}
+          >
+            📦 ORDERS
+          </button>
 
           <LogoutButton />
         </nav>
