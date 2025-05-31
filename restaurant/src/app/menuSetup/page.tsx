@@ -1,6 +1,6 @@
-// app/offer/setup/page.tsx
+// app/menuSetup/page.tsx
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react"; // Add useCallback
 import Image from "next/image"; // Make sure to import Image
 
 interface FoodItem {
@@ -23,6 +23,8 @@ const categoryMapping: Record<string, number> = {
   "Drinks": 5,
 };
 
+const ITEMS_PER_PAGE_ADMIN_FOOD = 4; // Define how many food items to load per request
+
 const AdminPage = () => {
   const [category, setCategory] = useState("");
   const [name, setName] = useState("");
@@ -35,36 +37,100 @@ const AdminPage = () => {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Added loading state
-  const [error, setError] = useState<string | null>(null); // Added error state
+
+  // Pagination states for food items
+  const [foodPage, setFoodPage] = useState(0); // Start at page 0
+  const [hasMoreFood, setHasMoreFood] = useState(true);
+  const [loadingFood, setLoadingFood] = useState(true); // Initial loading state
+  const [errorFood, setErrorFood] = useState<string | null>(null); // Renamed to avoid conflict
+
   const formRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    fetchFoodItems();
-  }, []);
+  // --- Intersection Observer for Infinite Scrolling (Food Items) ---
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastFoodItemElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loadingFood || !hasMoreFood) return; // Don't trigger if loading or no more items
+      if (observer.current) observer.current.disconnect();
 
-  const fetchFoodItems = async () => {
-    setIsLoading(true); // Set loading true before fetching
-    setError(null);    // Clear any previous errors
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMoreFood) {
+          setFoodPage((prevPage) => prevPage + 1);
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loadingFood, hasMoreFood] // Dependencies for useCallback
+  );
+
+  // --- Data Fetching Logic for Food Items ---
+  const fetchFoodItems = useCallback(async (page: number) => {
+    setLoadingFood(true);
+    setErrorFood(null); // Clear any previous errors
     try {
-      const res = await fetch("/api/menuitem?no_pagination=true"); // no_pagination=true is correct here
+      const queryParams = new URLSearchParams();
+      queryParams.append("page", page.toString());
+      queryParams.append("limit", ITEMS_PER_PAGE_ADMIN_FOOD.toString());
+      // No need for 'fetch_food_items' here, as this is the primary food item fetch
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+      const res = await fetch(`/api/menuitem?${queryParams.toString()}`, {
+        cache: "no-store", // Or 'no-cache' depending on desired freshness
+        signal: controller.signal,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      clearTimeout(timeoutId);
+
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error(`Failed to fetch menu items: ${res.status} - ${errorText}`);
+        throw new Error(
+          `HTTP error! status: ${res.status}, Message: ${errorText}`
+        );
       }
-      const data = await res.json();
-      setFoodItems(data);
-    } catch (err: unknown) {
-      console.error("Error fetching menu items:", err);
-      if (err instanceof Error) {
-        setError(err.message || "Failed to load menu items.");
+      const data: FoodItem[] = await res.json();
+      console.log(`Fetched food items page ${page}:`, data);
+
+      if (page === 0) {
+        setFoodItems(data);
       } else {
-        setError("An unknown error occurred while fetching.");
+        setFoodItems((prevItems) => [...prevItems, ...data]);
       }
+
+      setHasMoreFood(data.length === ITEMS_PER_PAGE_ADMIN_FOOD);
+    } catch (err: unknown) {
+      console.error("Failed to fetch food items:", err);
+      if (err instanceof Error) {
+        if (err.name === "AbortError") {
+          setErrorFood("Request timed out. Please try again.");
+        } else {
+          setErrorFood(err.message || "Failed to load food items.");
+        }
+      } else {
+        setErrorFood("An unknown error occurred while loading food items.");
+      }
+      setHasMoreFood(false); // Stop trying to load more on error
     } finally {
-      setIsLoading(false); // Set loading false after fetch (success or failure)
+      setLoadingFood(false);
     }
-  };
+  }, []); // Stable function reference
+
+  // Initial fetch for food items (page 0)
+  useEffect(() => {
+    fetchFoodItems(0);
+  }, [fetchFoodItems]); // Depend on fetchFoodItems so it triggers on mount
+
+  // Effect to load more food items when 'foodPage' state changes (triggered by observer)
+  useEffect(() => {
+    if (foodPage > 0) {
+      fetchFoodItems(foodPage);
+    }
+  }, [foodPage, fetchFoodItems]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,7 +151,7 @@ const AdminPage = () => {
 
   const handleFoodSubmit = async () => {
     setIsSubmitting(true);
-    setError(null); // Clear any previous errors
+    setErrorFood(null); // Use errorFood for general errors
     try {
       const selectedCategoryName = category;
       const category_id = categoryMapping[selectedCategoryName];
@@ -141,19 +207,17 @@ const AdminPage = () => {
       }
 
       if (method === "POST") {
-        // The API now explicitly returns `menuItem` directly as the result
         const newItemWithCategory: FoodItem = {
-            ...result, // Assuming result itself is the new item with category_name
-            // Ensure category_name is present. If your API isn't returning it, add it here:
-            category_name: result.category_name || selectedCategoryName
+          ...result,
+          category_name: result.category_name || selectedCategoryName
         };
+        // For new items, add to the beginning of the list for immediate visibility
         setFoodItems((prev) => [newItemWithCategory, ...prev]);
         alert("Item added successfully!");
       } else { // PUT
-        // The API now explicitly returns `menuItem` directly as the result
         const updatedItemWithCategory: FoodItem = {
-            ...result, // Assuming result itself is the updated item with category_name
-            category_name: result.category_name || selectedCategoryName
+          ...result,
+          category_name: result.category_name || selectedCategoryName
         };
         setFoodItems((prev) =>
           prev.map((item) => (item.item_id === updatedItemWithCategory.item_id ? updatedItemWithCategory : item))
@@ -165,9 +229,9 @@ const AdminPage = () => {
     } catch (err: unknown) {
       console.error("Error saving menu item:", err);
       if (err instanceof Error) {
-        setError(err.message || "Failed to save menu item.");
+        setErrorFood(err.message || "Failed to save menu item.");
       } else {
-        setError("An unknown error occurred while saving.");
+        setErrorFood("An unknown error occurred while saving.");
       }
     } finally {
       setIsSubmitting(false);
@@ -178,7 +242,7 @@ const AdminPage = () => {
     const confirmDelete = confirm(`Are you sure you want to delete "${itemName}"?`);
     if (!confirmDelete) return;
 
-    setError(null);
+    setErrorFood(null);
     try {
       const res = await fetch("/api/menuitem", {
         method: "DELETE",
@@ -196,9 +260,9 @@ const AdminPage = () => {
     } catch (err: unknown) {
       console.error("Error deleting food item:", err);
       if (err instanceof Error) {
-        setError(err.message || "Failed to delete item.");
+        setErrorFood(err.message || "Failed to delete item.");
       } else {
-        setError("An unknown error occurred while deleting.");
+        setErrorFood("An unknown error occurred while deleting.");
       }
     }
   };
@@ -265,8 +329,7 @@ const AdminPage = () => {
           accept="image/*"
           className="w-full p-2 border rounded-lg"
           onChange={handleImageUpload}
-          // Reset file input value only if image is cleared in resetForm
-          key={image || 'no-image'} // Use a key to force re-render when image changes
+          key={image || 'no-image'}
         />
 
         {image && <img src={image} alt="Preview" className="w-28 h-28 object-cover rounded-lg shadow-md mt-3" />}
@@ -297,78 +360,129 @@ const AdminPage = () => {
 
       {/* Food List */}
       <div className="w-full max-w-screen-xl mx-auto p-6">
-        {isLoading ? (
-          // Skeleton Loader
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {Array.from({ length: 8 }).map((_, index) => (
-              <div key={index} className="bg-gray-200 rounded-2xl h-72 animate-pulse"></div>
-            ))}
-          </div>
-        ) : error ? (
-          // Error Message
+        {errorFood && ( // Display error specific to food items fetch
           <div className="text-center text-red-500 text-xl font-semibold mt-10">
-            Error: {error}
+            Error: {errorFood}
             <button
-              onClick={fetchFoodItems}
+              onClick={() => fetchFoodItems(0)} // Retry from page 0
               className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
               Retry
             </button>
           </div>
-        ) : foodItems.length === 0 ? (
-          // No Items Message
-          <div className="text-center text-gray-600 text-xl font-semibold mt-10">
-            No menu items available. Start by adding one!
-          </div>
-        ) : (
-          // Display Food Items
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {foodItems.map((item) => (
-              <div
-                key={item.item_id}
-                className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105 relative"
-              >
-               <Image
-  src={item.image_url || "/placeholder.jpg"}
-  alt={item.name}
-  width={400}
-  height={208}
-  className="w-full h-52 object-cover rounded-t-2xl"
-  priority={true}
-  unoptimized={!!(item.image_url && item.image_url.startsWith('data:image/'))}
-/>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {foodItems.length > 0 ? (
+            foodItems.map((item, index) => {
+              // Attach ref to the last item for IntersectionObserver
+              if (foodItems.length === index + 1 && hasMoreFood) {
+                return (
+                  <div
+                    ref={lastFoodItemElementRef} // Ref for infinite scroll
+                    key={item.item_id}
+                    className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105 relative"
+                  >
+                    <Image
+                      src={item.image_url || "/placeholder.jpg"}
+                      alt={item.name}
+                      width={400}
+                      height={208}
+                      className="w-full h-52 object-cover rounded-t-2xl"
+                      priority={true}
+                      unoptimized={!!(item.image_url && item.image_url.startsWith('data:image/'))}
+                    />
 
-                {item.category_name && (
-                  <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-md">
-                    {item.category_name}
-                  </div>
-                )}
-                <div className="p-4 text-center space-y-2">
-                  <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
-                  <p className="text-gray-500 text-sm">{item.description}</p>
-                  <p className="text-xl font-semibold text-blue-800">${item.price}</p>
-                  <p className="text-md font-medium text-green-700">
-                    Item Number: {item.quantity}
-                  </p>
+                    {item.category_name && (
+                      <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-md">
+                        {item.category_name}
+                      </div>
+                    )}
+                    <div className="p-4 text-center space-y-2">
+                      <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
+                      <p className="text-gray-500 text-sm">{item.description}</p>
+                      <p className="text-xl font-semibold text-blue-800">${item.price}</p>
+                      <p className="text-md font-medium text-green-700">
+                        Item Number: {item.quantity}
+                      </p>
 
-                  <div className="flex justify-center gap-4 mt-4">
-                    <button
-                      onClick={() => editFoodItem(item)}
-                      className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-yellow-600 transition-all"
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button
-                      onClick={() => deleteFoodItem(item.item_id, item.name)}
-                      className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-red-600 transition-all"
-                    >
-                      🗑️ Delete
-                    </button>
+                      <div className="flex justify-center gap-4 mt-4">
+                        <button
+                          onClick={() => editFoodItem(item)}
+                          className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-yellow-600 transition-all"
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          onClick={() => deleteFoodItem(item.item_id, item.name)}
+                          className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-red-600 transition-all"
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                );
+              } else {
+                return (
+                  <div
+                    key={item.item_id}
+                    className="bg-white shadow-xl rounded-2xl overflow-hidden w-full max-w-xs mx-auto transform transition duration-300 hover:scale-105 relative"
+                  >
+                    <Image
+                      src={item.image_url || "/placeholder.jpg"}
+                      alt={item.name}
+                      width={400}
+                      height={208}
+                      className="w-full h-52 object-cover rounded-t-2xl"
+                      priority={true}
+                      unoptimized={!!(item.image_url && item.image_url.startsWith('data:image/'))}
+                    />
+
+                    {item.category_name && (
+                      <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-md">
+                        {item.category_name}
+                      </div>
+                    )}
+                    <div className="p-4 text-center space-y-2">
+                      <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
+                      <p className="text-gray-500 text-sm">{item.description}</p>
+                      <p className="text-xl font-semibold text-blue-800">${item.price}</p>
+                      <p className="text-md font-medium text-green-700">
+                        Item Number: {item.quantity}
+                      </p>
+
+                      <div className="flex justify-center gap-4 mt-4">
+                        <button
+                          onClick={() => editFoodItem(item)}
+                          className="bg-yellow-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-yellow-600 transition-all"
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          onClick={() => deleteFoodItem(item.item_id, item.name)}
+                          className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-red-600 transition-all"
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+            })
+          ) : (
+            !loadingFood && !errorFood && ( // Only show "No items" if not loading and no error
+              <div className="text-center text-gray-600 text-xl font-semibold mt-10 col-span-full">
+                No menu items available. Start by adding one!
               </div>
-            ))}
-          </div>
+            )
+          )}
+        </div>
+        {loadingFood && <SkeletonGrid />} {/* Use the skeleton grid */}
+        {!hasMoreFood && !loadingFood && foodItems.length > 0 && (
+          <p className="text-center text-gray-600 mt-8 text-lg">
+            You&apos;ve seen all available food items!
+          </p>
         )}
       </div>
     </div>
@@ -376,3 +490,15 @@ const AdminPage = () => {
 };
 
 export default AdminPage;
+
+// Skeleton Grid for loading effect (copied from your OfferSetup page)
+const SkeletonGrid = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6">
+    {Array.from({ length: ITEMS_PER_PAGE_ADMIN_FOOD }).map((_, i) => (
+      <div
+        key={`skeleton-${i}`}
+        className="animate-pulse bg-gray-200 rounded-2xl h-72 w-full"
+      />
+    ))}
+  </div>
+);

@@ -1,4 +1,4 @@
-// app/offer/setup/page.tsx
+// app/offerSetup/page.tsx
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
@@ -25,7 +25,7 @@ interface Offer {
   created_at: string;
 }
 
-const ITEMS_PER_PAGE_FOOD = 20; // Define how many food items to load per request
+const ITEMS_PER_PAGE_FOOD = 4; // Define how many food items to load per request
 
 export default function OfferSetup() {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
