@@ -7,7 +7,8 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const fetchFoodItems = searchParams.get("fetch_food_items") === "true"; // Used by OfferSetup
   const fetchOffers = searchParams.get("fetch_offers") === "true"; // Used by OfferSetup
-  const includeAllFoodItems = searchParams.get("include_all_food_items") === "true"; // <<< NEW PARAMETER for OffersCarousel
+  const includeAllFoodItems = searchParams.get("include_all_food_items") === "true"; // Used by OffersCarousel (old way)
+  const fetchCarouselOffers = searchParams.get("fetch_carousel_offers") === "true"; // <<< NEW PARAMETER for OffersCarousel
 
   try {
     await pool.query("SET search_path TO public");
@@ -35,8 +36,47 @@ export async function GET(req) {
             : JSON.stringify(offer.selected_items), // Ensure it's a string
       }));
       return NextResponse.json(offers, { status: 200 });
+    } else if (fetchCarouselOffers) {
+      // <<< CRITICAL NEW PATH FOR OFFERS CAROUSEL >>>
+      // Fetch offers and directly join with menu_items to get item details
+      const offersResult = await pool.query(`
+        SELECT
+            o.id,
+            o.total_price,
+            o.discounted_price,
+            o.offer_type,
+            o.start_date,
+            o.end_date,
+            (
+                SELECT json_agg(json_build_object(
+                    'item_id', mi.item_id,
+                    'name', mi.name,
+                    'image_url', mi.image_url,
+                    'quantity', mi.quantity
+                ))
+                FROM public.menu_items mi
+                -- FIX: Use jsonb_array_elements_text to extract elements from jsonb array
+                WHERE mi.item_id IN (SELECT jsonb_array_elements_text(o.selected_items)::int)
+            ) AS selected_items_details
+        FROM public.offers o
+        ORDER BY o.created_at DESC
+      `);
+
+      // Ensure selected_items_details is an array of objects
+      const offers = offersResult.rows.map((offer) => ({
+        ...offer,
+        // The original `selected_items` (JSONB string) is not strictly needed on the client anymore
+        // for displaying the carousel, but you can keep it if other parts of your app
+        // still expect it, or remove it for a slightly leaner payload.
+        // For now, let's keep it to avoid breaking other parts.
+        // If `selected_items` is consistently JSONB, you might want to convert it
+        // back to a string for the 'selected_items' property if it's expected elsewhere.
+        selected_items: JSON.stringify(offer.selected_items) // Ensure it's a string if it's the original JSONB column
+      }));
+
+      return NextResponse.json(offers, { status: 200 });
     } else if (includeAllFoodItems) {
-      // <<< THIS IS THE CRITICAL CHANGE FOR OffersCarousel >>>
+      // This path was for the previous OffersCarousel attempt
       // Fetch ALL offers AND ALL food items in a single response for the carousel
       // This avoids multiple network calls from the carousel component.
       const [offersResult, foodItemsResult] = await Promise.all([
@@ -78,7 +118,8 @@ export async function GET(req) {
   }
 }
 
-// POST: Insert a new offer
+// POST, DELETE, PUT remains the same as your previous code
+// ... (Your existing POST, DELETE, PUT functions) ...
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -105,7 +146,7 @@ export async function POST(req) {
     // Insert offer
     const insertOffer = await pool.query(
       `INSERT INTO public.offers (selected_items, total_price, discounted_price, offer_type, start_date, end_date)
-           VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+               VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [JSON.stringify(selectedItems), totalPrice, discountedPrice, offerType, startDate, endDate]
     );
 
@@ -168,10 +209,10 @@ export async function PUT(req, { params }) {
 
     const result = await pool.query(
       `UPDATE public.offers
-         SET selected_items = $1, total_price = $2, discounted_price = $3, offer_type = $4,
-             start_date = $5, end_date = $6, updated_at = NOW()
-         WHERE id = $7
-         RETURNING *`,
+           SET selected_items = $1, total_price = $2, discounted_price = $3, offer_type = $4,
+               start_date = $5, end_date = $6, updated_at = NOW()
+           WHERE id = $7
+           RETURNING *`,
       [JSON.stringify(selectedItems), totalPrice, discountedPrice, offerType, startDate, endDate, id]
     );
 

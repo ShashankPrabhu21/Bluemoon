@@ -4,18 +4,21 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdLocalOffer } from "react-icons/md";
 
-interface FoodItem {
+// Updated FoodItem interface for direct use
+interface FoodItemForCarousel {
   item_id: number;
   name: string;
   image_url: string;
   quantity: number;
 }
 
+// Updated Offer interface to directly include detailed items
 interface Offer {
   id: number;
   total_price: number | string | null;
   discounted_price: number | string | null;
-  selected_items: string;
+  // This `selected_items` property will now contain the actual item details, not just IDs.
+  selected_items_details: FoodItemForCarousel[]; // <<< CRITICAL CHANGE HERE
   offer_type: string;
   start_date: string;
   end_date: string;
@@ -23,8 +26,6 @@ interface Offer {
 
 const OffersCarousel = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
-  const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
-  const [foodItemLookup, setFoodItemLookup] = useState<Record<number, FoodItem>>({});
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -32,40 +33,36 @@ const OffersCarousel = () => {
   const totalSlides = offers.length;
 
   useEffect(() => {
-    const fetchOffersAndItems = async () => {
+    const fetchCarouselOffers = async () => {
       try {
         // --- CRITICAL CHANGE HERE ---
-        // Add the include_all_food_items=true parameter to the fetch URL
-        const res = await fetch("/api/offers?include_all_food_items=true");
-        const data = await res.json();
+        // Fetch using the new specific parameter for carousel offers
+        const res = await fetch("/api/offers?fetch_carousel_offers=true");
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data: Offer[] = await res.json(); // Data is now directly an array of Offer objects
+        console.log("Fetched carousel offers:", data);
 
-        if (!data || !Array.isArray(data.foodItems) || !Array.isArray(data.offers)) {
-          console.error("Invalid data format:", data);
-          setFoodItems([]);
+        if (!Array.isArray(data)) {
+          console.error("Invalid data format for carousel offers:", data);
           setOffers([]);
           return;
         }
-
-        setFoodItems(data.foodItems);
-        setOffers(data.offers); // Assuming data.offers is now populated correctly
+        setOffers(data);
       } catch (err) {
-        console.error("Error fetching offers:", err);
+        console.error("Error fetching carousel offers:", err);
         // Optionally set an error state here to inform the user
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOffersAndItems();
+    fetchCarouselOffers();
   }, []);
 
-  useEffect(() => {
-    const lookup: Record<number, FoodItem> = {};
-    foodItems.forEach((item) => {
-      lookup[item.item_id] = item;
-    });
-    setFoodItemLookup(lookup);
-  }, [foodItems]);
+  // Removed the foodItems and foodItemLookup states and their useEffects
+  // because the data is now pre-joined on the server.
 
   useEffect(() => {
     if (offers.length > 1 && !isHovered) {
@@ -84,20 +81,14 @@ const OffersCarousel = () => {
         <span className="ml-3 text-gray-700 font-semibold">Loading offers...</span>
       </div>
     );
-  if (offers.length === 0) return <p>No offers available.</p>;
+  if (offers.length === 0) return <p className="text-center text-gray-600 mt-8">No offers available.</p>;
 
   const prevIndex = (currentIndex - 1 + totalSlides) % totalSlides;
   const nextIndex = (currentIndex + 1) % totalSlides;
 
-  const getSelectedItems = (offer: Offer) => {
-    try {
-      const itemIds = JSON.parse(offer.selected_items) as number[];
-      // Use the pre-built foodItemLookup for O(1) access
-      return itemIds.map((id) => foodItemLookup[id]).filter(Boolean) as FoodItem[];
-    } catch (error) {
-      console.error("Error parsing selected_items:", error);
-      return [];
-    }
+  // The getSelectedItems function now just returns the pre-joined array
+  const getSelectedItems = (offer: Offer): FoodItemForCarousel[] => {
+    return offer.selected_items_details || []; // Ensure it returns an empty array if null/undefined
   };
 
   return (
