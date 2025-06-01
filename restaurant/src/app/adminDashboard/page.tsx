@@ -61,6 +61,12 @@ export default function AdminDashboard() {
           >
             🗓️ RESERVATION
           </button>
+          <button
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg hover:scale-105 transition-all duration-300 shadow-lg"
+            onClick={() => router.push("/admin/contact")}
+          >
+            💬 CONTACTS
+          </button>
 
           <LogoutButton />
         </nav>
@@ -145,20 +151,39 @@ export default function AdminDashboard() {
           <section
             className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
             onClick={() => router.push("/menuSetup")}>
-            <h3 className="text-2xl font-bold text-blue-900 mb-4">🍽️ Setup Menu</h3>
+            <h3 className="text-2xl font-bold text-blue-900 mb-4">🍽️ SETUP MENU</h3>
             <div className="flex flex-col gap-4 items-center">
               <button className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
                 🍳 BREAKFAST
               </button>
               <button className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🍛 DINNER
+                🍛 MAIN COURSE
               </button>
-              <button className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
-                🍟 SNACKS
-              </button>
+              
               <button className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
                 🥤 DRINKS
               </button>
+            </div>
+          </section>
+
+                    <section
+            className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-2xl transition-all duration-300 border border-blue-200 cursor-pointer"
+            >
+            <h3 className="text-2xl font-bold text-blue-900 mb-4">📝 CHECKOUT</h3>
+            <div className="flex flex-col gap-4 items-center">
+              <button onClick={() => router.push("/admin/orders")} 
+              className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+                📦 ORDERS
+              </button>
+              <button onClick={() => router.push("/admin/reservation")}
+              className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+                🗓️ RESERVATIONS
+              </button>
+              <button  onClick={() => router.push("/admin/contact")}
+              className="w-full sm:w-[300px] md:w-[350px] lg:w-[280px] xl:w-[350px] py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-800 hover:scale-105 transition-all duration-300 shadow-md">
+                💬 CONTACTS
+              </button>
+              
             </div>
           </section>
         </div>
