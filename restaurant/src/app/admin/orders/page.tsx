@@ -26,12 +26,16 @@ interface Order {
   postCode: string | null;
   state: string | null;
   created_at: string;
+  status: string; // Add the status field
 }
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "scheduled" | "immediate">(
+    "all"
+  );
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -41,10 +45,15 @@ export default function OrdersPage() {
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
-      // CORRECTED: Specify CartItem[] directly for cart_items in ApiResponse
       interface ApiResponse {
         success: boolean;
-        orders: Array<Omit<Order, 'total_amount'> & { total_amount: string; cart_items: CartItem[] }>;
+        orders: Array<
+          Omit<Order, "total_amount"> & {
+            total_amount: string;
+            cart_items: CartItem[];
+            status: string; // Ensure 'status' is received from API
+          }
+        >;
         error?: string;
       }
 
@@ -53,9 +62,9 @@ export default function OrdersPage() {
       if (data.success) {
         const parsedOrders: Order[] = data.orders.map((orderData) => ({
           ...orderData,
-          // cart_items should already be correctly typed from the API response
           cart_items: orderData.cart_items,
           total_amount: parseFloat(orderData.total_amount),
+          status: orderData.status || "pending", // Default to 'pending' if not provided
         }));
         setOrders(parsedOrders);
       } else {
@@ -74,7 +83,11 @@ export default function OrdersPage() {
   }, []);
 
   const handleDeleteOrder = async (orderId: number) => {
-    if (!window.confirm("Are you sure you want to delete this order? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this order? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
@@ -92,15 +105,65 @@ export default function OrdersPage() {
 
       if (response.ok && data.success) {
         toast.success("Order deleted successfully!", { id: "deleteToast" });
-        fetchOrders();
+        fetchOrders(); // Re-fetch orders to update the list
       } else {
         throw new Error(data.error || "Failed to delete order.");
       }
     } catch (err) {
       console.error("Deletion error:", err);
-      toast.error(`Error deleting order: ${err instanceof Error ? err.message : "An unknown error occurred."}`, { id: "deleteToast" });
+      toast.error(
+        `Error deleting order: ${
+          err instanceof Error ? err.message : "An unknown error occurred."
+        }`,
+        { id: "deleteToast" }
+      );
     }
   };
+
+  // New function to handle marking an order as complete
+  const handleMarkAsComplete = async (orderId: number) => {
+    try {
+      toast.loading("Updating order status...", { id: "statusUpdateToast" });
+      const response = await fetch("/api/orders/updateStatus", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: orderId, status: "completed" }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        toast.success("Order marked as complete!", { id: "statusUpdateToast" });
+        fetchOrders(); // Re-fetch orders to update the UI
+      } else {
+        throw new Error(data.error || "Failed to update order status.");
+      }
+    } catch (err) {
+      console.error("Error marking order as complete:", err);
+      toast.error(
+        `Error marking order as complete: ${
+          err instanceof Error ? err.message : "An unknown error occurred."
+        }`,
+        { id: "statusUpdateToast" }
+      );
+    }
+  };
+
+  const scheduledOrders = orders.filter(
+    (order) => order.scheduled_date && order.scheduled_time
+  );
+  const immediateOrders = orders.filter(
+    (order) => !order.scheduled_date && !order.scheduled_time
+  );
+
+  const displayedOrders =
+    filter === "scheduled"
+      ? scheduledOrders
+      : filter === "immediate"
+      ? immediateOrders
+      : orders;
 
   if (loading) {
     return (
@@ -133,11 +196,53 @@ export default function OrdersPage() {
         <h1 className="text-4xl font-extrabold text-gray-900 mb-8 text-center">
           All Orders
         </h1>
-        {orders.length === 0 ? (
-          <p className="text-center text-gray-600 text-lg">No orders found.</p>
+
+        <div className="mb-8 flex justify-center space-x-4">
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-6 py-3 rounded-full font-semibold transition duration-300 ${
+              filter === "all"
+                ? "bg-indigo-600 text-white shadow-lg"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            All Orders ({orders.length})
+          </button>
+          <button
+            onClick={() => setFilter("scheduled")}
+            className={`px-6 py-3 rounded-full font-semibold transition duration-300 ${
+              filter === "scheduled"
+                ? "bg-indigo-600 text-white shadow-lg"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            Scheduled Orders ({scheduledOrders.length})
+          </button>
+          <button
+            onClick={() => setFilter("immediate")}
+            className={`px-6 py-3 rounded-full font-semibold transition duration-300 ${
+              filter === "immediate"
+                ? "bg-indigo-600 text-white shadow-lg"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            Immediate Orders ({immediateOrders.length})
+          </button>
+        </div>
+
+        {displayedOrders.length === 0 ? (
+          <p className="text-center text-gray-600 text-lg">
+            No{" "}
+            {filter === "scheduled"
+              ? "scheduled"
+              : filter === "immediate"
+              ? "immediate"
+              : ""}{" "}
+            orders found.
+          </p>
         ) : (
           <div className="space-y-8">
-            {orders.map((order) => (
+            {displayedOrders.map((order) => (
               <div
                 key={order.id}
                 className="bg-white shadow-lg rounded-xl p-6 border border-gray-200"
@@ -146,9 +251,24 @@ export default function OrdersPage() {
                   <h2 className="text-2xl font-bold text-blue-800">
                     Order ID: {order.id}
                   </h2>
-                  <span className="text-sm text-gray-500">
-                    {new Date(order.created_at).toLocaleString()}
-                  </span>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm text-gray-500">
+                      {new Date(order.created_at).toLocaleString()}
+                    </span>
+                    {/* Display Order Status */}
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                        order.status === "completed"
+                          ? "bg-green-100 text-green-800"
+                          : order.status === "cancelled"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-yellow-100 text-yellow-800" // Default for 'pending', 'preparing', etc.
+                      }`}
+                    >
+                      {order.status.charAt(0).toUpperCase() +
+                        order.status.slice(1)}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -189,7 +309,7 @@ export default function OrdersPage() {
                         </p>
                       </>
                     )}
-                    {order.scheduled_date && order.scheduled_time && (
+                    {order.scheduled_date && order.scheduled_time ? (
                       <>
                         <p className="text-gray-600">
                           <span className="font-medium">Scheduled Date:</span>{" "}
@@ -200,6 +320,13 @@ export default function OrdersPage() {
                           {order.scheduled_time}
                         </p>
                       </>
+                    ) : (
+                      <p className="text-gray-600">
+                        <span className="font-medium">Order Type:</span>{" "}
+                        <span className="bg-green-100 text-green-800 font-semibold px-3 py-1 rounded-full inline-block">
+                          Immediate
+                        </span>
+                      </p>
                     )}
                   </div>
                 </div>
@@ -232,9 +359,30 @@ export default function OrdersPage() {
                   <span className="text-3xl font-extrabold text-indigo-700 ml-4">
                     ${order.total_amount.toFixed(2)}
                   </span>
+                  {/* Mark as Done Button */}
+                  {order.status !== "completed" && (
+                    <button
+                      onClick={() => handleMarkAsComplete(order.id)}
+                      className="ml-6 bg-green-500 text-white font-medium px-4 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-300 flex items-center"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Mark as Done
+                    </button>
+                  )}
                   <button
                     onClick={() => handleDeleteOrder(order.id)}
-                    className="ml-6 bg-red-500 text-white font-medium px-4 py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300 flex items-center"
+                    className="ml-2 bg-red-500 text-white font-medium px-4 py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300 flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
