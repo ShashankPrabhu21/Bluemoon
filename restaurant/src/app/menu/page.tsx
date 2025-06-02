@@ -29,7 +29,7 @@ const categoryMapping: Record<number, string> = {
   5: "Drinks",
 };
 
-const ITEMS_PER_PAGE = 7; // Define how many items to load per request
+const ITEMS_PER_PAGE = 6; // Define how many items to load per request
 
 const MenuPage = () => {
   const [items, setItems] = useState<FoodItem[]>([]); // This will hold the currently displayed items

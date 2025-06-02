@@ -189,9 +189,9 @@ const ContactUs = () => {
         <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-900 mb-2">Location</h4>
         <p className="text-sm sm:text-base lg:text-lg text-yellow-600 font-medium leading-relaxed">
           <span className="text-rose-600 block font-semibold">Bluemoon Restaurant</span>
-          4 Station Street, Wentworthville NSW 2145<br />
-          32-36 Burlington Rd, Homebush NSW 2140<br />
-          114 Pendle Way, Pendle Hill NSW 2145
+          4 Station Street, Wentworthville NSW 2145, Sydney, Australia<br />
+          32-36 Burlington Rd, Homebush NSW 2140, Sydney, Australia<br />
+          114 Pendle Way, Pendle Hill NSW 2145, Sydney, Australia
         </p>
       </div>
 
