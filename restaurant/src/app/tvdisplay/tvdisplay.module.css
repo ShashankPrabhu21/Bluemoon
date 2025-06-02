@@ -1,0 +1,12 @@
+/* app/tvdisplay/tvdisplay.module.css */
+.hideScrollbar {
+  /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0; /* For vertical scrollbar */
+    height: 0; /* For horizontal scrollbar */
+  }
+
+  /* Hide scrollbar for Firefox */
+  scrollbar-width: none; /* Firefox */
+}
