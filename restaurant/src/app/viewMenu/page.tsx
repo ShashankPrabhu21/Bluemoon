@@ -1,4 +1,3 @@
-//app/viewmenu/page.tsx (Assuming this file corresponds to your "view menupage")
 "use client";
 
 import Link from "next/link";
@@ -16,6 +15,7 @@ interface FoodItem {
   image_url: string;
   spicy_level: string;
   quantity: number;
+  // --- ADDED THIS LINE ---
   category_name?: string; // Add category_name to the interface
 }
 
@@ -38,17 +38,17 @@ const categoryMapping: Record<number, string> = {
   5: "Drinks",
 };
 
-const ITEMS_PER_PAGE = 6; // Define how many items to load per request for specific categories
+const ITEMS_PER_PAGE = 6; // Define how many items to load per request, same as MenuPage
 
 const OnlineOrderPage = () => {
-  const [items, setItems] = useState<FoodItem[]>([]);
+  const [items, setItems] = useState<FoodItem[]>([]); // Renamed from foodItems to items for consistency
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [serviceType, setServiceType] = useState<string>("delivery");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Initialize as false, fetch will set it to true
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0); // Current page (or category index for "All Menu")
-  const [hasMore, setHasMore] = useState(true); // True if there's more data/categories to load
+  const [page, setPage] = useState(0); // Current page for pagination (0-indexed)
+  const [hasMore, setHasMore] = useState(true); // True if there's more data to load
   const [filteredCategory, setFilteredCategory] = useState<string | null>(
     null
   ); // New state to hold the currently filtered category
@@ -78,27 +78,11 @@ const OnlineOrderPage = () => {
       setError(null);
       try {
         const queryParams = new URLSearchParams();
+        queryParams.append("page", currentPage.toString());
+        queryParams.append("limit", ITEMS_PER_PAGE.toString());
 
-        if (category === null || category === "All Menu") {
-          // Special logic for "All Menu": paginate by category
-          const categoriesInOrder = Object.values(categoryMapping);
-          const categoryToFetch = categoriesInOrder[currentPage]; // currentPage acts as category index
-
-          if (!categoryToFetch) {
-            // No more categories left to fetch
-            setHasMore(false);
-            setLoading(false);
-            return;
-          }
-
-          queryParams.append("category", categoryToFetch);
-          queryParams.append("limit", "500"); // Fetch all items for this specific category (large limit)
-          // No 'page' param for this specific category request, as we want all of it.
-        } else {
-          // Standard pagination for a single selected category
-          queryParams.append("page", currentPage.toString());
-          queryParams.append("limit", ITEMS_PER_PAGE.toString());
-          queryParams.append("category", category || "");
+        if (category && category !== "All Menu") {
+          queryParams.append("category", category);
         }
 
         const controller = new AbortController();
@@ -130,10 +114,11 @@ const OnlineOrderPage = () => {
         );
 
         // Map category_id to category_name for each item
-        const itemsWithCategoryNames = data.map((item) => ({
+        const itemsWithCategoryNames = data.map(item => ({
           ...item,
-          category_name: categoryMapping[item.category_id] || "Unknown Category",
+          category_name: categoryMapping[item.category_id] || 'Unknown Category'
         }));
+
 
         if (currentPage === 0) {
           setItems(itemsWithCategoryNames);
@@ -141,15 +126,7 @@ const OnlineOrderPage = () => {
           setItems((prevItems) => [...prevItems, ...itemsWithCategoryNames]);
         }
 
-        // Determine hasMore based on the selected category logic
-        if (category === null || category === "All Menu") {
-          const categoriesInOrder = Object.values(categoryMapping);
-          // Has more if there are still categories left to fetch
-          setHasMore(currentPage < categoriesInOrder.length - 1);
-        } else {
-          // For specific categories, hasMore based on ITEMS_PER_PAGE
-          setHasMore(data.length === ITEMS_PER_PAGE);
-        }
+        setHasMore(data.length === ITEMS_PER_PAGE);
       } catch (err: unknown) {
         console.error("Failed to fetch menu items:", err);
         if (err instanceof Error) {
@@ -197,7 +174,7 @@ const OnlineOrderPage = () => {
   useEffect(() => {
     const handleInitialLoad = async () => {
       // Set an initial category to trigger the first fetch
-      setFilteredCategory("All Menu"); // Start with "All Menu" view
+      setFilteredCategory("All Menu");
 
       if (sessionStorage.getItem("fromCart") === "true") {
         await fetchCartItems();
@@ -214,19 +191,17 @@ const OnlineOrderPage = () => {
   // Effect to trigger menu item fetch when filteredCategory changes or page changes
   useEffect(() => {
     if (filteredCategory !== null) {
+      // Clear items and reset page only when category changes, not just page
       if (page === 0) {
         setItems([]); // Clear existing items when category changes (or initial load)
-        setHasMore(true); // Assume there's more data for the new category (will be set accurately after fetch)
-        fetchMenuItems(filteredCategory, 0); // Fetch the first page/category
+        setHasMore(true); // Assume there's more data for the new category
+        fetchMenuItems(filteredCategory, 0); // Fetch the first page for the new category
       } else {
-        // Only fetch more if a category is selected, we're not on the initial load, and hasMore is true
-        if (hasMore) { // Ensure hasMore is true before triggering next fetch
-            fetchMenuItems(filteredCategory, page);
-        }
+        // Only fetch more if a category is selected and we're not on the initial load (page 0 handled above)
+        fetchMenuItems(filteredCategory, page);
       }
     }
-  }, [filteredCategory, page, fetchMenuItems, hasMore]);
-
+  }, [filteredCategory, page, fetchMenuItems]);
 
   const addToCart = async (
     item: FoodItem,
@@ -259,13 +234,13 @@ const OnlineOrderPage = () => {
       setCart(cartData);
     } catch (error) {
       console.error("Error adding to cart:", error);
-      setError("Failed to add item to cart. Please try again.");
+      setError("Failed to add item to cart. Please try again."); // Set a user-friendly error
     }
   };
 
   const handleCategoryFilter = useCallback((category: string | null) => {
     setFilteredCategory(category);
-    setPage(0); // Reset page/category index when filtering
+    setPage(0); // Reset page when filtering by category
     setItems([]); // Clear current items to show skeleton loader for new category
     setHasMore(true); // Assume there's more data for the new category
   }, []);
@@ -293,24 +268,9 @@ const OnlineOrderPage = () => {
 
   // Define categories for display, including "All Menu"
   const displayCategories = [
-    { label: "All Menu", value: "All Menu" }, // Changed value to "All Menu" for clarity in state
+    { label: "All Menu", value: null }, // Representing "All Menu" by null to fetch all
     ...Object.values(categoryMapping).map((label) => ({ label, value: label })),
   ];
-
-  // Group fetched items by category for display, maintaining order
-  const groupedItems = items.reduce(
-    (acc: Record<string, FoodItem[]>, item) => {
-      const categoryName =
-        item.category_name || categoryMapping[item.category_id] || "Uncategorized";
-      if (!acc[categoryName]) {
-        acc[categoryName] = [];
-      }
-      acc[categoryName].push(item);
-      return acc;
-    },
-    {}
-  );
-
 
   return (
     <div className="min-h-screen py-6 bg-[url('/sec1.jpg')] bg-cover bg-center bg-no-repeat relative">
@@ -395,54 +355,31 @@ const OnlineOrderPage = () => {
           <span className="absolute left-1/2 bottom-0 w-16 h-1 bg-gradient-to-r from-[#3345A7] to-blue-400 transform -translate-x-1/2"></span>
         </h2>
         {items.length > 0 ? (
-            // Conditional rendering based on filteredCategory
-            <>
-                {(filteredCategory === null || filteredCategory === "All Menu") ? (
-                    // When "All Menu" or no filter, iterate through categories in order
-                    Object.values(categoryMapping).map((categoryName) => {
-                        const itemsInCategory = groupedItems[categoryName];
-                        if (!itemsInCategory || itemsInCategory.length === 0) return null;
-
-                        return (
-                            <div key={categoryName} className="mb-8">
-                                <h3 className="text-2xl text-white font-bold mb-4 text-center relative">
-                                    {categoryName}
-                                </h3>
-                                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
-                                    {itemsInCategory.map((item) => {
-                                        const isLastItemOverall = items.length === items.indexOf(item) + 1;
-                                        return (
-                                            <div
-                                                key={`item-${item.item_id}`}
-                                                ref={isLastItemOverall ? lastItemElementRef : null}
-                                                className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
-                                            >
-                                                <Card item={item} setSelectedItem={setSelectedItem} />
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        );
-                    })
-                ) : (
-                    // For specific categories, display as a single grid with standard pagination
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
-                        {items.map((item, index) => {
-                            const isLastItemInList = items.length === index + 1;
-                            return (
-                                <div
-                                    ref={isLastItemInList ? lastItemElementRef : null}
-                                    key={`item-${item.item_id}`}
-                                    className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
-                                >
-                                    <Card item={item} setSelectedItem={setSelectedItem} />
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </>
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 px-2 sm:px-4">
+            {items.map((item, index) => {
+              // Attach ref to the last item for IntersectionObserver
+              if (items.length === index + 1) {
+                return (
+                  <div
+                    ref={lastItemElementRef}
+                    key={`item-${item.item_id}`}
+                    className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
+                  >
+                    <Card item={item} setSelectedItem={setSelectedItem} />
+                  </div>
+                );
+              } else {
+                return (
+                  <div
+                    key={`item-${item.item_id}`}
+                    className="z-10 group bg-white/90 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 ease-in-out rounded-2xl overflow-hidden hover:bg-[#b7cbf9] text-sm sm:text-base"
+                  >
+                    <Card item={item} setSelectedItem={setSelectedItem} />
+                  </div>
+                );
+              }
+            })}
+          </div>
         ) : (
           !loading && (
             <p className="text-center text-white text-lg mt-8">
@@ -453,6 +390,11 @@ const OnlineOrderPage = () => {
 
         {/* Loading indicator and messages */}
         {loading && <SkeletonGrid />}
+        {!loading && items.length === 0 && !hasMore && (
+          <p className="text-white text-center mt-8 text-lg">
+            No items found for this category.
+          </p>
+        )}
         {!hasMore && !loading && items.length > 0 && (
           <p className="text-white text-center mt-8 text-lg">
             You&apos;ve reached the end of the menu!
@@ -491,11 +433,13 @@ const Card = React.memo(
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
           loading="lazy"
         />
+        {/* --- ADDED THIS BLOCK --- */}
         {item.category_name && (
           <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-md">
             {item.category_name}
           </div>
         )}
+        {/* --- END ADDED BLOCK --- */}
       </div>
       <div className="p-2 sm:p-3 text-center rounded-b-xl">
         <h3 className="text-sm sm:text-lg font-bold text-blue-900 tracking-wide truncate">

@@ -2,10 +2,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Image from "next/image";
+import Image from "next/image"; // Make sure you have next/image installed: npm install next-image
 
 interface FoodItem {
-  item_id: number;
+  item_id: number; // Corrected: Using 'item_id' as your database's primary key column name
   category_id: number;
   name: string;
   description: string;
@@ -29,33 +29,33 @@ const categoryMapping: Record<number, string> = {
   5: "Drinks",
 };
 
-const ITEMS_PER_PAGE = 7; // Define how many items to load per request for specific categories
+const ITEMS_PER_PAGE = 7; // Define how many items to load per request
 
 const MenuPage = () => {
-  const [items, setItems] = useState<FoodItem[]>([]);
+  const [items, setItems] = useState<FoodItem[]>([]); // This will hold the currently displayed items
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0); // Current page (or category index for "All Menu")
-  const [hasMore, setHasMore] = useState(true); // True if there's more data/categories to load
+  const [page, setPage] = useState(0); // Current page for pagination (0-indexed)
+  const [hasMore, setHasMore] = useState(true); // True if there's more data to load
 
   // --- Intersection Observer for Infinite Scrolling ---
   const observer = useRef<IntersectionObserver | null>(null);
   const lastItemElementRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
+      if (loading) return; // Don't trigger if already loading
+      if (observer.current) observer.current.disconnect(); // Disconnect previous observer
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          // If the last item is intersecting and there's more data, load next page/category
+          // If the last item is intersecting and there's more data, load next page
           setPage((prevPage) => prevPage + 1);
         }
       });
 
-      if (node) observer.current.observe(node);
+      if (node) observer.current.observe(node); // Observe the last item
     },
-    [loading, hasMore]
+    [loading, hasMore] // Dependencies: re-create observer if loading or hasMore changes
   );
 
   // --- Data Fetching Logic ---
@@ -65,32 +65,15 @@ const MenuPage = () => {
       setError(null);
       try {
         const queryParams = new URLSearchParams();
+        queryParams.append("page", currentPage.toString());
+        queryParams.append("limit", ITEMS_PER_PAGE.toString());
 
-        if (category === "All Menu") {
-          // Special logic for "All Menu": paginate by category
-          const categoriesInOrder = Object.values(categoryMapping);
-          const categoryToFetch = categoriesInOrder[currentPage]; // currentPage acts as category index
-
-          if (!categoryToFetch) {
-            // No more categories left to fetch
-            setHasMore(false);
-            setLoading(false);
-            return;
-          }
-
-          queryParams.append("category", categoryToFetch);
-          queryParams.append("limit", "500"); // Fetch all items for this specific category (large limit)
-          // No 'page' param for this specific category request, as we want all of it.
-
-        } else {
-          // Standard pagination for a single selected category
-          queryParams.append("page", currentPage.toString());
-          queryParams.append("limit", ITEMS_PER_PAGE.toString());
-          queryParams.append("category", category || "");
+        if (category && category !== "All Menu") {
+          queryParams.append("category", category);
         }
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
         const res = await fetch(`/api/menuitem?${queryParams.toString()}`, {
           cache: "no-store",
@@ -116,74 +99,54 @@ const MenuPage = () => {
         );
 
         if (currentPage === 0) {
-          setItems(data); // First fetch (either first page of a specific category, or first category for "All Menu")
+          setItems(data); // First page, replace items
         } else {
-          setItems((prevItems) => [...prevItems, ...data]); // Append data for subsequent loads
+          setItems((prevItems) => [...prevItems, ...data]); // Subsequent pages, append items
         }
 
-        // Determine hasMore based on the selected category logic
-        if (category === "All Menu") {
-          const categoriesInOrder = Object.values(categoryMapping);
-          // Has more if there are still categories left to fetch
-          setHasMore(currentPage < categoriesInOrder.length - 1);
-        } else {
-          // For specific categories, hasMore based on ITEMS_PER_PAGE
-          setHasMore(data.length === ITEMS_PER_PAGE);
-        }
-      } catch (err: unknown) {
-        console.error("Failed to fetch menu items:", err);
-        if (err instanceof Error) {
-          if (err.name === "AbortError") {
-            setError("Request timed out. Please try again.");
-          } else {
-            setError(err.message || "Failed to load menu items.");
-          }
-        } else {
-          setError("An unknown error occurred.");
-        }
-        setHasMore(false);
-      } finally {
-        setLoading(false);
-      }
+        setHasMore(data.length === ITEMS_PER_PAGE); // If we received less than ITEMS_PER_PAGE, assume no more data
+      }// Inside your fetchItems useCallback:
+catch (err: unknown) { // Changed 'any' to 'unknown'
+  console.error("Failed to fetch menu items:", err);
+  if (err instanceof Error) { // Type guard: check if err is an instance of Error
+    if (err.name === "AbortError") {
+      setError("Request timed out. Please try again.");
+    } else {
+      setError(err.message || "Failed to load menu items.");
+    }
+  } else {
+    // Handle cases where the error is not an Error object (e.g., a string or number)
+    setError("An unknown error occurred.");
+  }
+  setHasMore(false); // Stop trying to load more on error
+} finally {
+  setLoading(false);
+}
     },
-    []
+    [] // No dependencies, this function reference remains stable
   );
 
   // Effect to trigger initial fetch when a category is selected or changed
   useEffect(() => {
     if (selectedCategory !== null) {
-      setItems([]); // Clear existing items for new selection
-      setPage(0); // Reset page/category index
-      setHasMore(true); // Assume there's more to load until proven otherwise
-      fetchItems(selectedCategory, 0); // Fetch the first page/category
+      setItems([]); // Clear existing items when category changes
+      setPage(0); // Reset page to 0 for new category
+      setHasMore(true); // Assume there's more data for the new category
+      fetchItems(selectedCategory, 0); // Fetch the first page of items for the new category
     }
   }, [selectedCategory, fetchItems]);
 
   // Effect to load more items when the 'page' state changes (triggered by observer)
   useEffect(() => {
-    // Only fetch more if page is incremented, a category is selected, and there's more data/categories to load
-    if (page > 0 && selectedCategory !== null && hasMore) {
+    // Only fetch more if a category is selected and we're not on the initial load (page 0 handled by above effect)
+    if (page > 0 && selectedCategory !== null) {
       fetchItems(selectedCategory, page);
     }
-  }, [page, selectedCategory, fetchItems, hasMore]);
+  }, [page, selectedCategory, fetchItems]);
 
   const handleCategoryClick = useCallback((category: string | null) => {
     setSelectedCategory(category);
   }, []);
-
-  // Group fetched items by category for display
-  const groupedItems = items.reduce(
-    (acc: Record<string, FoodItem[]>, item) => {
-      const categoryName =
-        categoryMapping[item.category_id] || "Uncategorized";
-      if (!acc[categoryName]) {
-        acc[categoryName] = [];
-      }
-      acc[categoryName].push(item);
-      return acc;
-    },
-    {}
-  );
 
   // Show error state
   if (error) {
@@ -251,36 +214,28 @@ const MenuPage = () => {
               <h2 className="text-3xl text-white font-bold mb-4">
                 {selectedCategory}
               </h2>
-
-              {/* Display categories in a specific order */}
-              {Object.values(categoryMapping).map((categoryName) => {
-                const itemsInCategory = groupedItems[categoryName];
-                // Only render the category section if it has items that have been fetched
-                if (!itemsInCategory || itemsInCategory.length === 0) return null;
-
-                return (
-                  <div key={categoryName} className="mb-8">
-                    <h3 className="text-2xl text-white font-bold mb-4 text-center">
-                      {categoryName}
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                      {itemsInCategory.map((item) => {
-                        // Attach ref to the absolute last item in the *entire* 'items' array
-                        // This ensures infinite scroll triggers correctly, whether by item count or by category completion
-                        const isLastItemOverall = items.length === items.indexOf(item) + 1;
-                        return (
-                          <div
-                            key={`item-${item.item_id}`}
-                            ref={isLastItemOverall ? lastItemElementRef : null}
-                          >
-                            <Card item={item} />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {items.map((item, index) => {
+                  // Attach ref to the last item for IntersectionObserver
+                  if (items.length === index + 1) {
+                    return (
+                      <div
+                        ref={lastItemElementRef}
+                        key={`item-${item.item_id}`} // Corrected: Use item.item_id for unique key
+                      >
+                        <Card item={item} />
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <Card
+                        key={`item-${item.item_id}`} // Corrected: Use item.item_id for unique key
+                        item={item}
+                      />
+                    );
+                  }
+                })}
+              </div>
 
               {/* Loading indicator and messages */}
               {loading && <SkeletonGrid />}
@@ -326,13 +281,15 @@ const CategoryCard = React.memo(
         fill
         className="object-cover"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        priority={label === "All Menu"}
+        priority={label === "All Menu"} // Prioritize "All Menu" image
       />
-      <div className="absolute bottom-0 w-full h-[20%] bg-black/40 backdrop-blur-md rounded-b-xl p-4 flex items-center justify-center">
-        <h2 className="text-2xl font-extrabold text-white drop-shadow-lg tracking-wider">
-          {label}
-        </h2>
-      </div>
+<div className="absolute bottom-0 w-full h-[20%] bg-black/40 backdrop-blur-md rounded-b-xl p-4 flex items-center justify-center">
+  <h2 className="text-2xl font-extrabold text-white drop-shadow-lg tracking-wider">
+    {label}
+  </h2>
+</div>
+
+
     </div>
   )
 );
@@ -349,7 +306,7 @@ const Card = React.memo(({ item }: { item: FoodItem }) => (
         fill
         className="object-cover"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-        loading="lazy"
+        loading="lazy" // Native lazy loading for images
       />
     </div>
     <div className="p-4 bg-black/30 text-white">
@@ -374,7 +331,7 @@ const Card = React.memo(({ item }: { item: FoodItem }) => (
 
 Card.displayName = "Card";
 
-// Optimized skeleton grid to match ITEMS_PER_PAGE for general loading indication
+// Optimized skeleton grid to match ITEMS_PER_PAGE
 const SkeletonGrid = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-12">
     {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
