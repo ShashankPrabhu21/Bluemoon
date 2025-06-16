@@ -44,7 +44,7 @@ const OnlineOrderPage = () => {
   const [items, setItems] = useState<FoodItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [serviceType, setServiceType] = useState<string>("delivery");
+  const [serviceType, setServiceType] = useState<string>("pickup");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0); // Current page (or category index for "All Menu")
@@ -338,7 +338,7 @@ const OnlineOrderPage = () => {
       {/* Service Type Selection */}
       <div className="z-10 flex flex-col sm:flex-row justify-center items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-6 text-center">
         <span className="text-lg sm:text-xl font-semibold z-10 text-white">
-          Select Service Type:
+          Service Type:
         </span>
 
         <div className="flex bg-gray-200 p-1 rounded-full shadow-lg border border-gray-300 z-10">
@@ -354,17 +354,7 @@ const OnlineOrderPage = () => {
             Pickup
           </button>
 
-          <button
-            onClick={() => setServiceType("delivery")}
-            className={`px-6 sm:px-8 py-2 sm:py-2.5 rounded-full text-base sm:text-lg font-semibold transition-all duration-300 ease-in-out
-              ${
-                serviceType === "delivery"
-                  ? "bg-gradient-to-r from-blue-700 to-blue-400 text-white shadow-xl transform scale-105"
-                  : "bg-transparent text-gray-700 hover:text-blue-500"
-              }`}
-          >
-            Delivery
-          </button>
+          
         </div>
       </div>
 

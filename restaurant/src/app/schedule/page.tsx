@@ -45,7 +45,7 @@ export default function SchedulePage() {
 
         {/* Service Selection */}
         <div className="mb-4">
-          <label className="block text-gray-600 font-medium mb-2">Pick a Service</label>
+          <label className="block text-gray-600 font-medium mb-2">Service</label>
           <div className="flex gap-2">
             <button
               className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
@@ -55,14 +55,7 @@ export default function SchedulePage() {
             >
               PICKUP
             </button>
-            <button
-              className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
-                service === "DELIVERY" ? "bg-blue-600 text-white shadow-md" : "bg-gray-100 hover:bg-gray-200"
-              }`}
-              onClick={() => setService("DELIVERY")}
-            >
-              DELIVERY
-            </button>
+            
           </div>
         </div>
 
