@@ -18,6 +18,20 @@ interface Review {
     phone_number?: string;
 }
 
+// Validation function for email
+const validateEmail = (email: string) => {
+    // A simple regex for email validation
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return re.test(String(email).toLowerCase());
+};
+
+// Validation function for phone number (10 digits)
+const validatePhoneNumber = (phone_number: string) => {
+    // Regex for a 10-digit number
+    const re = /^\d{10}$/;
+    return re.test(phone_number);
+};
+
 export default function Reviews() {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [name, setName] = useState("");
@@ -42,9 +56,22 @@ export default function Reviews() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Added validation for email and phone number
+
+        // Added validation for all fields
         if (!name || !experience || !gender || !email || !phone_number) {
             alert("Please fill out all fields!");
+            return;
+        }
+
+        // Validate email format
+        if (!validateEmail(email)) {
+            alert("Please enter a valid email address!");
+            return;
+        }
+
+        // Validate phone number format (10 digits)
+        if (!validatePhoneNumber(phone_number)) {
+            alert("Please enter a valid 10-digit phone number!");
             return;
         }
 
