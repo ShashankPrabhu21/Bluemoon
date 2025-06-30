@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { Star, Utensils, Calendar } from 'lucide-react';
+import { Star, Utensils, Calendar, Mail, Phone } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,8 @@ interface Review {
     created_at: string;
     gender?: string;
     experience: string;
+    email?: string;
+    phone_number?: string;
 }
 
 export default function Reviews() {
@@ -22,6 +24,8 @@ export default function Reviews() {
     const [rating, setRating] = useState(5);
     const [experience, setExperience] = useState("");
     const [gender, setGender] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone_number, setPhone_number] = useState("");
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -38,12 +42,13 @@ export default function Reviews() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!name || !experience || !gender) {
+        // Added validation for email and phone number
+        if (!name || !experience || !gender || !email || !phone_number) {
             alert("Please fill out all fields!");
             return;
         }
 
-        const newReview = { name, rating, experience, gender };
+        const newReview = { name, rating, experience, gender, email, phone_number };
 
         const response = await fetch('/api/reviews', {
             method: 'POST',
@@ -58,6 +63,8 @@ export default function Reviews() {
             setExperience("");
             setRating(5);
             setGender("");
+            setEmail(""); // Reset email field
+            setPhone_number(""); // Reset phone number field
         } else {
             console.error('Failed to submit review');
         }
@@ -124,6 +131,28 @@ export default function Reviews() {
                                     <option value="Female">Female</option>
                                 </select>
                             </div>
+                            {/* Added Email Input */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium mb-2">Email</label>
+                                <Input
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            {/* Added Phone Number Input */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium mb-2">Phone Number</label>
+                                <Input
+                                    type="tel"
+                                    placeholder="Enter your phone number"
+                                    value={phone_number}
+                                    onChange={(e) => setPhone_number(e.target.value)}
+                                    required
+                                />
+                            </div>
                         </div>
 
                         <div className="space-y-2">
@@ -154,7 +183,21 @@ export default function Reviews() {
                         reviews.map((review) => (
                             <Card key={review.id} className="p-6 border rounded-lg shadow-sm">
                                 <h3 className="text-lg font-semibold">{review.name}</h3>
-                                <p className="text-sm text-gray-500">
+                                <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
+                                    {review.email && (
+                                        <div className="flex items-center gap-1">
+                                            <Mail className="w-4 h-4" />
+                                            <span>{review.email}</span>
+                                        </div>
+                                    )}
+                                    {review.phone_number && (
+                                        <div className="flex items-center gap-1">
+                                            <Phone className="w-4 h-4" />
+                                            <span>{review.phone_number}</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <p className="text-sm text-gray-500 mt-2">
                                     <Calendar className="w-4 h-4 inline" /> {new Date(review.created_at).toLocaleDateString()}
                                 </p>
                                 <StarRating rating={review.rating} />

@@ -7,7 +7,8 @@ export async function GET() {
   try {
     await pool.query('SET search_path TO public');
     const result = await pool.query(
-      'SELECT id, name, gender, rating, experience, created_at FROM public.reviews ORDER BY created_at DESC'
+      // Updated the SELECT query to include the new columns
+      'SELECT id, name, gender, rating, experience, created_at, email, phone_number FROM public.reviews ORDER BY created_at DESC'
     );
     return NextResponse.json(result.rows, { status: 200 });
   } catch (error) {
@@ -19,15 +20,18 @@ export async function GET() {
 // Add a new review
 export async function POST(req) {
   try {
-    const { name, gender, rating, experience } = await req.json();
+    // Destructure the new fields from the request body
+    const { name, gender, rating, experience, email, phone_number } = await req.json();
 
-    if (!name || !gender || !experience) {
+    // Added validation for the new fields
+    if (!name || !gender || !experience || !email || !phone_number) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const result = await pool.query(
-      'INSERT INTO reviews (name, gender, rating, experience, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING *',
-      [name, gender, rating, experience]
+      // Updated the INSERT query to include the new columns and their values
+      'INSERT INTO reviews (name, gender, rating, experience, email, phone_number, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *',
+      [name, gender, rating, experience, email, phone_number]
     );
 
     return NextResponse.json(result.rows[0], { status: 201 });
